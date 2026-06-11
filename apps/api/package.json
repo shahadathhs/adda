@@ -1,0 +1,47 @@
+{
+  "name": "@adda/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/src/main",
+    "start:debug": "nest start --debug --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check . --ignore-path .prettierignore",
+    "format:fix": "prettier --write . --ignore-path .prettierignore",
+    "clean": "rimraf dist node_modules",
+    "clean:turbo": "rimraf .turbo dist node_modules",
+    "spec:generate": "tsx scripts/spec.ts"
+  },
+  "dependencies": {
+    "@adda/types": "workspace:*",
+    "@adda/utils": "workspace:*",
+    "@adda/db": "workspace:*",
+    "@nestjs/common": "catalog:",
+    "@nestjs/config": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@nestjs/swagger": "^11.4.4",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
+    "@prisma/adapter-pg": "^7.8.0",
+    "pg": "^8.21.0",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:"
+  },
+  "devDependencies": {
+    "@adda/eslint": "workspace:*",
+    "@adda/typescript": "workspace:*",
+    "@nestjs/cli": "catalog:",
+    "@nestjs/schematics": "catalog:",
+    "@types/node": "catalog:",
+    "@types/pg": "^8.20.0",
+    "eslint": "catalog:",
+    "js-yaml": "^4.1.0",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "extends": "@adda/typescript/base.json",
+  "include": ["**/*.ts", "**/*.js", "**/*.mjs", "**/*.cjs"],
+  "exclude": ["node_modules", "dist"]
+}

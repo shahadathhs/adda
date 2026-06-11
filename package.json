@@ -1,0 +1,42 @@
+{
+  "name": "adda",
+  "private": true,
+  "description": "Adda — Next.js Web + NestJS API Monorepo with Shared Packages",
+  "author": "Shahadath Hossen Sajib <shahadathhossensajib732@gmail.com> (https://github.com/shahadathhs)",
+  "packageManager": "pnpm@11.5.3",
+  "scripts": {
+    "dev": "turbo dev",
+    "start": "turbo start",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "format": "prettier --check . --ignore-path .prettierignore && turbo format",
+    "format:fix": "prettier --write . --ignore-path .prettierignore && turbo format:fix",
+    "ci:check": "pnpm lint && pnpm format",
+    "ci:fix": "pnpm lint:fix && pnpm format:fix",
+    "clean": "turbo clean && rimraf node_modules",
+    "codegen": "pnpm --filter @adda/db run build && pnpm --filter @adda/api run spec:generate && pnpm --filter @adda/api-spec run codegen",
+    "prepare": "husky",
+    "commit": "cz",
+    "test": "turbo run test"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "configs/*"
+  ],
+  "devDependencies": {
+    "@adda/eslint": "workspace:*",
+    "@adda/typescript": "workspace:*",
+    "@types/node": "catalog:",
+    "commitizen": "catalog:",
+    "cz-git": "catalog:",
+    "eslint": "catalog:",
+    "husky": "catalog:",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  }
+}

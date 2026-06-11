@@ -1,0 +1,10 @@
+{
+  "name": "@adda/typescript",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./base.json": "./base.json",
+    "./next.json": "./next.json",
+    "./nest.json": "./nest.json"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "@adda/typescript/next.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", ".next"]
+}

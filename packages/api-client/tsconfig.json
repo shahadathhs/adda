@@ -1,0 +1,15 @@
+{
+  "extends": "@adda/typescript/base.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "composite": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": ["dom", "es2023"],
+    "types": ["node"],
+    "jsx": "react-jsx"
+  },
+  "include": ["src"]
+}
