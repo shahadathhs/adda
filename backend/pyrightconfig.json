@@ -1,0 +1,9 @@
+{
+  "include": ["main.py", "config.py", "database.py", "redis_client.py",
+              "auth", "communities", "members", "streaming", "ws",
+              "models", "schemas"],
+  "exclude": ["**/__pycache__", "alembic"],
+  "typeCheckingMode": "standard",
+  "reportMissingImports": "error",
+  "reportMissingTypeStubs": "none"
+}

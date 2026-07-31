@@ -1,0 +1,43 @@
+###############################################
+# mediamtx config for adda
+#
+# Streamers push via RTMP:  rtmp://<host>:1935/community/<community_id>
+# Viewers watch via HLS:    http://<host>:8888/community/<community_id>/index.m3u8
+#                          or WebRTC:           http://<host>:8889/community/<community_id>
+# The backend reads stream state from the API: http://<host>:9997
+###############################################
+
+# REST API — used by the backend to detect live streams.
+api: yes
+apiAddress: :9997
+
+# RTSP (not used; disabled)
+rtsp: no
+
+# RTMP — ingest from OBS / ffmpeg
+rtmp: yes
+rtmpAddress: :1935
+
+# HLS — playback for the web player (hls.js)
+hls: yes
+hlsAddress: :8888
+
+# WebRTC — low-latency playback option
+webrtc: yes
+webrtcAddress: :8889
+webrtcEncryption: no
+
+# SRT (optional ingest alternative)
+srt: no
+
+# Record every stream to disk (becomes the "Recordings" library later).
+# Files land in /media (the mediamtx_data docker volume) as <path>-<timestamp>.mp4.
+record: yes
+recordPath: ./media/%path-%Y%m%d%H%M%S.mp4
+recordFormat: fmp4
+
+###############################################
+# Paths — accept any community/* path dynamically.
+###############################################
+paths:
+  all_others:

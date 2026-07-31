@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-adda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-adda}
+      POSTGRES_DB: ${POSTGRES_DB:-adda}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-adda}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    restart: unless-stopped
+    ports:
+      - "${RTMP_PORT:-1935}:1935"   # RTMP ingest (OBS streams here)
+      - "${HLS_PORT:-8888}:8888"    # HLS playback
+      - "${WEBRTC_PORT:-8889}:8889" # WebRTC playback
+      - "${MTX_API_PORT:-9997}:9997" # mediamtx REST API
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+      - mediamtx_data:/media
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-adda}:${POSTGRES_PASSWORD:-adda}@postgres:5432/${POSTGRES_DB:-adda}
+      REDIS_URL: redis://redis:6379/0
+      MTX_API_URL: http://mediamtx:9997
+      HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
+    ports:
+      - "${BACKEND_PORT:-7001}:7001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn main:app --host 0.0.0.0 --port 7001"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
+      VITE_WS_BASE_URL: ws://localhost:${BACKEND_PORT:-7001}
+      VITE_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  mediamtx_data:
