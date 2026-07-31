@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
@@ -8,7 +8,6 @@ from models.base import Base
 
 class Community(Base):
     __tablename__ = "communities"
-    __table_args__ = (UniqueConstraint("slug", name="uq_communities_slug"),)
 
     name: Mapped[str] = mapped_column(String(100))
     slug: Mapped[str] = mapped_column(String(100), unique=True, index=True)
