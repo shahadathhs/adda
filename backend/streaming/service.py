@@ -18,7 +18,10 @@ async def _list_paths() -> list[dict]:
     """Return mediamtx's active paths (v2 API). Empty list on failure."""
     try:
         async with httpx.AsyncClient(timeout=2.0) as client:
-            resp = await client.get(f"{settings.mtx_api_url}/v2/paths/list")
+            resp = await client.get(
+                f"{settings.mtx_api_url}/v3/paths/list",
+                auth=(settings.mtx_api_user, settings.mtx_api_pass),
+            )
             resp.raise_for_status()
             data = resp.json()
             return data.get("items", [])

@@ -4,14 +4,37 @@
 # Streamers push via RTMP:  rtmp://<host>:1935/community/<community_id>
 # Viewers watch via HLS:    http://<host>:8888/community/<community_id>/index.m3u8
 #                          or WebRTC:           http://<host>:8889/community/<community_id>
-# The backend reads stream state from the API: http://<host>:9997
+# The backend reads stream state from the API: http://<host>:9997 (admin/admin)
 ###############################################
 
 # REST API — used by the backend to detect live streams.
 api: yes
 apiAddress: :9997
 
-# RTSP (not used; disabled)
+# Authentication: mediamtx v1.19+ gates the API to localhost by default.
+# Since the backend calls from the Docker network (not 127.0.0.1), we define
+# explicit users: anonymous publish/read (OBS + HLS viewers) and admin/admin
+# for the control API used by the backend.
+authMethod: internal
+authInternalUsers:
+  # Anonymous publishing + reading (OBS ingest, HLS playback).
+  - user: any
+    pass:
+    ips: []
+    permissions:
+      - action: publish
+      - action: read
+      - action: playback
+  # Backend API access (status polling, recording control).
+  - user: admin
+    pass: admin
+    ips: []
+    permissions:
+      - action: api
+      - action: metrics
+      - action: pprof
+
+# RTSP (not used)
 rtsp: no
 
 # RTMP — ingest from OBS / ffmpeg
@@ -31,9 +54,8 @@ webrtcEncryption: no
 srt: no
 
 # Record every stream to disk (becomes the "Recordings" library later).
-# Files land in /media (the mediamtx_data docker volume) as <path>-<timestamp>.mp4.
 record: yes
-recordPath: ./media/%path-%Y%m%d%H%M%S.mp4
+recordPath: ./media/%path-%Y%m%d%H%M%S
 recordFormat: fmp4
 
 ###############################################

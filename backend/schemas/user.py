@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
 
 class UserOut(BaseModel):
@@ -11,3 +11,8 @@ class UserOut(BaseModel):
     avatar_url: str | None = None
     bio: str | None = None
     is_admin: bool = False
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def _coerce_uuid(cls, value: object) -> str:
+        return str(value)

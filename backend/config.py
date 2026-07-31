@@ -28,6 +28,8 @@ class Settings(BaseSettings):
 
     # Streaming (mediamtx)
     mtx_api_url: str = "http://localhost:9997"
+    mtx_api_user: str = "admin"
+    mtx_api_pass: str = "admin"
     hls_base_url: str = "http://localhost:8888"
 
     # CORS origins (comma-separated)
