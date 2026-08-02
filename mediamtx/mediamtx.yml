@@ -11,28 +11,18 @@
 api: yes
 apiAddress: :9997
 
-# Authentication: mediamtx v1.19+ gates the API to localhost by default.
-# Since the backend calls from the Docker network (not 127.0.0.1), we define
-# explicit users: anonymous publish/read (OBS + HLS viewers) and admin/admin
-# for the control API used by the backend.
-authMethod: internal
-authInternalUsers:
-  # Anonymous publishing + reading (OBS ingest, HLS playback).
-  - user: any
-    pass:
-    ips: []
-    permissions:
-      - action: publish
-      - action: read
-      - action: playback
-  # Backend API access (status polling, recording control).
-  - user: admin
-    pass: admin
-    ips: []
-    permissions:
-      - action: api
-      - action: metrics
-      - action: pprof
+# Authentication: mediamtx calls the backend on every publish; the backend
+# validates the community's stream key (POSTed as ?key=… on the RTMP URL).
+# Reads (HLS/playback) and the control API are excluded below, so viewing a
+# stream never needs a key and the key never appears in the HLS path.
+authMethod: http
+authHTTPAddress: http://backend:7001/api/streams/auth
+authHTTPExclude:
+  - action: read
+  - action: playback
+  - action: api
+  - action: metrics
+  - action: pprof
 
 # RTSP (not used)
 rtsp: no

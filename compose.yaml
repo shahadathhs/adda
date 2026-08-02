@@ -31,7 +31,7 @@ services:
       retries: 10
 
   mediamtx:
-    image: bluenviron/mediamtx:latest
+    build: ./mediamtx
     restart: unless-stopped
     ports:
       - "${RTMP_PORT:-1935}:1935"   # RTMP ingest (OBS streams here)
@@ -40,7 +40,6 @@ services:
       - "8189:8189/udp"             # WebRTC UDP/ICE (the actual media stream)
       - "${MTX_API_PORT:-9997}:9997" # mediamtx REST API
     volumes:
-      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
       - mediamtx_data:/media
 
   backend:

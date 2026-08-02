@@ -48,6 +48,33 @@ async def list_live_community_ids() -> list[str]:
     return ids
 
 
+async def kick_publisher(community_id: str) -> None:
+    """Disconnect any RTMP publisher currently streaming to this community.
+
+    Used after a stream-key rotation so the change takes effect immediately
+    (mediamtx only checks the key at connect time; the live connection has to
+    be dropped to force a reconnect with the new key).
+    """
+    path = _community_path(community_id)
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.get(
+                f"{settings.mtx_api_url}/v3/rtmpconns/list",
+                auth=(settings.mtx_api_user, settings.mtx_api_pass),
+            )
+            resp.raise_for_status()
+            for conn in resp.json().get("items", []):
+                if conn.get("path") == path:
+                    await client.post(
+                        f"{settings.mtx_api_url}/v3/rtmpconns/kick/{conn['id']}",
+                        auth=(settings.mtx_api_user, settings.mtx_api_pass),
+                    )
+    except Exception:
+        # Best-effort: if mediamtx is unreachable, the rotation still took
+        # effect in the DB (the old key is dead for new connections).
+        return
+
+
 def hls_url(community_id: str) -> str:
     return f"{settings.hls_base_url}/{_community_path(community_id)}/index.m3u8"
 
