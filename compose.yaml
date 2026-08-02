@@ -36,7 +36,8 @@ services:
     ports:
       - "${RTMP_PORT:-1935}:1935"   # RTMP ingest (OBS streams here)
       - "${HLS_PORT:-8888}:8888"    # HLS playback
-      - "${WEBRTC_PORT:-8889}:8889" # WebRTC playback
+      - "${WEBRTC_PORT:-8889}:8889" # WebRTC playback (HTTP/HTTPS handshake)
+      - "8189:8189/udp"             # WebRTC UDP/ICE (the actual media stream)
       - "${MTX_API_PORT:-9997}:9997" # mediamtx REST API
     volumes:
       - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
@@ -54,6 +55,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       MTX_API_URL: http://mediamtx:9997
       HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
+      WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
     ports:
       - "${BACKEND_PORT:-7001}:7001"
     depends_on:
@@ -74,6 +76,7 @@ services:
       VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
       VITE_WS_BASE_URL: ws://localhost:${BACKEND_PORT:-7001}
       VITE_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
+      VITE_WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     depends_on:

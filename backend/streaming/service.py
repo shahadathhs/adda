@@ -53,4 +53,4 @@ def hls_url(community_id: str) -> str:
 
 
 def webrtc_url(community_id: str) -> str:
-    return f"{settings.hls_base_url}/{_community_path(community_id)}"
+    return f"{settings.webrtc_base_url}/{_community_path(community_id)}"

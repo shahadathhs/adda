@@ -67,6 +67,7 @@ export default function CommunityPage() {
 
   const hlsUrl = `${HLS_BASE_URL}/community/${community.id}/index.m3u8`;
   const isOwner = community.owner_id === user?.id;
+  const showPlayer = isLive;
 
   return (
     <div className="flex h-full flex-col">
@@ -112,7 +113,7 @@ export default function CommunityPage() {
         <div className="grid gap-4 py-4 md:grid-cols-[1fr_320px]">
           <div className="min-h-[400px]">
             {tab === "Live" &&
-              (isLive ? (
+              (showPlayer ? (
                 <LivePlayer hlsUrl={hlsUrl} />
               ) : (
                 <Card className="flex aspect-video items-center justify-center text-sm text-muted-foreground">

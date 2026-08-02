@@ -44,11 +44,22 @@ rtmpAddress: :1935
 # HLS — playback for the web player (hls.js)
 hls: yes
 hlsAddress: :8888
+# Low-Latency HLS: ~1-3s glass-to-glass latency (vs ~10-30s for plain HLS).
+hlsVariant: lowLatency
+# Generate HLS continuously while a stream is published, so the playlist is
+# already populated when a viewer joins. (Default is to mux only on first
+# request, which causes the start-up delay / loading flicker.)
+hlsAlwaysRemux: yes
 
-# WebRTC — low-latency playback option
+# WebRTC — low-latency playback (used by the web player for Live)
 webrtc: yes
 webrtcAddress: :8889
 webrtcEncryption: no
+# Advertise host-reachable ICE candidates. Inside Docker, mediamtx otherwise
+# only gathers the container's internal IP (not reachable from the host
+# browser), so the WebRTC media flow never establishes. These extra hosts let
+# the browser connect over localhost.
+webrtcAdditionalHosts: ["host.docker.internal", "127.0.0.1"]
 
 # SRT (optional ingest alternative)
 srt: no
