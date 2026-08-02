@@ -1,0 +1,19 @@
+# Secrets — read from runtime env (compose), never bake into the image
+.env
+.env.local
+
+# Local tooling / caches
+.venv/
+__pycache__/
+*.py[cod]
+.pyright/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.sqlite3
+
+# Tests aren't needed in the runtime image
+tests/
+pytest.ini

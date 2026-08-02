@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.git/
+*.log
+
+# Local overrides (keep .env — Vite reads VITE_* vars at build time)
+.env.local
+.env.*.local

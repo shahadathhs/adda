@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
+
+if TYPE_CHECKING:
+    from models.membership import Membership
 
 
 class Community(Base):
@@ -21,7 +27,7 @@ class Community(Base):
         index=True,
     )
 
-    members: Mapped[list["Membership"]] = relationship(  # noqa: F821
+    members: Mapped[list["Membership"]] = relationship(
         "Membership",
         back_populates="community",
         cascade="all, delete-orphan",

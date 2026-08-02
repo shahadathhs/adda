@@ -113,7 +113,7 @@ class ConnectionManager:
 
     async def presence_members(self, channel: str) -> list[str]:
         members = await redis_client.smembers(PRESENCE_PREFIX + channel)
-        return sorted(members)
+        return sorted(m.decode() if isinstance(m, bytes) else m for m in members)
 
     async def announce_presence(self, channel: str) -> None:
         members = await self.presence_members(channel)

@@ -6,15 +6,15 @@ mediamtx streaming server.
 
 ## Commands
 
-### Backend (Poetry, Python 3.11+)
+### Backend (uv, Python 3.12)
 
 ```bash
 cd backend
-poetry install
-poetry run alembic upgrade head          # apply migrations
-poetry run uvicorn main:app --reload --port 7001
-poetry run pytest                         # tests
-poetry run pyright                        # type checking (must pass, no new warnings)
+uv sync
+uv run alembic upgrade head          # apply migrations
+uv run uvicorn main:app --reload --port 7001
+uv run pytest                         # tests
+uv run pyright                        # type checking (must pass, no new warnings)
 ```
 
 ### Frontend (pnpm)
@@ -35,8 +35,8 @@ docker compose up -d --build              # postgres + redis + mediamtx + backen
 
 ## Testing & quality policy
 
-- Run backend tests after every backend change: `cd backend && poetry run pytest`.
-- Run type checking after every backend change: `cd backend && poetry run pyright`.
+- Run backend tests after every backend change: `cd backend && uv run pytest`.
+- Run type checking after every backend change: `cd backend && uv run pyright`.
   No new warnings in changed files.
 - Run frontend lint/build after frontend changes: `cd frontend && pnpm lint && pnpm build`.
 

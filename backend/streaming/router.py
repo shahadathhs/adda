@@ -3,6 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends
 
 from auth.deps import get_current_user
+from config import settings
 from models.user import User
 from streaming.service import hls_url, is_community_live, list_live_community_ids, webrtc_url
 
@@ -31,7 +32,7 @@ async def stream_status(community_id: uuid.UUID):
     return {
         "community_id": str(community_id),
         "is_live": live,
-        "rtmp_ingest_url": f"rtmp://localhost:1935/community/{community_id}",
+        "rtmp_ingest_url": f"{settings.rtmp_base_url}/community/{community_id}",
         "hls_url": hls_url(str(community_id)),
         "webrtc_url": webrtc_url(str(community_id)),
     }
@@ -41,12 +42,12 @@ async def stream_status(community_id: uuid.UUID):
 async def streaming_playbook(current_user: User = Depends(get_current_user)):
     """Instructions for going live with OBS (shown in the UI)."""
     return {
-        "ingest_server": "rtmp://localhost:1935",
+        "ingest_server": settings.rtmp_base_url,
         "path_format": "community/<community_id>",
         "steps": [
             "Open OBS → Settings → Stream",
             "Service: Custom",
-            f"Server: rtmp://localhost:1935/community/<your-community-id>",
+            f"Server: {settings.rtmp_base_url}/community/<your-community-id>",
             "Start streaming — status flips to live within a few seconds",
         ],
     }

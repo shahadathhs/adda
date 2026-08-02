@@ -88,9 +88,9 @@ The backend runs Alembic migrations automatically on startup.
 ```bash
 # Backend (needs postgres + redis running, e.g. via `docker compose up postgres redis`)
 cd backend
-poetry install
-poetry run alembic upgrade head
-poetry run uvicorn main:app --reload --port 7001
+uv sync
+uv run alembic upgrade head
+uv run uvicorn main:app --reload --port 7001
 
 # Frontend
 cd frontend
@@ -111,8 +111,8 @@ pnpm dev
 
 ```bash
 # Backend
-cd backend && poetry run pytest          # tests
-cd backend && poetry run pyright         # type checking
+cd backend && uv run pytest          # tests
+cd backend && uv run pyright         # type checking
 
 # Frontend
 cd frontend && pnpm lint                 # eslint
@@ -125,7 +125,7 @@ cd frontend && pnpm build                # tsc + vite build
 adda/
 ├── docker-compose.yml
 ├── .env.example
-├── backend/        FastAPI app (Poetry)
+├── backend/        FastAPI app (uv)
 │   ├── main.py     app entry, router registration
 │   ├── config.py   settings (pydantic-settings)
 │   ├── auth/ communities/ ws/ streaming/ members/
