@@ -32,6 +32,10 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup() -> None:
+    from seed import seed_db
+
+    await seed_db()
+
     from ws.manager import manager
 
     await manager.start()

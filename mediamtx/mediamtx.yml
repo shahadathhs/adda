@@ -54,10 +54,18 @@ webrtcAdditionalHosts: ["host.docker.internal", "127.0.0.1"]
 # SRT (optional ingest alternative)
 srt: no
 
-# Record every stream to disk (becomes the "Recordings" library later).
-record: yes
-recordPath: ./media/%path-%Y%m%d%H%M%S
-recordFormat: fmp4
+###############################################
+# Path defaults — recording is written to /media, which compose bind-mounts
+# to ./recordings on the host (real files you can browse/back up). %path is
+# "community/<id>", so recordings file per community. Segments split hourly;
+# kept 30 days (set 0 to keep forever).
+###############################################
+pathDefaults:
+  record: yes
+  recordPath: /media/%path/%Y-%m-%d_%H-%M-%S
+  recordFormat: fmp4
+  recordSegmentDuration: 1h
+  recordDeleteAfter: 720h
 
 ###############################################
 # Paths — accept any community/* path dynamically.
