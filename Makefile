@@ -113,7 +113,6 @@ reset: ## Full factory reset: remove containers + volumes + recordings, then sta
 	@$(MAKE) --no-print-directory env dirs
 	@$(MAKE) --no-print-directory up
 	@echo "Reset complete — fresh DB (migrated + seeded on backend startup)."
-
 migration: ## Generate a migration: make migration m="add posts"
 	@test -n "$(m)" || { echo 'Usage: make migration m="message"'; exit 1; }
 	$(ALEMBIC) upgrade head
