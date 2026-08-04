@@ -11,28 +11,18 @@
 api: yes
 apiAddress: :9997
 
-# Authentication: mediamtx v1.19+ gates the API to localhost by default.
-# Since the backend calls from the Docker network (not 127.0.0.1), we define
-# explicit users: anonymous publish/read (OBS + HLS viewers) and admin/admin
-# for the control API used by the backend.
-authMethod: internal
-authInternalUsers:
-  # Anonymous publishing + reading (OBS ingest, HLS playback).
-  - user: any
-    pass:
-    ips: []
-    permissions:
-      - action: publish
-      - action: read
-      - action: playback
-  # Backend API access (status polling, recording control).
-  - user: admin
-    pass: admin
-    ips: []
-    permissions:
-      - action: api
-      - action: metrics
-      - action: pprof
+# Authentication: mediamtx calls the backend on every publish; the backend
+# validates the community's stream key (POSTed as ?key=… on the RTMP URL).
+# Reads (HLS/playback) and the control API are excluded below, so viewing a
+# stream never needs a key and the key never appears in the HLS path.
+authMethod: http
+authHTTPAddress: http://backend:7001/api/streams/auth
+authHTTPExclude:
+  - action: read
+  - action: playback
+  - action: api
+  - action: metrics
+  - action: pprof
 
 # RTSP (not used)
 rtsp: no
@@ -44,11 +34,22 @@ rtmpAddress: :1935
 # HLS — playback for the web player (hls.js)
 hls: yes
 hlsAddress: :8888
+# Low-Latency HLS: ~1-3s glass-to-glass latency (vs ~10-30s for plain HLS).
+hlsVariant: lowLatency
+# Generate HLS continuously while a stream is published, so the playlist is
+# already populated when a viewer joins. (Default is to mux only on first
+# request, which causes the start-up delay / loading flicker.)
+hlsAlwaysRemux: yes
 
-# WebRTC — low-latency playback option
+# WebRTC — low-latency playback (used by the web player for Live)
 webrtc: yes
 webrtcAddress: :8889
 webrtcEncryption: no
+# Advertise host-reachable ICE candidates. Inside Docker, mediamtx otherwise
+# only gathers the container's internal IP (not reachable from the host
+# browser), so the WebRTC media flow never establishes. These extra hosts let
+# the browser connect over localhost.
+webrtcAdditionalHosts: ["host.docker.internal", "127.0.0.1"]
 
 # SRT (optional ingest alternative)
 srt: no

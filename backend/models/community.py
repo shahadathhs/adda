@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import secrets
 import uuid
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,11 @@ if TYPE_CHECKING:
     from models.membership import Membership
 
 
+def new_stream_key() -> str:
+    """Random per-community key the owner uses to authenticate OBS publishing."""
+    return "sk_" + secrets.token_urlsafe(24)
+
+
 class Community(Base):
     __tablename__ = "communities"
 
@@ -22,12 +28,17 @@ class Community(Base):
     avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     is_private: Mapped[bool] = mapped_column(default=False)
 
+    # Secret required to publish an RTMP stream to this community.
+    stream_key: Mapped[str] = mapped_column(
+        String(64), unique=True, index=True, default=new_stream_key
+    )
+
     owner_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
         index=True,
     )
 
-    members: Mapped[list["Membership"]] = relationship(
+    members: Mapped[list["Membership"]] = relationship(  # noqa: F821
         "Membership",
         back_populates="community",
         cascade="all, delete-orphan",

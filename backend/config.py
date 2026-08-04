@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     mtx_api_user: str = "admin"
     mtx_api_pass: str = "admin"
     hls_base_url: str = "http://localhost:8888"
+    webrtc_base_url: str = "http://localhost:8889"
     rtmp_base_url: str = "rtmp://localhost:1935"
 
     # CORS origins (comma-separated)
