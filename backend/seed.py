@@ -57,10 +57,10 @@ async def seed_db() -> None:
             )
             if settings.seed_test_users:
                 await _ensure_user(
-                    db, "alice", "alice@adda.local", settings.seed_test_password
+                    db, "alice", "alice@example.com", settings.seed_test_password
                 )
                 await _ensure_user(
-                    db, "bob", "bob@adda.local", settings.seed_test_password
+                    db, "bob", "bob@example.com", settings.seed_test_password
                 )
     except Exception:
         # Seeding must never block startup.

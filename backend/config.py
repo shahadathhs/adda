@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     # Bootstrap accounts — seeded idempotently on startup (only created if they
     # don't already exist). Override all of these in prod with strong values.
     superadmin_username: str = "admin"
-    superadmin_email: str = "admin@adda.local"
+    superadmin_email: str = "admin@example.com"
     superadmin_password: str = "admin12345"
     seed_test_users: bool = True
     seed_test_password: str = "password123"
