@@ -17,6 +17,7 @@ htmlcov/
 node_modules/
 frontend/dist/
 .vite/
+pnpm-lock.yaml
 
 # ── Env / secrets ──
 .env

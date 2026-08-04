@@ -18,7 +18,7 @@ ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 .PHONY: help setup env dirs toolchain install \
         up down restart build logs logs-backend logs-frontend ps \
         dev backend frontend \
-        migrate migration reset db-up test typecheck \
+        migrate migration reset reset-migrate db-up test typecheck \
         lint build-web \
         check clean clean-recordings
 
@@ -103,9 +103,16 @@ db-up: env ## Start a Docker Postgres on :5432 (for local dev)
 migrate: ## Apply migrations (Alembic)
 	$(ALEMBIC) upgrade head
 
-reset: db-up ## Reset DB: roll back ALL migrations, then re-apply from scratch (destroys data)
-	$(ALEMBIC) downgrade base
+reset-migrate: db-up ## Reset DB: drop everything, re-apply migrations from scratch (destroys DB data)
+	$(COMPOSE) exec -T postgres psql -U adda -d adda -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 	$(ALEMBIC) upgrade head
+
+reset: ## Full factory reset: remove containers + volumes + recordings, then start fresh (DESTRUCTIVE)
+	$(COMPOSE) down -v
+	@rm -rf recordings && mkdir recordings
+	@$(MAKE) --no-print-directory env dirs
+	@$(MAKE) --no-print-directory up
+	@echo "Reset complete — fresh DB (migrated + seeded on backend startup)."
 
 migration: ## Generate a migration: make migration m="add posts"
 	@test -n "$(m)" || { echo 'Usage: make migration m="message"'; exit 1; }
