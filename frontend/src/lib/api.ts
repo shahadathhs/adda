@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../config";
-import type { Community, Token, User } from "../types";
+import type { Community, StreamCredentials, Token, User } from "../types";
 
 const TOKEN_KEY = "adda_token";
 
@@ -74,6 +74,14 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  getStreamKey: (id: string) =>
+    request<StreamCredentials>(`/api/communities/${id}/stream-key`),
+  rotateStreamKey: (id: string) =>
+    request<StreamCredentials>(
+      `/api/communities/${id}/stream-key/rotate`,
+      { method: "POST" }
+    ),
 
   // ── Membership ──
   joinCommunity: (id: string) =>

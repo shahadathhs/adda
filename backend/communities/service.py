@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.community import Community
+from models.community import Community, new_stream_key
 from models.membership import CommunityRole, Membership
 from schemas.community import CommunityCreate, CommunityUpdate
 
@@ -66,6 +66,14 @@ async def update_community(
 async def delete_community(db: AsyncSession, community: Community) -> None:
     await db.delete(community)
     await db.commit()
+
+
+async def regenerate_stream_key(db: AsyncSession, community: Community) -> Community:
+    """Rotate the key a streamer uses to authenticate OBS publishing."""
+    community.stream_key = new_stream_key()
+    await db.commit()
+    await db.refresh(community)
+    return community
 
 
 async def count_members(db: AsyncSession, community_id: uuid.UUID) -> int:

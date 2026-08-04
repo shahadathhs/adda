@@ -8,6 +8,7 @@ from communities import router as communities_router
 from config import settings
 from members import router as members_router
 from streaming import router as streaming_router
+from streams.router import router as streams_router
 from ws import router as ws_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -49,5 +50,6 @@ app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
 app.include_router(members_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)
+app.include_router(streams_router, prefix=settings.api_prefix)
 # WebSocket gateway sits at the root (no api prefix)
 app.include_router(ws_router)

@@ -31,3 +31,10 @@ class CommunityOut(BaseModel):
     owner_id: str
     member_count: int = 0
     is_live: bool = False
+
+
+class StreamCredentialsOut(BaseModel):
+    """Owner-only: the RTMP URL (with key) + the raw key, for OBS setup."""
+
+    stream_url: str
+    stream_key: str
