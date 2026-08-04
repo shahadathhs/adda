@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { FiVideoOff } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { Avatar } from "../components/ui/Avatar";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import ChatPanel from "../components/ChatPanel";
+import CopyField from "../components/CopyField";
 import LivePlayer from "../components/LivePlayer";
 import { api } from "../lib/api";
 import { useAuthStore } from "../store/auth-store";
 import { HLS_BASE_URL } from "../config";
-import type { Community } from "../types";
+import type { Community, StreamCredentials } from "../types";
 
 const TABS = ["Posts", "Live", "Media", "Files", "Members", "Recordings"] as const;
 type Tab = (typeof TABS)[number];
@@ -29,6 +31,7 @@ export default function CommunityPage() {
   const [community, setCommunity] = useState<Community | null>(null);
   const [tab, setTab] = useState<Tab>("Live");
   const [isLive, setIsLive] = useState(false);
+  const [creds, setCreds] = useState<StreamCredentials | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,6 +49,25 @@ export default function CommunityPage() {
       }
     })();
   }, [id, navigate]);
+
+  // Owner-only: load the stream URL + key for the OBS setup panel.
+  useEffect(() => {
+    if (!id || !user || community?.owner_id !== user.id) {
+      setCreds(null);
+      return;
+    }
+    api.getStreamKey(id).then(setCreds).catch(() => setCreds(null));
+  }, [id, user, community?.owner_id]);
+
+  const rotateKey = async () => {
+    if (!id) return;
+    try {
+      setCreds(await api.rotateStreamKey(id));
+      toast.success("Stream key rotated — update OBS with the new URL.");
+    } catch {
+      toast.error("Could not rotate the stream key");
+    }
+  };
 
   // Poll stream status while on the Live tab (cheap; mediamtx API).
   useEffect(() => {
@@ -67,6 +89,7 @@ export default function CommunityPage() {
 
   const hlsUrl = `${HLS_BASE_URL}/community/${community.id}/index.m3u8`;
   const isOwner = community.owner_id === user?.id;
+  const showPlayer = isLive;
 
   return (
     <div className="flex h-full flex-col">
@@ -111,14 +134,42 @@ export default function CommunityPage() {
         {/* Body: content + chat */}
         <div className="grid gap-4 py-4 md:grid-cols-[1fr_320px]">
           <div className="min-h-[400px]">
-            {tab === "Live" &&
-              (isLive ? (
-                <LivePlayer hlsUrl={hlsUrl} />
-              ) : (
-                <Card className="flex aspect-video items-center justify-center text-sm text-muted-foreground">
-                  No active stream. {isOwner && "Go live with OBS → rtmp://localhost:1935/community/" + community.id}
-                </Card>
-              ))}
+            {tab === "Live" && (
+              <div className="space-y-4">
+                {showPlayer ? (
+                  <LivePlayer hlsUrl={hlsUrl} />
+                ) : (
+                  <Card className="flex aspect-video flex-col items-center justify-center gap-3 px-6 text-center">
+                    <FiVideoOff className="h-10 w-10 text-muted-foreground/40" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">No live stream</p>
+                      <p className="max-w-sm text-xs text-muted-foreground">
+                        {isOwner
+                          ? "Start broadcasting in OBS to go live — grab your URL from “Stream setup” below."
+                          : "This community isn't broadcasting right now. Check back soon."}
+                      </p>
+                    </div>
+                  </Card>
+                )}
+
+                {isOwner && creds && (
+                  <Card className="space-y-3 p-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold">Stream setup (OBS)</h3>
+                      <Button variant="outline" size="sm" onClick={rotateKey}>
+                        Rotate key
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Paste the <strong>Stream URL</strong> into OBS → Settings →
+                      Stream → Server, and leave the Stream Key field empty.
+                    </p>
+                    <CopyField label="Stream URL" value={creds.stream_url} />
+                    <CopyField label="Stream Key" value={creds.stream_key} />
+                  </Card>
+                )}
+              </div>
+            )}
             {tab === "Posts" && <ComingSoon label="Announcements & posts" />}
             {tab === "Media" && <ComingSoon label="Photo / video gallery" />}
             {tab === "Files" && <ComingSoon label="Shared files" />}

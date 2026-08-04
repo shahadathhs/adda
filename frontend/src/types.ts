@@ -27,6 +27,11 @@ export interface Community {
   is_live: boolean;
 }
 
+export interface StreamCredentials {
+  stream_url: string;
+  stream_key: string;
+}
+
 export interface ChatMessage {
   id: string;
   channel: string;
