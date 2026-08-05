@@ -31,7 +31,8 @@ frontend/.env.local
 *.swp
 .DS_Store
 
-# ── Data ──
-media/
-recordings/
-uploads/
+# ── Data (root-only; the leading slash stops these from matching source
+#    folders like backend/recordings/) ──
+/media/
+/recordings/
+/uploads/
