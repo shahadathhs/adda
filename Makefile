@@ -15,12 +15,12 @@ PNPM         := pnpm
 # is native or a Docker container (db-up) doesn't matter.
 ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 
-.PHONY: help setup env toolchain install \
+.PHONY: help setup env dirs toolchain install \
         up down restart build logs logs-backend logs-frontend ps \
         dev backend frontend \
-        migrate migration db-up test typecheck \
+        migrate migration reset reset-migrate db-up test typecheck \
         lint build-web \
-        check clean
+        check clean clean-recordings
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / \
@@ -34,6 +34,9 @@ env: ## Create .env files (root, backend, frontend) from their examples
 	  else echo "$$f exists (skipped)"; fi; \
 	done
 
+dirs: ## Create local data directories (recordings/, …)
+	@mkdir -p recordings
+
 toolchain: ## Ensure brew and uv are installed (uv manages its own Python)
 	@command -v brew >/dev/null 2>&1 || { echo "Homebrew is required — install from https://brew.sh"; exit 1; }
 	@command -v uv >/dev/null 2>&1 || { echo "Installing uv via brew..."; brew install uv; }
@@ -42,7 +45,7 @@ install: toolchain ## Install backend (uv) + frontend (pnpm) deps
 	@cd $(BACKEND_DIR) && uv sync
 	@cd $(FRONTEND_DIR) && pnpm install
 
-setup: env install db-up migrate ## First-time setup: .env + toolchain + deps + Postgres + migrations
+setup: env dirs install db-up migrate ## First-time setup: .env + dirs + deps + Postgres + migrations
 	@echo "Setup complete — DB synced to head. Run 'make dev'."
 
 # ── Docker (full stack) ───────────────────────────────────────────────
@@ -100,6 +103,16 @@ db-up: env ## Start a Docker Postgres on :5432 (for local dev)
 migrate: ## Apply migrations (Alembic)
 	$(ALEMBIC) upgrade head
 
+reset-migrate: db-up ## Reset DB: drop everything, re-apply migrations from scratch (destroys DB data)
+	$(COMPOSE) exec -T postgres psql -U adda -d adda -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+	$(ALEMBIC) upgrade head
+
+reset: ## Full factory reset: remove containers + volumes + recordings, then start fresh (DESTRUCTIVE)
+	$(COMPOSE) down -v
+	@rm -rf recordings && mkdir recordings
+	@$(MAKE) --no-print-directory env dirs
+	@$(MAKE) --no-print-directory up
+	@echo "Reset complete — fresh DB (migrated + seeded on backend startup)."
 migration: ## Generate a migration: make migration m="add posts"
 	@test -n "$(m)" || { echo 'Usage: make migration m="message"'; exit 1; }
 	$(ALEMBIC) upgrade head
@@ -124,5 +137,9 @@ build-web: ## Build frontend (tsc + vite)
 
 check: test typecheck lint build-web ## Run all quality gates
 
-clean: ## Remove containers AND volumes (DESTRUCTIVE)
+clean-recordings: ## Delete ALL recordings (keeps the folder) — DESTRUCTIVE
+	@rm -rf recordings && mkdir recordings
+	@echo "Recordings cleared."
+
+clean: ## Remove containers + Docker volumes (keeps recordings) — DESTRUCTIVE
 	$(COMPOSE) down -v

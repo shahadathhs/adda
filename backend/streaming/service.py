@@ -48,6 +48,22 @@ async def list_live_community_ids() -> list[str]:
     return ids
 
 
+async def viewer_count(community_id: str) -> int:
+    """Approximate viewer count (mediamtx readers) for a community stream."""
+    path = _community_path(community_id)
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.get(
+                f"{settings.mtx_api_url}/v3/paths/get/{path}",
+                auth=(settings.mtx_api_user, settings.mtx_api_pass),
+            )
+            if resp.status_code != 200:
+                return 0
+            return len(resp.json().get("readers", []))
+    except Exception:
+        return 0
+
+
 async def kick_publisher(community_id: str) -> None:
     """Disconnect any RTMP publisher currently streaming to this community.
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -6,6 +7,7 @@ import { useAuthStore } from "../store/auth-store";
 
 export default function LoginPage() {
   const { login, register } = useAuthStore();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [form, setForm] = useState({
     username: "",
@@ -24,8 +26,12 @@ export default function LoginPage() {
     try {
       if (mode === "login") {
         await login(form.email, form.password);
+        // Admins land on the admin dashboard; everyone else on communities.
+        const admin = useAuthStore.getState().user?.is_admin;
+        navigate(admin ? "/admin" : "/");
       } else {
         await register(form);
+        navigate("/");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");

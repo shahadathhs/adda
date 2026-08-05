@@ -33,9 +33,20 @@ class Settings(BaseSettings):
     hls_base_url: str = "http://localhost:8888"
     webrtc_base_url: str = "http://localhost:8889"
     rtmp_base_url: str = "rtmp://localhost:1935"
+    # Where mediamtx writes recordings (bind-mounted). Local: repo root; in
+    # docker the container path (/recordings) is set via RECORDINGS_DIR.
+    recordings_dir: str = "../recordings"
 
     # CORS origins (comma-separated)
     cors_origins: str = "http://localhost:5173"
+
+    # Bootstrap accounts — seeded idempotently on startup (only created if they
+    # don't already exist). Override all of these in prod with strong values.
+    superadmin_username: str = "admin"
+    superadmin_email: str = "admin@example.com"
+    superadmin_password: str = "admin12345"
+    seed_test_users: bool = True
+    seed_test_password: str = "password123"
 
 
 @lru_cache

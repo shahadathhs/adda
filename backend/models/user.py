@@ -18,6 +18,8 @@ class User(Base):
 
     # Global role (per-community roles live on Membership)
     is_admin: Mapped[bool] = mapped_column(default=False)
+    # Suspended accounts cannot log in (admin moderation lever).
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     def to_public_dict(self) -> dict[str, str | bool | None]:
         return {

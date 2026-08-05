@@ -48,7 +48,11 @@ async def get_community_by_slug(db: AsyncSession, slug: str) -> Community | None
 
 async def list_communities(db: AsyncSession, limit: int = 50, offset: int = 0) -> list[Community]:
     result = await db.execute(
-        select(Community).order_by(Community.created_at.desc()).limit(limit).offset(offset)
+        select(Community)
+        .where(Community.is_suspended.is_(False))
+        .order_by(Community.created_at.desc())
+        .limit(limit)
+        .offset(offset)
     )
     return list(result.scalars().all())
 
