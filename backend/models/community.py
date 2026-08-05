@@ -27,6 +27,8 @@ class Community(Base):
     banner_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     is_private: Mapped[bool] = mapped_column(default=False)
+    # Suspended communities are hidden from public listings (admin lever).
+    is_suspended: Mapped[bool] = mapped_column(default=False)
 
     # Secret required to publish an RTMP stream to this community.
     stream_key: Mapped[str] = mapped_column(

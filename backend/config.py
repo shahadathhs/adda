@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     hls_base_url: str = "http://localhost:8888"
     webrtc_base_url: str = "http://localhost:8889"
     rtmp_base_url: str = "rtmp://localhost:1935"
+    # Where mediamtx writes recordings (bind-mounted). Local: repo root; in
+    # docker the container path (/recordings) is set via RECORDINGS_DIR.
+    recordings_dir: str = "../recordings"
 
     # CORS origins (comma-separated)
     cors_origins: str = "http://localhost:5173"

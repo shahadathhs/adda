@@ -32,6 +32,10 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
         )
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Account suspended"
+        )
     token = create_access_token(str(user.id))
     return Token(access_token=token, user=UserOut.model_validate(user, from_attributes=True))
 

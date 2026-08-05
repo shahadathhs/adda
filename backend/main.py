@@ -7,7 +7,9 @@ from auth import router as auth_router
 from communities import router as communities_router
 from config import settings
 from members import router as members_router
+from recordings.router import router as recordings_router
 from streaming import router as streaming_router
+from admin.router import router as admin_router
 from streams.router import router as streams_router
 from ws import router as ws_router
 
@@ -53,7 +55,9 @@ async def health() -> dict[str, str]:
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
 app.include_router(members_router, prefix=settings.api_prefix)
+app.include_router(recordings_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)
 app.include_router(streams_router, prefix=settings.api_prefix)
+app.include_router(admin_router, prefix=settings.api_prefix)
 # WebSocket gateway sits at the root (no api prefix)
 app.include_router(ws_router)

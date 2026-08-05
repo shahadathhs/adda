@@ -1,5 +1,16 @@
 import { API_BASE_URL } from "../config";
-import type { Community, StreamCredentials, Token, User } from "../types";
+import type {
+  AdminCommunity,
+  AdminMember,
+  AdminStats,
+  AdminUser,
+  Community,
+  LiveStream,
+  Recording,
+  StreamCredentials,
+  Token,
+  User,
+} from "../types";
 
 const TOKEN_KEY = "adda_token";
 
@@ -83,11 +94,70 @@ export const api = {
       { method: "POST" }
     ),
 
+  // ── Admin ──
+  adminStats: () => request<AdminStats>("/api/admin/stats"),
+  adminUsers: (q?: string) =>
+    request<AdminUser[]>(`/api/admin/users${q ? `?q=${encodeURIComponent(q)}` : ""}`),
+  adminUpdateUser: (id: string, data: { is_admin?: boolean; is_active?: boolean }) =>
+    request<AdminUser>(`/api/admin/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  adminResetUserPassword: (id: string, password: string) =>
+    request<void>(`/api/admin/users/${id}/reset-password`, {
+      method: "POST",
+      body: JSON.stringify({ password }),
+    }),
+  adminDeleteUser: (id: string) =>
+    request<void>(`/api/admin/users/${id}`, { method: "DELETE" }),
+
+  adminCommunities: () => request<AdminCommunity[]>("/api/admin/communities"),
+  adminUpdateCommunity: (
+    id: string,
+    data: { is_suspended?: boolean; name?: string; description?: string; is_private?: boolean }
+  ) =>
+    request<AdminCommunity>(`/api/admin/communities/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  adminCommunityMembers: (id: string) =>
+    request<AdminMember[]>(`/api/admin/communities/${id}/members`),
+  adminKickMember: (communityId: string, userId: string) =>
+    request<void>(`/api/admin/communities/${communityId}/members/${userId}`, {
+      method: "DELETE",
+    }),
+  adminCommunityStreamKey: (id: string) =>
+    request<StreamCredentials>(`/api/admin/communities/${id}/stream-key`),
+  adminRotateCommunityKey: (id: string) =>
+    request<StreamCredentials>(
+      `/api/admin/communities/${id}/stream-key/rotate`,
+      { method: "POST" }
+    ),
+  adminStopStream: (id: string) =>
+    request<void>(`/api/admin/communities/${id}/stop`, { method: "POST" }),
+  adminDeleteCommunity: (id: string) =>
+    request<void>(`/api/admin/communities/${id}`, { method: "DELETE" }),
+
+  adminLive: () => request<LiveStream[]>("/api/admin/live"),
+
+  adminRecordings: (communityId?: string) =>
+    request<Recording[]>(
+      `/api/admin/recordings${communityId ? `?community_id=${communityId}` : ""}`
+    ),
+  adminDeleteRecording: (path: string) =>
+    request<void>(`/api/admin/recordings?path=${encodeURIComponent(path)}`, {
+      method: "DELETE",
+    }),
+
   // ── Membership ──
   joinCommunity: (id: string) =>
     request<User>(`/api/communities/${id}/members`, { method: "POST" }),
   leaveCommunity: (id: string) =>
     request<void>(`/api/communities/${id}/members`, { method: "DELETE" }),
+
+  // ── Recordings (community VODs) ──
+  recordings: (communityId: string) =>
+    request<Recording[]>(`/api/recordings?community_id=${communityId}`),
 
   // ── Streaming ──
   streamStatus: (id: string) =>

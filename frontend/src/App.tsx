@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { socket } from "./lib/ws";
 import { useAuthStore } from "./store/auth-store";
 import { Avatar } from "./components/ui/Avatar";
@@ -7,15 +7,24 @@ import { Button } from "./components/ui/Button";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import CommunityPage from "./pages/CommunityPage";
+import AdminPage from "./pages/AdminPage";
 
 function TopBar() {
   const { user, logout } = useAuthStore();
   return (
     <header className="flex h-14 items-center justify-between border-b border-border px-4">
       <div className="flex items-center gap-2">
-        <span className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-xl font-bold text-transparent">
+        <Link to="/" className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-xl font-bold text-transparent">
           adda
-        </span>
+        </Link>
+        {user?.is_admin && (
+          <Link
+            to="/admin"
+            className="rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Admin
+          </Link>
+        )}
       </div>
       {user && (
         <div className="flex items-center gap-3">
@@ -73,6 +82,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/community/:id" element={<CommunityPage />} />
+          <Route
+            path="/admin"
+            element={user?.is_admin ? <AdminPage /> : <Navigate to="/" replace />}
+          />
           <Route path="*" element={<Navigate to="/" replace state={{ from: location }} />} />
         </Routes>
       </main>

@@ -55,8 +55,11 @@ services:
       MTX_API_URL: http://mediamtx:9997
       HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
       WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
+      RECORDINGS_DIR: /recordings
     ports:
       - "${BACKEND_PORT:-7001}:7001"
+    volumes:
+      - ./recordings:/recordings
     depends_on:
       postgres:
         condition: service_healthy
