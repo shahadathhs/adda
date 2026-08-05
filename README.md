@@ -28,11 +28,11 @@ Communities
 ## Prerequisites
 
 - **Docker** + **Docker Compose** — runs the full stack.
-- **Homebrew** — installs `uv` (Python) and is used by the Makefile toolchain target.
+- **[uv](https://docs.astral.sh/uv/)** — Python package manager (installs its own
+  Python 3.12; no system Python needed).
+  Install: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **Node.js 20+** + **pnpm** — only needed for local frontend dev (`make dev`).
-
-> No need to install Python, Poetry, or manage versions manually — the Makefile
-> bootstraps everything via `uv` (which manages its own Python 3.12).
+  Enable pnpm via `corepack enable` after installing Node.
 
 ## Getting started
 

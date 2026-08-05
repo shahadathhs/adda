@@ -37,9 +37,11 @@ env: ## Create .env files (root, backend, frontend) from their examples
 dirs: ## Create local data directories (recordings/, …)
 	@mkdir -p recordings
 
-toolchain: ## Ensure brew and uv are installed (uv manages its own Python)
-	@command -v brew >/dev/null 2>&1 || { echo "Homebrew is required — install from https://brew.sh"; exit 1; }
-	@command -v uv >/dev/null 2>&1 || { echo "Installing uv via brew..."; brew install uv; }
+toolchain: ## Ensure uv is installed
+	@command -v uv >/dev/null 2>&1 || { \
+	  echo "uv is required. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"; \
+	  exit 1; \
+	}
 
 install: toolchain ## Install backend (uv) + frontend (pnpm) deps
 	@cd $(BACKEND_DIR) && uv sync
