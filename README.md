@@ -21,126 +21,178 @@ Communities
 | Frontend | React 18 · TypeScript · Vite · Tailwind · Zustand · Radix UI |
 | Backend  | FastAPI · async SQLAlchemy 2.0 · Pydantic v2 · PyJWT |
 | Database | PostgreSQL (async) · Redis (pub/sub + presence) |
-| Streaming | mediamtx (RTMP ingest → HLS / WebRTC playback) |
+| Streaming | mediamtx (RTMP ingest → HLS playback) |
 | Realtime | WebSocket gateway backed by Redis fan-out |
 | Infra | Docker Compose (single command up) |
 
-## Architecture
+## Prerequisites
 
-```
-┌──────────────────┐   REST (auth, communities, files)   ┌──────────────────────┐
-│  Frontend (5173) │ ──────────────────────────────────► │  Backend FastAPI(7001)│
-│  React/Vite      │ ◄────────────────────────────────── │  service modules      │
-└──────────────────┘   WebSocket (chat, presence, live)   └─────────┬────────────┘
-            │                                                      │
-            │  HLS playback (via mediamtx)                          ├──► PostgreSQL
-            ▼                                                      ├──► Redis (pub/sub)
-┌──────────────────┐    RTMP ingest (OBS)                          │
-│   mediamtx       │ ◄─────────────── Streamer                     ▼
-│   8888/8889      │                                     ┌──────────────────┐
-└──────────────────┘                                     │ mediamtx API     │
-                                                         │ (stream status)  │
-                                                         └──────────────────┘
-```
+- **Docker** + **Docker Compose** — runs the full stack.
+- **Homebrew** — installs `uv` (Python) and is used by the Makefile toolchain target.
+- **Node.js 20+** + **pnpm** — only needed for local frontend dev (`make dev`).
 
-The **WebSocket message contract** is the single source of truth shared by both
-halves (see `backend/ws/protocol.py` and `frontend/src/lib/ws.ts`). New realtime
-features add a message type there first, then handle it on each side.
-
-### Backend service modules
-
-Each domain is a self-contained module under `backend/` — a router, a service,
-and its models/schemas. They start in one app and can split into separate
-services later.
-
-```
-auth/          register, login, JWT issuance
-communities/   CRUD + join/leave + roles
-ws/            realtime gateway + Redis pub/sub + presence
-streaming/     go-live, stream status (reads mediamtx API)
-members/       membership & permissions
-notifications/ notification fan-out (scaffold)
-```
+> No need to install Python, Poetry, or manage versions manually — the Makefile
+> bootstraps everything via `uv` (which manages its own Python 3.12).
 
 ## Getting started
 
-### 1. Configure
+### Quick start (Docker — recommended)
 
 ```bash
-cp .env.example .env
-# edit JWT_SECRET to a random string
+make setup    # creates .env files + installs deps + starts Postgres + migrates
+make up       # builds and starts all services
 ```
 
-### 2. Run everything with Docker
+That's it. Open http://localhost:5173.
+
+**Seeded accounts** (created automatically on first backend startup):
+
+| User | Email | Password | Role |
+|------|-------|----------|------|
+| admin | `admin@example.com` | `admin12345` | admin |
+| alice | `alice@example.com` | `password123` | member |
+| bob | `bob@example.com` | `password123` | member |
+
+Override these in `.env` (`SUPERADMIN_*`, `SEED_TEST_*`).
+
+### Local development (faster feedback)
+
+For frontend/backend hot-reload while keeping Postgres/Redis/mediamtx in Docker:
 
 ```bash
-docker compose up -d --build
+make setup                          # one-time: env + deps + DB
+make up postgres redis mediamtx     # infra only (skip backend/frontend containers)
+make dev                            # runs backend (uv) + frontend (vite) concurrently
 ```
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:7001 (docs at `/docs` in debug)
-- mediamtx HLS: http://localhost:8888
-
-The backend runs Alembic migrations automatically on startup.
-
-### 3. Develop locally (faster feedback)
+Or run them individually:
 
 ```bash
-# Backend (needs postgres + redis running, e.g. via `docker compose up postgres redis`)
-cd backend
-uv sync
-uv run alembic upgrade head
-uv run uvicorn main:app --reload --port 7001
-
-# Frontend
-cd frontend
-pnpm install
-pnpm dev
+make backend     # uvicorn --reload on :7001
+make frontend    # vite dev server on :5173
 ```
 
 ## Going live (streaming)
 
-1. Start the stack: `docker compose up -d`.
-2. In OBS, set **Stream → Service: Custom**, **Server:** `rtmp://localhost:1935/community/<id>`
-   (use any community id, e.g. `community/1`).
-3. Start streaming. The backend reads stream status from mediamtx's REST API.
-4. Watch at `http://localhost:8888/community/<id>/index.m3u8` (HLS) — the
-   frontend player is wired to `VITE_HLS_BASE_URL`.
+Streams are **secured by a per-community stream key**. As the community owner:
 
-## Testing & quality
+1. Open the community → **Live** tab → **Stream setup** card.
+2. Copy the **Stream URL** (it includes `?key=…`).
+3. In OBS → **Settings → Stream**:
+   - **Service:** Custom
+   - **Server:** paste the Stream URL
+   - **Stream Key:** *(leave empty)*
+4. Click **Start Streaming**.
+
+Viewers watch in the community's **Live** tab (HLS player, auto-connects).
+After the stream ends, the recording appears in the **Recordings** tab automatically.
+
+> Rotating the stream key (button in the same card) immediately kicks the current
+> OBS connection — the old key stops working instantly.
+
+## Common commands
 
 ```bash
-# Backend
-cd backend && uv run pytest          # tests
-cd backend && uv run pyright         # type checking
+make help              # list all targets
 
-# Frontend
-cd frontend && pnpm lint                 # eslint
-cd frontend && pnpm build                # tsc + vite build
+# Docker (full stack)
+make up                # build + start all services (detached)
+make down              # stop + remove containers
+make logs              # tail all logs
+make ps                # list running containers
+
+# Database
+make migrate           # apply Alembic migrations
+make migration m="…"   # generate a new migration from model changes
+make reset-migrate     # drop all tables, re-apply from scratch (destroys data)
+make reset             # full factory reset: containers + volumes + recordings → fresh
+
+# Quality gates
+make test              # backend pytest
+make typecheck         # backend pyright
+make lint              # frontend eslint
+make build-web         # frontend tsc + vite build
+make check             # all of the above in sequence
+
+# Cleanup
+make clean             # remove containers + Docker volumes (keeps recordings)
+make clean-recordings  # delete all recording files (keeps the folder)
 ```
+
+## Architecture
+
+```
+┌──────────────────┐   REST (auth, communities, admin)  ┌──────────────────────┐
+│  Frontend (5173) │ ─────────────────────────────────► │  Backend FastAPI(7001)│
+│  React/Vite      │ ◄──────────────────────────────── │  service modules      │
+└──────────────────┘   WebSocket (chat, presence)       └─────────┬────────────┘
+            │                                                    │
+            │  HLS playback (mediamtx :8888)                      ├──► PostgreSQL
+            ▼                                                    ├──► Redis (pub/sub)
+┌──────────────────┐    RTMP ingest (OBS + stream key)           │
+│   mediamtx       │ ◄─────────────────── Streamer               ▼
+│   :1935/:8888    │                                  ┌──────────────────┐
+└──────────────────┘                                  │ ./recordings/    │
+   auth webhook ──► backend validates key              │ (bind-mounted)   │
+                                                       └──────────────────┘
+```
+
+### Backend modules
+
+Each domain is self-contained under `backend/`:
+
+```
+auth/           register, login, JWT, suspend
+communities/    CRUD + join/leave + roles + stream keys + suspend
+members/        membership & permissions
+ws/             realtime gateway + Redis pub/sub + presence
+streaming/      live status, viewer counts, publisher kick
+streams/        mediamtx publish-auth webhook
+recordings/     list + serve community VODs (.mp4)
+admin/          dashboard: users, communities, live, recordings
+seed.py         idempotent startup seeding (admin + test users)
+```
+
+## Ports
+
+| Service | Port |
+|---------|------|
+| Frontend | 5173 |
+| Backend API | 7001 |
+| PostgreSQL | 5432 |
+| Redis | 6379 |
+| mediamtx RTMP | 1935 |
+| mediamtx HLS | 8888 |
+| mediamtx API | 9997 |
 
 ## Project layout
 
 ```
 adda/
-├── docker-compose.yml
-├── .env.example
-├── backend/        FastAPI app (uv)
-│   ├── main.py     app entry, router registration
-│   ├── config.py   settings (pydantic-settings)
-│   ├── auth/ communities/ ws/ streaming/ members/
-│   └── alembic/    migrations
-├── frontend/       React app (pnpm + Vite)
+├── Makefile              all common commands
+├── compose.yaml          Docker Compose (postgres, redis, mediamtx, backend, frontend)
+├── .env.example          root env (compose interpolation)
+├── backend/              FastAPI app (uv, Python 3.12)
+│   ├── main.py           app entry, router registration, startup seed
+│   ├── config.py         settings (pydantic-settings)
+│   ├── seed.py           idempotent user seeding
+│   ├── auth/ communities/ members/ ws/ streaming/ streams/ recordings/ admin/
+│   └── alembic/          migrations
+├── frontend/             React app (pnpm + Vite)
 │   └── src/
-│       ├── store/      Zustand stores
-│       ├── lib/        api + ws clients
-│       ├── components/ UI
-│       └── pages/      routes
-└── mediamtx/       streaming server config
+│       ├── pages/        Landing, Login, Home, Community, Admin
+│       ├── components/   LivePlayer, ChatPanel, CopyField, WebRTCPlayer, UI kit
+│       ├── store/        Zustand stores (auth)
+│       └── lib/          api + ws clients
+├── mediamtx/             mediamtx config (Dockerfile-baked) + recording retention
+└── recordings/           stream recordings (gitignored, bind-mounted)
 ```
 
 ## Roadmap
 
-The starter ships: auth (JWT), communities CRUD + join/leave, a Redis-backed WS
-gateway with presence, and streaming status wired to mediamtx. Next up: chat
-persistence, posts, files, media gallery, recordings, events, notifications.
+**Done:** auth (JWT + suspend), communities CRUD + stream keys, Redis WS gateway with
+presence + chat, HLS live streaming (auto-connect), recordings (list + play + delete),
+admin dashboard (users/communities/live/recordings), landing page.
+
+**Next:** profile pages, posts/announcements, notifications, discovery/search, media gallery,
+files, events, chat persistence, private-community enforcement.
