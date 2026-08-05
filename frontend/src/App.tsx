@@ -5,6 +5,7 @@ import { useAuthStore } from "./store/auth-store";
 import { Avatar } from "./components/ui/Avatar";
 import { Button } from "./components/ui/Button";
 import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import CommunityPage from "./pages/CommunityPage";
 import AdminPage from "./pages/AdminPage";
@@ -70,7 +71,10 @@ export default function App() {
   if (!user) {
     return (
       <Routes>
-        <Route path="*" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage initialMode="login" />} />
+        <Route path="/register" element={<LoginPage initialMode="register" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }
