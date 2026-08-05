@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { useAuthStore } from "../store/auth-store";
 
-export default function LoginPage() {
+export default function LoginPage({ initialMode = "login" }: { initialMode?: "login" | "register" }) {
   const { login, register } = useAuthStore();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -44,9 +44,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-4xl font-extrabold text-transparent">
+          <Link to="/" className="inline-block bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-4xl font-extrabold text-transparent">
             adda
-          </h1>
+          </Link>
           <p className="mt-2 text-sm text-muted-foreground">
             Communities that happen to stream.
           </p>
