@@ -1,9 +1,9 @@
 import type { ComponentProps } from "react";
 import { Link } from "@tanstack/react-router";
-import { Globe, MessageCircle } from "lucide-react";
 import { Container } from "@/shared/ui/container";
 
-type Item = { label: string; to?: ComponentProps<typeof Link>["to"] };
+type To = ComponentProps<typeof Link>["to"];
+type Item = { label: string; to: To };
 
 const COLUMNS: { title: string; items: Item[] }[] = [
   {
@@ -11,31 +11,31 @@ const COLUMNS: { title: string; items: Item[] }[] = [
     items: [
       { label: "Features", to: "/features" },
       { label: "Pricing", to: "/pricing" },
-      { label: "Changelog" },
-      { label: "Roadmap" },
+      { label: "Changelog", to: "/changelog" },
+      { label: "Roadmap", to: "/roadmap" },
     ],
   },
   {
     title: "Company",
     items: [
       { label: "About", to: "/about" },
-      { label: "Blog" },
-      { label: "Careers" },
-      { label: "Contact" },
+      { label: "Blog", to: "/blog" },
+      { label: "Contact", to: "/contact" },
     ],
   },
   {
     title: "Resources",
     items: [
-      { label: "Documentation" },
-      { label: "Help Center" },
-      { label: "Community" },
-      { label: "Status" },
+      { label: "Documentation", to: "/docs" },
+      { label: "Status", to: "/status" },
     ],
   },
   {
     title: "Legal",
-    items: [{ label: "Privacy" }, { label: "Terms" }, { label: "Security" }],
+    items: [
+      { label: "Privacy", to: "/privacy" },
+      { label: "Terms", to: "/terms" },
+    ],
   },
 ];
 
@@ -54,22 +54,6 @@ export function Footer() {
             <p className="max-w-xs text-sm text-muted-foreground">
               Communities that happen to stream. Live video, chat, and content — all in one place.
             </p>
-            <div className="flex gap-3">
-              <a
-                href="#"
-                aria-label="Website"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <Globe className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="Community"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <MessageCircle className="h-4 w-4" />
-              </a>
-            </div>
           </div>
 
           {COLUMNS.map((col) => (
@@ -78,21 +62,12 @@ export function Footer() {
               <ul className="space-y-2.5">
                 {col.items.map((it) => (
                   <li key={it.label}>
-                    {it.to ? (
-                      <Link
-                        to={it.to}
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {it.label}
-                      </Link>
-                    ) : (
-                      <a
-                        href="#"
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {it.label}
-                      </a>
-                    )}
+                    <Link
+                      to={it.to}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {it.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
