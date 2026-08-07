@@ -46,8 +46,9 @@ docker compose up -d --build              # postgres + redis + mediamtx + backen
 ## Conventions
 
 - **WebSocket contract is sacred.** The message types in
-  `backend/modules/realtime/protocol.py` and `frontend/src/lib/ws.ts` must stay
-  in sync. When adding a realtime feature, define the type in both places first.
+  `backend/modules/realtime/protocol.py` and `frontend/src/features/realtime/ws.ts`
+  must stay in sync. When adding a realtime feature, define the type in both
+  places first.
 - Backend is async-first (async SQLAlchemy, asyncpg, `redis.asyncio`). Never use
   blocking calls in request handlers.
 - **Layout:** `core/` holds shared infra — `config.py`, `database.py`,
@@ -68,8 +69,11 @@ docker compose up -d --build              # postgres + redis + mediamtx + backen
   module's `model.py` but never its `router`/`service` (prevents import cycles).
 - Use triple-quoted strings for multi-line prompt/text. Pydantic v2 models for
   all request/response schemas.
-- Frontend state via Zustand stores (`src/store/`). API calls via `src/lib/api.ts`,
-  WS via `src/lib/ws.ts`.
+- Frontend uses TanStack Query + TanStack Router (file-based routes under
+  `src/routes/`). Feature-sliced: each domain has `src/features/<domain>/` with
+  `api.ts`, `hooks.ts`, `types.ts`. Shared UI in `src/shared/ui/` (shadcn/ui
+  style). API client in `src/shared/api/client.ts`, WS in
+  `src/features/realtime/ws.ts`.
 
 ## Ports
 
