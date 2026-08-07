@@ -15,6 +15,24 @@ class UserLogin(BaseModel):
     password: str
 
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str = Field(min_length=8, max_length=128)
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8, max_length=128)
+
+
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

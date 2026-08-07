@@ -18,6 +18,7 @@ dependencies = [
     "bcrypt>=4.2.0",
     "python-multipart>=0.0.20",
     "httpx>=0.28.1",
+    "aiosmtplib>=5.1.2",
 ]
 
 [dependency-groups]

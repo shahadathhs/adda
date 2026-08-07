@@ -25,6 +25,20 @@ class Settings(BaseSettings):
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+    # Password reset tokens (signed JWT, separate purpose).
+    reset_token_expire_minutes: int = 30
+    # Frontend URL the reset email links to (token appended as ?token=…).
+    password_reset_url: str = "http://localhost:5173/reset-password"
+    # Google OAuth 2.0 (ID-token flow). Set to your Google client id to enable.
+    google_client_id: str = ""
+
+    # Email (SMTP). Leave smtp_host empty to skip sending (e.g. in dev).
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""  # app password for Gmail etc.
+    smtp_from: str = "adda <noreply@adda.example>"
+    smtp_starttls: bool = True
 
     # Streaming (mediamtx)
     mtx_api_url: str = "http://localhost:9997"
