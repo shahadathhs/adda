@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { FiVideoOff } from "react-icons/fi";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { HLS_BASE_URL } from "@/shared/config";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import CopyField from "@/shared/ui/CopyField";
-import { useAuthStore } from "@/features/auth/store";
+import { useMe } from "@/features/auth/hooks";
 import { useCommunity, useRotateStreamKey, useStreamKey } from "@/features/communities/hooks";
 import { useStreamStatus } from "@/features/streaming/hooks";
 import LivePlayer from "@/features/streaming/LivePlayer";
@@ -28,7 +28,7 @@ function ComingSoon({ label }: { label: string }) {
 export default function CommunityPage() {
   const { id } = useParams({ from: "/_authed/community/$id" });
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { data: user } = useMe();
   const [tab, setTab] = useState<Tab>("Live");
 
   const { data: community, isLoading: loading, isError } = useCommunity(id);

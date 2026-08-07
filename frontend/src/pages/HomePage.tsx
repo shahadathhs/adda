@@ -1,23 +1,29 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/shared/ui/form";
 import { useCommunities, useCreateCommunity } from "@/features/communities/hooks";
+import { createCommunitySchema, type CreateCommunityValues } from "@/features/communities/schemas";
 
 export default function HomePage() {
   const { data: communities = [], isLoading: loading } = useCommunities();
   const createMutation = useCreateCommunity();
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: "", slug: "", description: "" });
+  const form = useForm<CreateCommunityValues>({
+    resolver: zodResolver(createCommunitySchema),
+    defaultValues: { name: "", slug: "", description: "" },
+  });
 
-  const create = (e: React.FormEvent) => {
-    e.preventDefault();
-    createMutation.mutate(form, {
+  const create = (values: CreateCommunityValues) => {
+    createMutation.mutate(values, {
       onSuccess: () => {
-        setForm({ name: "", slug: "", description: "" });
+        form.reset({ name: "", slug: "", description: "" });
         setCreating(false);
         toast.success("Community created");
       },
@@ -39,32 +45,52 @@ export default function HomePage() {
 
       {creating && (
         <Card className="mb-6 p-4">
-          <form onSubmit={create} className="grid gap-3 sm:grid-cols-2">
-            <Input
-              placeholder="Name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-            <Input
-              placeholder="slug (lowercase, hyphens)"
-              value={form.slug}
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
-              required
-            />
-            <Input
-              placeholder="Description"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="sm:col-span-2"
-            />
-            <div className="flex gap-2 sm:col-span-2">
-              <Button type="submit">Create</Button>
-              <Button type="button" variant="ghost" onClick={() => setCreating(false)}>
-                Cancel
-              </Button>
-            </div>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(create)} className="grid gap-3 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="slug (lowercase, hyphens)" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormControl>
+                      <Input placeholder="Description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex gap-2 sm:col-span-2">
+                <Button type="submit">Create</Button>
+                <Button type="button" variant="ghost" onClick={() => setCreating(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
         </Card>
       )}
 

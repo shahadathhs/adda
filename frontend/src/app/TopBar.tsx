@@ -1,10 +1,13 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
-import { useAuthStore } from "@/features/auth/store";
+import { useLogout, useMe } from "@/features/auth/hooks";
 
 export function TopBar() {
-  const { user, logout } = useAuthStore();
+  const { data: user } = useMe();
+  const logout = useLogout();
+  const navigate = useNavigate();
+
   return (
     <header className="flex h-14 items-center justify-between border-b border-border px-4">
       <div className="flex items-center gap-2">
@@ -31,7 +34,14 @@ export function TopBar() {
               {user.display_name}
             </span>
           </div>
-          <Button variant="ghost" size="sm" onClick={logout}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              logout();
+              navigate({ to: "/login" });
+            }}
+          >
             Logout
           </Button>
         </div>

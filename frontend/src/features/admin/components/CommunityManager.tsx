@@ -1,4 +1,4 @@
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
 import CopyField from "@/shared/ui/CopyField";

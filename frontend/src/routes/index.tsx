@@ -1,11 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useAuthStore } from "@/features/auth/store";
+import { readUser } from "@/features/auth/hooks";
 import LandingPage from "@/pages/LandingPage";
 
 export const Route = createFileRoute("/")({
-  beforeLoad: () => {
+  beforeLoad: ({ context }) => {
     // Authed users landing on "/" bounce to their home feed.
-    if (useAuthStore.getState().user) {
+    if (readUser(context.queryClient)) {
       throw redirect({ to: "/home" });
     }
   },

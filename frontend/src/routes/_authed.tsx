@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { TopBar } from "@/app/TopBar";
-import { useAuthStore } from "@/features/auth/store";
+import { readUser } from "@/features/auth/hooks";
 
 /**
  * Pathless layout for every authenticated screen. Renders the TopBar shell and
@@ -8,8 +8,8 @@ import { useAuthStore } from "@/features/auth/store";
  * the login page before any child component mounts.
  */
 export const Route = createFileRoute("/_authed")({
-  beforeLoad: () => {
-    if (!useAuthStore.getState().user) {
+  beforeLoad: ({ context }) => {
+    if (!readUser(context.queryClient)) {
       throw redirect({ to: "/login" });
     }
   },

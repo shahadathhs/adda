@@ -1,10 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useAuthStore } from "@/features/auth/store";
+import { readUser } from "@/features/auth/hooks";
 import AdminPage from "@/pages/AdminPage";
 
 export const Route = createFileRoute("/_authed/admin")({
-  beforeLoad: () => {
-    if (!useAuthStore.getState().user?.is_admin) {
+  beforeLoad: ({ context }) => {
+    if (!readUser(context.queryClient)?.is_admin) {
       throw redirect({ to: "/home" });
     }
   },

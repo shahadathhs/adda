@@ -1,5 +1,5 @@
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import {

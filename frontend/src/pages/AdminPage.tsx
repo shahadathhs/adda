@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthStore } from "@/features/auth/store";
+import { useMe } from "@/features/auth/hooks";
 import { useAdminStats } from "@/features/admin/hooks";
 import { StatCard } from "@/features/admin/components/StatCard";
 import { UsersTab } from "@/features/admin/components/UsersTab";
@@ -11,7 +11,7 @@ const TABS = ["Users", "Communities", "Live", "Recordings"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function AdminPage() {
-  const { user } = useAuthStore();
+  const { data: user } = useMe();
   const [tab, setTab] = useState<Tab>("Users");
   const { data: stats } = useAdminStats();
 
