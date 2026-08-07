@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import toast from "react-hot-toast";
-import { Avatar } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import { Input } from "../components/ui/Input";
-import { api } from "../lib/api";
-import type { Community } from "../types";
+import { Avatar } from "@/shared/ui/Avatar";
+import { Button } from "@/shared/ui/Button";
+import { Card } from "@/shared/ui/Card";
+import { Input } from "@/shared/ui/Input";
+import { createCommunity, listCommunities } from "@/features/communities/api";
+import type { Community } from "@/features/communities/types";
 
 export default function HomePage() {
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -16,8 +16,8 @@ export default function HomePage() {
 
   const load = async () => {
     try {
-      setCommunities(await api.listCommunities());
-    } catch (err) {
+      setCommunities(await listCommunities());
+    } catch {
       toast.error("Failed to load communities");
     } finally {
       setLoading(false);
@@ -31,7 +31,7 @@ export default function HomePage() {
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const c = await api.createCommunity(form);
+      const c = await createCommunity(form);
       setCommunities([c, ...communities]);
       setForm({ name: "", slug: "", description: "" });
       setCreating(false);
@@ -56,9 +56,24 @@ export default function HomePage() {
       {creating && (
         <Card className="mb-6 p-4">
           <form onSubmit={create} className="grid gap-3 sm:grid-cols-2">
-            <Input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-            <Input placeholder="slug (lowercase, hyphens)" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
-            <Input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="sm:col-span-2" />
+            <Input
+              placeholder="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="slug (lowercase, hyphens)"
+              value={form.slug}
+              onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Description"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="sm:col-span-2"
+            />
             <div className="flex gap-2 sm:col-span-2">
               <Button type="submit">Create</Button>
               <Button type="button" variant="ghost" onClick={() => setCreating(false)}>
@@ -78,7 +93,7 @@ export default function HomePage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {communities.map((c) => (
-            <Link key={c.id} to={`/community/${c.id}`}>
+            <Link key={c.id} to="/community/$id" params={{ id: c.id }}>
               <Card className="cursor-pointer p-4 transition-colors hover:border-primary">
                 <div className="flex items-start gap-3">
                   <Avatar name={c.name} src={c.avatar_url} className="h-12 w-12 text-base" />
@@ -94,9 +109,7 @@ export default function HomePage() {
                     <p className="line-clamp-2 text-sm text-muted-foreground">
                       {c.description || `@${c.slug}`}
                     </p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {c.member_count} members
-                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">{c.member_count} members</p>
                   </div>
                 </div>
               </Card>

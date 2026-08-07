@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  FiUsers,
-  FiRadio,
-  FiMessageCircle,
-  FiServer,
-  FiArrowRight,
-} from "react-icons/fi";
-import { Avatar } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
-import { api } from "../lib/api";
-import type { Community } from "../types";
+import { Link } from "@tanstack/react-router";
+import { FiArrowRight, FiMessageCircle, FiRadio, FiServer, FiUsers } from "react-icons/fi";
+import { Avatar } from "@/shared/ui/Avatar";
+import { Button } from "@/shared/ui/Button";
+import { listCommunities } from "@/features/communities/api";
+import type { Community } from "@/features/communities/types";
 
 const FEATURES = [
   {
@@ -39,8 +33,7 @@ export default function LandingPage() {
   const [live, setLive] = useState<Community[]>([]);
 
   useEffect(() => {
-    api
-      .listCommunities()
+    listCommunities()
       .then((cs) => setLive(cs.filter((c) => c.is_live)))
       .catch(() => setLive([]));
   }, []);
@@ -54,7 +47,9 @@ export default function LandingPage() {
         </span>
         <div className="flex gap-2">
           <Link to="/login">
-            <Button variant="ghost" size="sm">Log in</Button>
+            <Button variant="ghost" size="sm">
+              Log in
+            </Button>
           </Link>
           <Link to="/register">
             <Button size="sm">Get started</Button>
@@ -72,8 +67,8 @@ export default function LandingPage() {
           Communities that happen to stream.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-          Self-hosted hubs for posts, chat, files, and live — Telegram Channels
-          meets Discord meets Twitch, deployable in one command.
+          Self-hosted hubs for posts, chat, files, and live — Telegram Channels meets Discord meets
+          Twitch, deployable in one command.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link to="/register">
@@ -82,7 +77,9 @@ export default function LandingPage() {
             </Button>
           </Link>
           <Link to="/login">
-            <Button variant="outline" size="lg">Log in</Button>
+            <Button variant="outline" size="lg">
+              Log in
+            </Button>
           </Link>
         </div>
       </section>
