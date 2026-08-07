@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
 import { useLogout, useMe } from "@/features/auth/hooks";
 
 export function TopBar() {
@@ -26,26 +27,29 @@ export function TopBar() {
           </Link>
         )}
       </div>
-      {user && (
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <UserAvatar name={user.display_name} src={user.avatar_url} />
-            <span className="hidden text-sm text-muted-foreground sm:inline">
-              {user.display_name}
-            </span>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              logout();
-              navigate({ to: "/login" });
-            }}
-          >
-            Logout
-          </Button>
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+        {user && (
+          <>
+            <div className="flex items-center gap-2">
+              <UserAvatar name={user.display_name} src={user.avatar_url} />
+              <span className="hidden text-sm text-muted-foreground sm:inline">
+                {user.display_name}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                logout();
+                navigate({ to: "/login" });
+              }}
+            >
+              Logout
+            </Button>
+          </>
+        )}
+      </div>
     </header>
   );
 }

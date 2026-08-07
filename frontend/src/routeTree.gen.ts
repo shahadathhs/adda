@@ -9,21 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
-import { Route as IndexRouteImport } from "./routes/index";
 import { Route as AuthedRouteImport } from "./routes/_authed";
+import { Route as PublicRouteImport } from "./routes/_public";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as RegisterRouteImport } from "./routes/register";
 import { Route as AuthedAdminRouteImport } from "./routes/_authed/admin";
 import { Route as AuthedHomeRouteImport } from "./routes/_authed/home";
+import { Route as PublicIndexRouteImport } from "./routes/_public/index";
+import { Route as PublicAboutRouteImport } from "./routes/_public/about";
+import { Route as PublicFeaturesRouteImport } from "./routes/_public/features";
+import { Route as PublicPricingRouteImport } from "./routes/_public/pricing";
 import { Route as AuthedCommunityIdRouteImport } from "./routes/_authed/community.$id";
 
-const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const AuthedRoute = AuthedRouteImport.update({
   id: "/_authed",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const PublicRoute = PublicRouteImport.update({
+  id: "/_public",
   getParentRoute: () => rootRouteImport,
 } as any);
 const LoginRoute = LoginRouteImport.update({
@@ -46,6 +49,26 @@ const AuthedHomeRoute = AuthedHomeRouteImport.update({
   path: "/home",
   getParentRoute: () => AuthedRoute,
 } as any);
+const PublicIndexRoute = PublicIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PublicRoute,
+} as any);
+const PublicAboutRoute = PublicAboutRouteImport.update({
+  id: "/about",
+  path: "/about",
+  getParentRoute: () => PublicRoute,
+} as any);
+const PublicFeaturesRoute = PublicFeaturesRouteImport.update({
+  id: "/features",
+  path: "/features",
+  getParentRoute: () => PublicRoute,
+} as any);
+const PublicPricingRoute = PublicPricingRouteImport.update({
+  id: "/pricing",
+  path: "/pricing",
+  getParentRoute: () => PublicRoute,
+} as any);
 const AuthedCommunityIdRoute = AuthedCommunityIdRouteImport.update({
   id: "/community/$id",
   path: "/community/$id",
@@ -53,68 +76,100 @@ const AuthedCommunityIdRoute = AuthedCommunityIdRouteImport.update({
 } as any);
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
+  "/": typeof PublicIndexRoute;
   "/login": typeof LoginRoute;
   "/register": typeof RegisterRoute;
   "/admin": typeof AuthedAdminRoute;
   "/home": typeof AuthedHomeRoute;
+  "/about": typeof PublicAboutRoute;
+  "/features": typeof PublicFeaturesRoute;
+  "/pricing": typeof PublicPricingRoute;
   "/community/$id": typeof AuthedCommunityIdRoute;
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
+  "/": typeof PublicIndexRoute;
   "/login": typeof LoginRoute;
   "/register": typeof RegisterRoute;
   "/admin": typeof AuthedAdminRoute;
   "/home": typeof AuthedHomeRoute;
+  "/about": typeof PublicAboutRoute;
+  "/features": typeof PublicFeaturesRoute;
+  "/pricing": typeof PublicPricingRoute;
   "/community/$id": typeof AuthedCommunityIdRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
   "/_authed": typeof AuthedRouteWithChildren;
+  "/_public": typeof PublicRouteWithChildren;
   "/login": typeof LoginRoute;
   "/register": typeof RegisterRoute;
   "/_authed/admin": typeof AuthedAdminRoute;
   "/_authed/home": typeof AuthedHomeRoute;
+  "/_public/about": typeof PublicAboutRoute;
+  "/_public/features": typeof PublicFeaturesRoute;
+  "/_public/pricing": typeof PublicPricingRoute;
+  "/_public/": typeof PublicIndexRoute;
   "/_authed/community/$id": typeof AuthedCommunityIdRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/login" | "/register" | "/admin" | "/home" | "/community/$id";
+  fullPaths:
+    | "/"
+    | "/login"
+    | "/register"
+    | "/admin"
+    | "/home"
+    | "/about"
+    | "/features"
+    | "/pricing"
+    | "/community/$id";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/login" | "/register" | "/admin" | "/home" | "/community/$id";
+  to:
+    | "/"
+    | "/login"
+    | "/register"
+    | "/admin"
+    | "/home"
+    | "/about"
+    | "/features"
+    | "/pricing"
+    | "/community/$id";
   id:
     | "__root__"
-    | "/"
     | "/_authed"
+    | "/_public"
     | "/login"
     | "/register"
     | "/_authed/admin"
     | "/_authed/home"
+    | "/_public/about"
+    | "/_public/features"
+    | "/_public/pricing"
+    | "/_public/"
     | "/_authed/community/$id";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
   AuthedRoute: typeof AuthedRouteWithChildren;
+  PublicRoute: typeof PublicRouteWithChildren;
   LoginRoute: typeof LoginRoute;
   RegisterRoute: typeof RegisterRoute;
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/_authed": {
       id: "/_authed";
       path: "";
       fullPath: "/";
       preLoaderRoute: typeof AuthedRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_public": {
+      id: "/_public";
+      path: "";
+      fullPath: "/";
+      preLoaderRoute: typeof PublicRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/login": {
@@ -145,6 +200,34 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthedHomeRouteImport;
       parentRoute: typeof AuthedRoute;
     };
+    "/_public/": {
+      id: "/_public/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof PublicIndexRouteImport;
+      parentRoute: typeof PublicRoute;
+    };
+    "/_public/about": {
+      id: "/_public/about";
+      path: "/about";
+      fullPath: "/about";
+      preLoaderRoute: typeof PublicAboutRouteImport;
+      parentRoute: typeof PublicRoute;
+    };
+    "/_public/features": {
+      id: "/_public/features";
+      path: "/features";
+      fullPath: "/features";
+      preLoaderRoute: typeof PublicFeaturesRouteImport;
+      parentRoute: typeof PublicRoute;
+    };
+    "/_public/pricing": {
+      id: "/_public/pricing";
+      path: "/pricing";
+      fullPath: "/pricing";
+      preLoaderRoute: typeof PublicPricingRouteImport;
+      parentRoute: typeof PublicRoute;
+    };
     "/_authed/community/$id": {
       id: "/_authed/community/$id";
       path: "/community/$id";
@@ -169,9 +252,25 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 
 const AuthedRouteWithChildren = AuthedRoute._addFileChildren(AuthedRouteChildren);
 
+interface PublicRouteChildren {
+  PublicAboutRoute: typeof PublicAboutRoute;
+  PublicFeaturesRoute: typeof PublicFeaturesRoute;
+  PublicPricingRoute: typeof PublicPricingRoute;
+  PublicIndexRoute: typeof PublicIndexRoute;
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicAboutRoute: PublicAboutRoute,
+  PublicFeaturesRoute: PublicFeaturesRoute,
+  PublicPricingRoute: PublicPricingRoute,
+  PublicIndexRoute: PublicIndexRoute,
+};
+
+const PublicRouteWithChildren = PublicRoute._addFileChildren(PublicRouteChildren);
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
+  PublicRoute: PublicRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
 };
