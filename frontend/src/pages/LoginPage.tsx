@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import toast from "react-hot-toast";
-import { Button } from "@/shared/ui/Button";
-import { Input } from "@/shared/ui/Input";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
 import { useAuthStore } from "@/features/auth/store";
 
 export default function LoginPage({

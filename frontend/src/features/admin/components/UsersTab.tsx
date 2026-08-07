@@ -1,59 +1,48 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
-import { Input } from "@/shared/ui/Input";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
 import {
-  adminDeleteUser,
-  adminResetUserPassword,
-  adminUpdateUser,
-  adminUsers,
-} from "@/features/admin/api";
+  useAdminDeleteUser,
+  useAdminResetUserPassword,
+  useAdminUpdateUser,
+  useAdminUsers,
+} from "@/features/admin/hooks";
 import type { AdminUser } from "@/features/admin/types";
 
 export function UsersTab({ selfId }: { selfId?: string }) {
   const [q, setQ] = useState("");
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState<string | undefined>(undefined);
+  const { data: users = [], isLoading: loading } = useAdminUsers(search);
+  const updateMutation = useAdminUpdateUser();
+  const resetMutation = useAdminResetUserPassword();
+  const deleteMutation = useAdminDeleteUser();
 
-  const load = (query?: string) => {
-    setLoading(true);
-    adminUsers(query)
-      .then(setUsers)
-      .catch(() => toast.error("Failed to load users"))
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => load(), []);
+  const update = (u: AdminUser, patch: { is_admin?: boolean; is_active?: boolean }) =>
+    updateMutation.mutate(
+      { id: u.id, data: patch },
+      { onError: (e) => toast.error(e instanceof Error ? e.message : "Failed") },
+    );
 
-  const update = async (u: AdminUser, patch: { is_admin?: boolean; is_active?: boolean }) => {
-    try {
-      const updated = await adminUpdateUser(u.id, patch);
-      setUsers((p) => p.map((x) => (x.id === u.id ? updated : x)));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
-  };
-
-  const resetPw = async (u: AdminUser) => {
+  const resetPw = (u: AdminUser) => {
     const password = window.prompt(`New password for ${u.username} (min 8 chars):`);
     if (!password) return;
-    try {
-      await adminResetUserPassword(u.id, password);
-      toast.success("Password reset");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
+    resetMutation.mutate(
+      { id: u.id, password },
+      {
+        onSuccess: () => toast.success("Password reset"),
+        onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+      },
+    );
   };
 
-  const remove = async (u: AdminUser) => {
+  const remove = (u: AdminUser) => {
     if (!window.confirm(`Delete ${u.username}? Removes their communities/memberships too.`)) return;
-    try {
-      await adminDeleteUser(u.id);
-      setUsers((p) => p.filter((x) => x.id !== u.id));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
+    deleteMutation.mutate(u.id, {
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
   };
 
   return (
@@ -61,7 +50,7 @@ export function UsersTab({ selfId }: { selfId?: string }) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          load(q);
+          setSearch(q || undefined);
         }}
         className="flex gap-2"
       >
@@ -99,7 +88,7 @@ export function UsersTab({ selfId }: { selfId?: string }) {
                   <tr key={u.id} className="border-b border-border/60 last:border-0">
                     <td className="p-3">
                       <div className="flex items-center gap-2">
-                        <Avatar name={u.display_name} className="h-7 w-7 text-xs" />
+                        <UserAvatar name={u.display_name} className="h-7 w-7 text-xs" />
                         <div>
                           <div className="font-medium">
                             {u.display_name}{" "}

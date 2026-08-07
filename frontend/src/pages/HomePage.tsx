@@ -1,44 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import toast from "react-hot-toast";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
-import { Input } from "@/shared/ui/Input";
-import { createCommunity, listCommunities } from "@/features/communities/api";
-import type { Community } from "@/features/communities/types";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
+import { useCommunities, useCreateCommunity } from "@/features/communities/hooks";
 
 export default function HomePage() {
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: communities = [], isLoading: loading } = useCommunities();
+  const createMutation = useCreateCommunity();
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ name: "", slug: "", description: "" });
 
-  const load = async () => {
-    try {
-      setCommunities(await listCommunities());
-    } catch {
-      toast.error("Failed to load communities");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const create = async (e: React.FormEvent) => {
+  const create = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const c = await createCommunity(form);
-      setCommunities([c, ...communities]);
-      setForm({ name: "", slug: "", description: "" });
-      setCreating(false);
-      toast.success("Community created");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to create");
-    }
+    createMutation.mutate(form, {
+      onSuccess: () => {
+        setForm({ name: "", slug: "", description: "" });
+        setCreating(false);
+        toast.success("Community created");
+      },
+      onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to create"),
+    });
   };
 
   return (
@@ -96,7 +80,7 @@ export default function HomePage() {
             <Link key={c.id} to="/community/$id" params={{ id: c.id }}>
               <Card className="cursor-pointer p-4 transition-colors hover:border-primary">
                 <div className="flex items-start gap-3">
-                  <Avatar name={c.name} src={c.avatar_url} className="h-12 w-12 text-base" />
+                  <UserAvatar name={c.name} src={c.avatar_url} className="h-12 w-12 text-base" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="truncate font-semibold">{c.name}</h3>

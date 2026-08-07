@@ -3,14 +3,13 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { FiVideoOff } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { HLS_BASE_URL } from "@/shared/config";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
 import CopyField from "@/shared/ui/CopyField";
 import { useAuthStore } from "@/features/auth/store";
-import { getCommunity, getStreamKey, rotateStreamKey } from "@/features/communities/api";
-import type { Community, StreamCredentials } from "@/features/communities/types";
-import { streamStatus } from "@/features/streaming/api";
+import { useCommunity, useRotateStreamKey, useStreamKey } from "@/features/communities/hooks";
+import { useStreamStatus } from "@/features/streaming/hooks";
 import LivePlayer from "@/features/streaming/LivePlayer";
 import ChatPanel from "@/features/realtime/ChatPanel";
 import RecordingsPanel from "@/features/recordings/RecordingsPanel";
@@ -30,69 +29,35 @@ export default function CommunityPage() {
   const { id } = useParams({ from: "/_authed/community/$id" });
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const [community, setCommunity] = useState<Community | null>(null);
   const [tab, setTab] = useState<Tab>("Live");
-  const [isLive, setIsLive] = useState(false);
-  const [creds, setCreds] = useState<StreamCredentials | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const { data: community, isLoading: loading, isError } = useCommunity(id);
+  const isOwner = !!community && !!user && community.owner_id === user.id;
+  const { data: creds } = useStreamKey(id, isOwner);
+  const { data: status } = useStreamStatus(id, tab === "Live");
+  const rotateMutation = useRotateStreamKey(id);
+
+  const isLive = status?.is_live ?? community?.is_live ?? false;
 
   useEffect(() => {
-    if (!id) return;
-    (async () => {
-      try {
-        const c = await getCommunity(id);
-        setCommunity(c);
-        setIsLive(c.is_live);
-      } catch {
-        toast.error("Community not found");
-        navigate({ to: "/home" });
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id, navigate]);
-
-  // Owner-only: load the stream URL + key for the OBS setup panel.
-  useEffect(() => {
-    if (!id || !user || community?.owner_id !== user.id) {
-      setCreds(null);
-      return;
+    if (isError) {
+      toast.error("Community not found");
+      navigate({ to: "/home" });
     }
-    getStreamKey(id)
-      .then(setCreds)
-      .catch(() => setCreds(null));
-  }, [id, user, community?.owner_id]);
+  }, [isError, navigate]);
 
-  const rotateKey = async () => {
-    if (!id) return;
-    try {
-      setCreds(await rotateStreamKey(id));
-      toast.success("Stream key rotated — update OBS with the new URL.");
-    } catch {
-      toast.error("Could not rotate the stream key");
-    }
+  const rotateKey = () => {
+    rotateMutation.mutate(undefined, {
+      onSuccess: () => toast.success("Stream key rotated — update OBS with the new URL."),
+      onError: () => toast.error("Could not rotate the stream key"),
+    });
   };
-
-  // Poll stream status while on the Live tab (cheap; mediamtx API).
-  useEffect(() => {
-    if (!id || tab !== "Live") return;
-    const t = setInterval(async () => {
-      try {
-        const s = await streamStatus(id);
-        setIsLive(s.is_live);
-      } catch {
-        /* ignore */
-      }
-    }, 5000);
-    return () => clearInterval(t);
-  }, [id, tab]);
 
   if (loading || !community) {
     return <div className="p-6 text-muted-foreground">Loading…</div>;
   }
 
   const hlsUrl = `${HLS_BASE_URL}/community/${community.id}/index.m3u8`;
-  const isOwner = community.owner_id === user?.id;
   const showPlayer = isLive;
 
   return (
@@ -101,7 +66,7 @@ export default function CommunityPage() {
       <div className="h-32 bg-gradient-to-r from-primary/40 to-purple-500/40" />
       <div className="mx-auto w-full max-w-6xl px-6">
         <div className="-mt-10 flex items-end gap-4">
-          <Avatar
+          <UserAvatar
             name={community.name}
             src={community.avatar_url}
             className="h-20 w-20 text-2xl ring-4 ring-background"

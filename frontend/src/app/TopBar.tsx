@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
 import { useAuthStore } from "@/features/auth/store";
 
 export function TopBar() {
@@ -26,7 +26,7 @@ export function TopBar() {
       {user && (
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Avatar name={user.display_name} src={user.avatar_url} />
+            <UserAvatar name={user.display_name} src={user.avatar_url} />
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {user.display_name}
             </span>

@@ -1,49 +1,35 @@
-import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
 import CopyField from "@/shared/ui/CopyField";
 import {
-  adminCommunityMembers,
-  adminCommunityStreamKey,
-  adminKickMember,
-  adminRotateCommunityKey,
-} from "@/features/admin/api";
+  useAdminCommunityMembers,
+  useAdminCommunityStreamKey,
+  useAdminKickMember,
+  useAdminRotateCommunityKey,
+} from "@/features/admin/hooks";
 import type { AdminCommunity, AdminMember } from "@/features/admin/types";
-import type { StreamCredentials } from "@/features/communities/types";
 
 export function CommunityManager({ community }: { community: AdminCommunity }) {
-  const [members, setMembers] = useState<AdminMember[]>([]);
-  const [creds, setCreds] = useState<StreamCredentials | null>(null);
+  const { data: members = [] } = useAdminCommunityMembers(community.id);
+  const { data: creds } = useAdminCommunityStreamKey(community.id);
+  const kickMutation = useAdminKickMember(community.id);
+  const rotateMutation = useAdminRotateCommunityKey(community.id);
 
-  useEffect(() => {
-    adminCommunityMembers(community.id)
-      .then(setMembers)
-      .catch(() => {});
-    adminCommunityStreamKey(community.id)
-      .then(setCreds)
-      .catch(() => {});
-  }, [community.id]);
-
-  const kick = async (m: AdminMember) => {
+  const kick = (m: AdminMember) => {
     if (!window.confirm(`Remove ${m.username} from this community?`)) return;
-    try {
-      await adminKickMember(community.id, m.user_id);
-      setMembers((p) => p.filter((x) => x.user_id !== m.user_id));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
+    kickMutation.mutate(m.user_id, {
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
   };
 
-  const rotate = async () => {
+  const rotate = () => {
     if (!window.confirm("Rotate the stream key? The current OBS connection will be kicked."))
       return;
-    try {
-      setCreds(await adminRotateCommunityKey(community.id));
-      toast.success("Key rotated");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
+    rotateMutation.mutate(undefined, {
+      onSuccess: () => toast.success("Key rotated"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
   };
 
   return (
@@ -57,7 +43,7 @@ export function CommunityManager({ community }: { community: AdminCommunity }) {
               className="flex items-center justify-between rounded bg-background/50 px-2 py-1 text-sm"
             >
               <div className="flex items-center gap-2">
-                <Avatar name={m.display_name} className="h-6 w-6 text-xs" />
+                <UserAvatar name={m.display_name} className="h-6 w-6 text-xs" />
                 <span>{m.display_name}</span>
                 <span className="text-xs text-muted-foreground">{m.role}</span>
               </div>

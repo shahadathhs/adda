@@ -1,34 +1,18 @@
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import toast from "react-hot-toast";
-import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
-import { adminLive, adminStopStream } from "@/features/admin/api";
-import type { LiveStream } from "@/features/admin/types";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import { useAdminLive, useAdminStopStream } from "@/features/admin/hooks";
 
 export function LiveTab() {
-  const [items, setItems] = useState<LiveStream[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminLive();
+  const stopMutation = useAdminStopStream();
 
-  const load = () =>
-    adminLive()
-      .then(setItems)
-      .finally(() => setLoading(false));
-  useEffect(() => {
-    load();
-    const t = setInterval(load, 10000);
-    return () => clearInterval(t);
-  }, []);
-
-  const stop = async (id: string) => {
-    try {
-      await adminStopStream(id);
-      toast.success("Stream stopped");
-      load();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
-  };
+  const stop = (id: string) =>
+    stopMutation.mutate(id, {
+      onSuccess: () => toast.success("Stream stopped"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
 
   if (loading) return <p className="text-muted-foreground">Loading…</p>;
   if (items.length === 0)

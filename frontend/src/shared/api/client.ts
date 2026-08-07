@@ -14,6 +14,16 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+/** Error thrown for any non-2xx response. Carries the HTTP status. */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 /** Authenticated JSON fetch helper used by every feature api module. */
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
@@ -38,7 +48,7 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     } catch {
       /* ignore */
     }
-    throw new Error(detail);
+    throw new ApiError(detail, resp.status);
   }
   return resp.json() as Promise<T>;
 }

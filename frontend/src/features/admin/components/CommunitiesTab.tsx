@@ -1,56 +1,41 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import toast from "react-hot-toast";
-import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
 import {
-  adminCommunities,
-  adminDeleteCommunity,
-  adminStopStream,
-  adminUpdateCommunity,
-} from "@/features/admin/api";
+  useAdminCommunities,
+  useAdminDeleteCommunity,
+  useAdminStopStream,
+  useAdminUpdateCommunity,
+} from "@/features/admin/hooks";
 import type { AdminCommunity } from "@/features/admin/types";
 import { CommunityManager } from "./CommunityManager";
 
 export function CommunitiesTab() {
-  const [items, setItems] = useState<AdminCommunity[]>([]);
+  const { data: items = [] } = useAdminCommunities();
   const [openId, setOpenId] = useState<string | null>(null);
+  const updateMutation = useAdminUpdateCommunity();
+  const stopMutation = useAdminStopStream();
+  const deleteMutation = useAdminDeleteCommunity();
 
-  const load = () =>
-    adminCommunities()
-      .then(setItems)
-      .catch(() => toast.error("Failed to load"));
-  useEffect(() => {
-    load();
-  }, []);
+  const toggleSuspend = (c: AdminCommunity) =>
+    updateMutation.mutate(
+      { id: c.id, data: { is_suspended: !c.is_suspended } },
+      { onError: (e) => toast.error(e instanceof Error ? e.message : "Failed") },
+    );
 
-  const toggleSuspend = async (c: AdminCommunity) => {
-    try {
-      const updated = await adminUpdateCommunity(c.id, { is_suspended: !c.is_suspended });
-      setItems((p) => p.map((x) => (x.id === c.id ? updated : x)));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
-  };
+  const stop = (c: AdminCommunity) =>
+    stopMutation.mutate(c.id, {
+      onSuccess: () => toast.success("Stream stopped"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
 
-  const stop = async (c: AdminCommunity) => {
-    try {
-      await adminStopStream(c.id);
-      toast.success("Stream stopped");
-      load();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
-  };
-
-  const remove = async (c: AdminCommunity) => {
+  const remove = (c: AdminCommunity) => {
     if (!window.confirm(`Delete community ${c.name}?`)) return;
-    try {
-      await adminDeleteCommunity(c.id);
-      setItems((p) => p.filter((x) => x.id !== c.id));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
+    deleteMutation.mutate(c.id, {
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
   };
 
   return (

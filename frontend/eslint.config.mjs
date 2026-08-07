@@ -49,6 +49,15 @@ export default defineConfig([
     },
   },
 
+  // shadcn/ui primitives legitimately export variant helpers / context next to
+  // their components.
+  {
+    files: ["src/shared/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+
   // Run Prettier as an ESLint rule (and disable conflicting formatting rules).
   eslintPluginPrettierRecommended,
 ]);

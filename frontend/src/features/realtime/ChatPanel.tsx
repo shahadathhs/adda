@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
 import { useChat } from "./useChat";
 
 function formatTime(iso: string): string {
@@ -44,7 +44,7 @@ export default function ChatPanel({ communityId }: { communityId: string }) {
         )}
         {messages.map((m) => (
           <div key={m.id} className="flex gap-3">
-            <Avatar name={m.display_name} />
+            <UserAvatar name={m.display_name} />
             <div className="min-w-0">
               <div className="flex items-baseline gap-2">
                 <span className="text-sm font-medium">{m.display_name}</span>

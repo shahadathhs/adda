@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { FiArrowRight, FiMessageCircle, FiRadio, FiServer, FiUsers } from "react-icons/fi";
-import { Avatar } from "@/shared/ui/Avatar";
-import { Button } from "@/shared/ui/Button";
-import { listCommunities } from "@/features/communities/api";
-import type { Community } from "@/features/communities/types";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
+import { useCommunities } from "@/features/communities/hooks";
 
 const FEATURES = [
   {
@@ -30,13 +28,8 @@ const FEATURES = [
 ];
 
 export default function LandingPage() {
-  const [live, setLive] = useState<Community[]>([]);
-
-  useEffect(() => {
-    listCommunities()
-      .then((cs) => setLive(cs.filter((c) => c.is_live)))
-      .catch(() => setLive([]));
-  }, []);
+  const { data: communities = [] } = useCommunities();
+  const live = communities.filter((c) => c.is_live);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -99,7 +92,7 @@ export default function LandingPage() {
                 className="group rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar name={c.name} src={c.avatar_url} className="h-10 w-10" />
+                  <UserAvatar name={c.name} src={c.avatar_url} className="h-10 w-10" />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="truncate font-semibold">{c.name}</span>

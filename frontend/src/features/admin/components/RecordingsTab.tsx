@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
-import { adminCommunities, adminDeleteRecording, adminRecordings } from "@/features/admin/api";
-import type { AdminCommunity } from "@/features/admin/types";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import {
+  useAdminCommunities,
+  useAdminDeleteRecording,
+  useAdminRecordings,
+} from "@/features/admin/hooks";
 import type { Recording } from "@/features/recordings/types";
 
 function fmtBytes(n: number) {
@@ -13,34 +16,17 @@ function fmtBytes(n: number) {
 }
 
 export function RecordingsTab() {
-  const [items, setItems] = useState<Recording[]>([]);
-  const [communities, setCommunities] = useState<AdminCommunity[]>([]);
   const [filter, setFilter] = useState("");
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminRecordings(filter || undefined);
+  const { data: communities = [] } = useAdminCommunities();
+  const deleteMutation = useAdminDeleteRecording();
 
-  const load = () => {
-    setLoading(true);
-    Promise.all([adminRecordings(filter || undefined), adminCommunities()])
-      .then(([recs, comms]) => {
-        setItems(recs);
-        setCommunities(comms);
-      })
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
-
-  const remove = async (r: Recording) => {
+  const remove = (r: Recording) => {
     if (!window.confirm(`Delete recording ${r.name}?`)) return;
-    try {
-      await adminDeleteRecording(r.path);
-      setItems((p) => p.filter((x) => x.path !== r.path));
-      toast.success("Recording deleted");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
-    }
+    deleteMutation.mutate(r.path, {
+      onSuccess: () => toast.success("Recording deleted"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    });
   };
 
   const nameFor = (id: string | null) =>

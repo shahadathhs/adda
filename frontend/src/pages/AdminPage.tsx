@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/features/auth/store";
-import { adminStats } from "@/features/admin/api";
-import type { AdminStats } from "@/features/admin/types";
+import { useAdminStats } from "@/features/admin/hooks";
 import { StatCard } from "@/features/admin/components/StatCard";
 import { UsersTab } from "@/features/admin/components/UsersTab";
 import { CommunitiesTab } from "@/features/admin/components/CommunitiesTab";
@@ -14,13 +13,7 @@ type Tab = (typeof TABS)[number];
 export default function AdminPage() {
   const { user } = useAuthStore();
   const [tab, setTab] = useState<Tab>("Users");
-  const [stats, setStats] = useState<AdminStats | null>(null);
-
-  useEffect(() => {
-    adminStats()
-      .then(setStats)
-      .catch(() => {});
-  }, [tab]);
+  const { data: stats } = useAdminStats();
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">

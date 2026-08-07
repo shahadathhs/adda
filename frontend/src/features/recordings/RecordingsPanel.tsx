@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import { API_BASE_URL } from "@/shared/config";
-import { Card } from "@/shared/ui/Card";
-import { recordings as fetchRecordings } from "./api";
+import { Card } from "@/shared/ui/card";
+import { useRecordings } from "./hooks";
 import type { Recording } from "./types";
 
 function fmtSize(n: number) {
@@ -11,17 +10,8 @@ function fmtSize(n: number) {
 }
 
 export default function RecordingsPanel({ communityId }: { communityId: string }) {
-  const [recs, setRecs] = useState<Recording[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: recs = [], isLoading: loading } = useRecordings(communityId);
   const [active, setActive] = useState<Recording | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    fetchRecordings(communityId)
-      .then((r) => setRecs(r))
-      .catch(() => toast.error("Failed to load recordings"))
-      .finally(() => setLoading(false));
-  }, [communityId]);
 
   const src = active
     ? `${API_BASE_URL}/api/recordings/file?path=${encodeURIComponent(active.path)}`
