@@ -8,415 +8,416 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as AuthedRouteImport } from "./routes/_authed";
-import { Route as PublicRouteImport } from "./routes/_public";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as RegisterRouteImport } from "./routes/register";
-import { Route as AuthedAdminRouteImport } from "./routes/_authed/admin";
-import { Route as AuthedHomeRouteImport } from "./routes/_authed/home";
-import { Route as PublicIndexRouteImport } from "./routes/_public/index";
-import { Route as PublicAboutRouteImport } from "./routes/_public/about";
-import { Route as PublicBlogRouteImport } from "./routes/_public/blog";
-import { Route as PublicChangelogRouteImport } from "./routes/_public/changelog";
-import { Route as PublicContactRouteImport } from "./routes/_public/contact";
-import { Route as PublicDocsRouteImport } from "./routes/_public/docs";
-import { Route as PublicFeaturesRouteImport } from "./routes/_public/features";
-import { Route as PublicPricingRouteImport } from "./routes/_public/pricing";
-import { Route as PublicPrivacyRouteImport } from "./routes/_public/privacy";
-import { Route as PublicRoadmapRouteImport } from "./routes/_public/roadmap";
-import { Route as PublicStatusRouteImport } from "./routes/_public/status";
-import { Route as PublicTermsRouteImport } from "./routes/_public/terms";
-import { Route as AuthedCommunityIdRouteImport } from "./routes/_authed/community.$id";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as PublicRouteImport } from './routes/_public'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
+import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
+import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicBlogRouteImport } from './routes/_public/blog'
+import { Route as PublicChangelogRouteImport } from './routes/_public/changelog'
+import { Route as PublicContactRouteImport } from './routes/_public/contact'
+import { Route as PublicDocsRouteImport } from './routes/_public/docs'
+import { Route as PublicFeaturesRouteImport } from './routes/_public/features'
+import { Route as PublicPricingRouteImport } from './routes/_public/pricing'
+import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
+import { Route as PublicRoadmapRouteImport } from './routes/_public/roadmap'
+import { Route as PublicStatusRouteImport } from './routes/_public/status'
+import { Route as PublicTermsRouteImport } from './routes/_public/terms'
+import { Route as AuthedCommunityIdRouteImport } from './routes/_authed/community.$id'
 
 const AuthedRoute = AuthedRouteImport.update({
-  id: "/_authed",
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const PublicRoute = PublicRouteImport.update({
-  id: "/_public",
+  id: '/_public',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
-  id: "/register",
-  path: "/register",
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthedAdminRoute = AuthedAdminRouteImport.update({
-  id: "/admin",
-  path: "/admin",
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthedRoute,
-} as any);
+} as any)
 const AuthedHomeRoute = AuthedHomeRouteImport.update({
-  id: "/home",
-  path: "/home",
+  id: '/home',
+  path: '/home',
   getParentRoute: () => AuthedRoute,
-} as any);
+} as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicAboutRoute = PublicAboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicBlogRoute = PublicBlogRouteImport.update({
-  id: "/blog",
-  path: "/blog",
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicChangelogRoute = PublicChangelogRouteImport.update({
-  id: "/changelog",
-  path: "/changelog",
+  id: '/changelog',
+  path: '/changelog',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicContactRoute = PublicContactRouteImport.update({
-  id: "/contact",
-  path: "/contact",
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicDocsRoute = PublicDocsRouteImport.update({
-  id: "/docs",
-  path: "/docs",
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicFeaturesRoute = PublicFeaturesRouteImport.update({
-  id: "/features",
-  path: "/features",
+  id: '/features',
+  path: '/features',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicPricingRoute = PublicPricingRouteImport.update({
-  id: "/pricing",
-  path: "/pricing",
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
-  id: "/privacy",
-  path: "/privacy",
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicRoadmapRoute = PublicRoadmapRouteImport.update({
-  id: "/roadmap",
-  path: "/roadmap",
+  id: '/roadmap',
+  path: '/roadmap',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicStatusRoute = PublicStatusRouteImport.update({
-  id: "/status",
-  path: "/status",
+  id: '/status',
+  path: '/status',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const PublicTermsRoute = PublicTermsRouteImport.update({
-  id: "/terms",
-  path: "/terms",
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => PublicRoute,
-} as any);
+} as any)
 const AuthedCommunityIdRoute = AuthedCommunityIdRouteImport.update({
-  id: "/community/$id",
-  path: "/community/$id",
+  id: '/community/$id',
+  path: '/community/$id',
   getParentRoute: () => AuthedRoute,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof PublicIndexRoute;
-  "/login": typeof LoginRoute;
-  "/register": typeof RegisterRoute;
-  "/admin": typeof AuthedAdminRoute;
-  "/home": typeof AuthedHomeRoute;
-  "/about": typeof PublicAboutRoute;
-  "/blog": typeof PublicBlogRoute;
-  "/changelog": typeof PublicChangelogRoute;
-  "/contact": typeof PublicContactRoute;
-  "/docs": typeof PublicDocsRoute;
-  "/features": typeof PublicFeaturesRoute;
-  "/pricing": typeof PublicPricingRoute;
-  "/privacy": typeof PublicPrivacyRoute;
-  "/roadmap": typeof PublicRoadmapRoute;
-  "/status": typeof PublicStatusRoute;
-  "/terms": typeof PublicTermsRoute;
-  "/community/$id": typeof AuthedCommunityIdRoute;
+  '/': typeof PublicIndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/admin': typeof AuthedAdminRoute
+  '/home': typeof AuthedHomeRoute
+  '/about': typeof PublicAboutRoute
+  '/blog': typeof PublicBlogRoute
+  '/changelog': typeof PublicChangelogRoute
+  '/contact': typeof PublicContactRoute
+  '/docs': typeof PublicDocsRoute
+  '/features': typeof PublicFeaturesRoute
+  '/pricing': typeof PublicPricingRoute
+  '/privacy': typeof PublicPrivacyRoute
+  '/roadmap': typeof PublicRoadmapRoute
+  '/status': typeof PublicStatusRoute
+  '/terms': typeof PublicTermsRoute
+  '/community/$id': typeof AuthedCommunityIdRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof PublicIndexRoute;
-  "/login": typeof LoginRoute;
-  "/register": typeof RegisterRoute;
-  "/admin": typeof AuthedAdminRoute;
-  "/home": typeof AuthedHomeRoute;
-  "/about": typeof PublicAboutRoute;
-  "/blog": typeof PublicBlogRoute;
-  "/changelog": typeof PublicChangelogRoute;
-  "/contact": typeof PublicContactRoute;
-  "/docs": typeof PublicDocsRoute;
-  "/features": typeof PublicFeaturesRoute;
-  "/pricing": typeof PublicPricingRoute;
-  "/privacy": typeof PublicPrivacyRoute;
-  "/roadmap": typeof PublicRoadmapRoute;
-  "/status": typeof PublicStatusRoute;
-  "/terms": typeof PublicTermsRoute;
-  "/community/$id": typeof AuthedCommunityIdRoute;
+  '/': typeof PublicIndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/admin': typeof AuthedAdminRoute
+  '/home': typeof AuthedHomeRoute
+  '/about': typeof PublicAboutRoute
+  '/blog': typeof PublicBlogRoute
+  '/changelog': typeof PublicChangelogRoute
+  '/contact': typeof PublicContactRoute
+  '/docs': typeof PublicDocsRoute
+  '/features': typeof PublicFeaturesRoute
+  '/pricing': typeof PublicPricingRoute
+  '/privacy': typeof PublicPrivacyRoute
+  '/roadmap': typeof PublicRoadmapRoute
+  '/status': typeof PublicStatusRoute
+  '/terms': typeof PublicTermsRoute
+  '/community/$id': typeof AuthedCommunityIdRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/_authed": typeof AuthedRouteWithChildren;
-  "/_public": typeof PublicRouteWithChildren;
-  "/login": typeof LoginRoute;
-  "/register": typeof RegisterRoute;
-  "/_authed/admin": typeof AuthedAdminRoute;
-  "/_authed/home": typeof AuthedHomeRoute;
-  "/_public/about": typeof PublicAboutRoute;
-  "/_public/blog": typeof PublicBlogRoute;
-  "/_public/changelog": typeof PublicChangelogRoute;
-  "/_public/contact": typeof PublicContactRoute;
-  "/_public/docs": typeof PublicDocsRoute;
-  "/_public/features": typeof PublicFeaturesRoute;
-  "/_public/pricing": typeof PublicPricingRoute;
-  "/_public/privacy": typeof PublicPrivacyRoute;
-  "/_public/roadmap": typeof PublicRoadmapRoute;
-  "/_public/status": typeof PublicStatusRoute;
-  "/_public/terms": typeof PublicTermsRoute;
-  "/_public/": typeof PublicIndexRoute;
-  "/_authed/community/$id": typeof AuthedCommunityIdRoute;
+  __root__: typeof rootRouteImport
+  '/_authed': typeof AuthedRouteWithChildren
+  '/_public': typeof PublicRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_authed/admin': typeof AuthedAdminRoute
+  '/_authed/home': typeof AuthedHomeRoute
+  '/_public/about': typeof PublicAboutRoute
+  '/_public/blog': typeof PublicBlogRoute
+  '/_public/changelog': typeof PublicChangelogRoute
+  '/_public/contact': typeof PublicContactRoute
+  '/_public/docs': typeof PublicDocsRoute
+  '/_public/features': typeof PublicFeaturesRoute
+  '/_public/pricing': typeof PublicPricingRoute
+  '/_public/privacy': typeof PublicPrivacyRoute
+  '/_public/roadmap': typeof PublicRoadmapRoute
+  '/_public/status': typeof PublicStatusRoute
+  '/_public/terms': typeof PublicTermsRoute
+  '/_public/': typeof PublicIndexRoute
+  '/_authed/community/$id': typeof AuthedCommunityIdRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/login"
-    | "/register"
-    | "/admin"
-    | "/home"
-    | "/about"
-    | "/blog"
-    | "/changelog"
-    | "/contact"
-    | "/docs"
-    | "/features"
-    | "/pricing"
-    | "/privacy"
-    | "/roadmap"
-    | "/status"
-    | "/terms"
-    | "/community/$id";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/login'
+    | '/register'
+    | '/admin'
+    | '/home'
+    | '/about'
+    | '/blog'
+    | '/changelog'
+    | '/contact'
+    | '/docs'
+    | '/features'
+    | '/pricing'
+    | '/privacy'
+    | '/roadmap'
+    | '/status'
+    | '/terms'
+    | '/community/$id'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/login"
-    | "/register"
-    | "/admin"
-    | "/home"
-    | "/about"
-    | "/blog"
-    | "/changelog"
-    | "/contact"
-    | "/docs"
-    | "/features"
-    | "/pricing"
-    | "/privacy"
-    | "/roadmap"
-    | "/status"
-    | "/terms"
-    | "/community/$id";
+    | '/'
+    | '/login'
+    | '/register'
+    | '/admin'
+    | '/home'
+    | '/about'
+    | '/blog'
+    | '/changelog'
+    | '/contact'
+    | '/docs'
+    | '/features'
+    | '/pricing'
+    | '/privacy'
+    | '/roadmap'
+    | '/status'
+    | '/terms'
+    | '/community/$id'
   id:
-    | "__root__"
-    | "/_authed"
-    | "/_public"
-    | "/login"
-    | "/register"
-    | "/_authed/admin"
-    | "/_authed/home"
-    | "/_public/about"
-    | "/_public/blog"
-    | "/_public/changelog"
-    | "/_public/contact"
-    | "/_public/docs"
-    | "/_public/features"
-    | "/_public/pricing"
-    | "/_public/privacy"
-    | "/_public/roadmap"
-    | "/_public/status"
-    | "/_public/terms"
-    | "/_public/"
-    | "/_authed/community/$id";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/_authed'
+    | '/_public'
+    | '/login'
+    | '/register'
+    | '/_authed/admin'
+    | '/_authed/home'
+    | '/_public/about'
+    | '/_public/blog'
+    | '/_public/changelog'
+    | '/_public/contact'
+    | '/_public/docs'
+    | '/_public/features'
+    | '/_public/pricing'
+    | '/_public/privacy'
+    | '/_public/roadmap'
+    | '/_public/status'
+    | '/_public/terms'
+    | '/_public/'
+    | '/_authed/community/$id'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthedRoute: typeof AuthedRouteWithChildren;
-  PublicRoute: typeof PublicRouteWithChildren;
-  LoginRoute: typeof LoginRoute;
-  RegisterRoute: typeof RegisterRoute;
+  AuthedRoute: typeof AuthedRouteWithChildren
+  PublicRoute: typeof PublicRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/_authed": {
-      id: "/_authed";
-      path: "";
-      fullPath: "/";
-      preLoaderRoute: typeof AuthedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_public": {
-      id: "/_public";
-      path: "";
-      fullPath: "/";
-      preLoaderRoute: typeof PublicRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/register": {
-      id: "/register";
-      path: "/register";
-      fullPath: "/register";
-      preLoaderRoute: typeof RegisterRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_authed/admin": {
-      id: "/_authed/admin";
-      path: "/admin";
-      fullPath: "/admin";
-      preLoaderRoute: typeof AuthedAdminRouteImport;
-      parentRoute: typeof AuthedRoute;
-    };
-    "/_authed/home": {
-      id: "/_authed/home";
-      path: "/home";
-      fullPath: "/home";
-      preLoaderRoute: typeof AuthedHomeRouteImport;
-      parentRoute: typeof AuthedRoute;
-    };
-    "/_public/": {
-      id: "/_public/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof PublicIndexRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/about": {
-      id: "/_public/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof PublicAboutRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/blog": {
-      id: "/_public/blog";
-      path: "/blog";
-      fullPath: "/blog";
-      preLoaderRoute: typeof PublicBlogRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/changelog": {
-      id: "/_public/changelog";
-      path: "/changelog";
-      fullPath: "/changelog";
-      preLoaderRoute: typeof PublicChangelogRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/contact": {
-      id: "/_public/contact";
-      path: "/contact";
-      fullPath: "/contact";
-      preLoaderRoute: typeof PublicContactRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/docs": {
-      id: "/_public/docs";
-      path: "/docs";
-      fullPath: "/docs";
-      preLoaderRoute: typeof PublicDocsRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/features": {
-      id: "/_public/features";
-      path: "/features";
-      fullPath: "/features";
-      preLoaderRoute: typeof PublicFeaturesRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/pricing": {
-      id: "/_public/pricing";
-      path: "/pricing";
-      fullPath: "/pricing";
-      preLoaderRoute: typeof PublicPricingRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/privacy": {
-      id: "/_public/privacy";
-      path: "/privacy";
-      fullPath: "/privacy";
-      preLoaderRoute: typeof PublicPrivacyRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/roadmap": {
-      id: "/_public/roadmap";
-      path: "/roadmap";
-      fullPath: "/roadmap";
-      preLoaderRoute: typeof PublicRoadmapRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/status": {
-      id: "/_public/status";
-      path: "/status";
-      fullPath: "/status";
-      preLoaderRoute: typeof PublicStatusRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_public/terms": {
-      id: "/_public/terms";
-      path: "/terms";
-      fullPath: "/terms";
-      preLoaderRoute: typeof PublicTermsRouteImport;
-      parentRoute: typeof PublicRoute;
-    };
-    "/_authed/community/$id": {
-      id: "/_authed/community/$id";
-      path: "/community/$id";
-      fullPath: "/community/$id";
-      preLoaderRoute: typeof AuthedCommunityIdRouteImport;
-      parentRoute: typeof AuthedRoute;
-    };
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/home': {
+      id: '/_authed/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthedHomeRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_public/': {
+      id: '/_public/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/about': {
+      id: '/_public/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof PublicAboutRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/blog': {
+      id: '/_public/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof PublicBlogRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/changelog': {
+      id: '/_public/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof PublicChangelogRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/contact': {
+      id: '/_public/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof PublicContactRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/docs': {
+      id: '/_public/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof PublicDocsRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/features': {
+      id: '/_public/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof PublicFeaturesRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/pricing': {
+      id: '/_public/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PublicPricingRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/privacy': {
+      id: '/_public/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PublicPrivacyRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/roadmap': {
+      id: '/_public/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof PublicRoadmapRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/status': {
+      id: '/_public/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof PublicStatusRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/terms': {
+      id: '/_public/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof PublicTermsRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_authed/community/$id': {
+      id: '/_authed/community/$id'
+      path: '/community/$id'
+      fullPath: '/community/$id'
+      preLoaderRoute: typeof AuthedCommunityIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
 interface AuthedRouteChildren {
-  AuthedAdminRoute: typeof AuthedAdminRoute;
-  AuthedHomeRoute: typeof AuthedHomeRoute;
-  AuthedCommunityIdRoute: typeof AuthedCommunityIdRoute;
+  AuthedAdminRoute: typeof AuthedAdminRoute
+  AuthedHomeRoute: typeof AuthedHomeRoute
+  AuthedCommunityIdRoute: typeof AuthedCommunityIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAdminRoute: AuthedAdminRoute,
   AuthedHomeRoute: AuthedHomeRoute,
   AuthedCommunityIdRoute: AuthedCommunityIdRoute,
-};
+}
 
-const AuthedRouteWithChildren = AuthedRoute._addFileChildren(AuthedRouteChildren);
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
 
 interface PublicRouteChildren {
-  PublicAboutRoute: typeof PublicAboutRoute;
-  PublicBlogRoute: typeof PublicBlogRoute;
-  PublicChangelogRoute: typeof PublicChangelogRoute;
-  PublicContactRoute: typeof PublicContactRoute;
-  PublicDocsRoute: typeof PublicDocsRoute;
-  PublicFeaturesRoute: typeof PublicFeaturesRoute;
-  PublicPricingRoute: typeof PublicPricingRoute;
-  PublicPrivacyRoute: typeof PublicPrivacyRoute;
-  PublicRoadmapRoute: typeof PublicRoadmapRoute;
-  PublicStatusRoute: typeof PublicStatusRoute;
-  PublicTermsRoute: typeof PublicTermsRoute;
-  PublicIndexRoute: typeof PublicIndexRoute;
+  PublicAboutRoute: typeof PublicAboutRoute
+  PublicBlogRoute: typeof PublicBlogRoute
+  PublicChangelogRoute: typeof PublicChangelogRoute
+  PublicContactRoute: typeof PublicContactRoute
+  PublicDocsRoute: typeof PublicDocsRoute
+  PublicFeaturesRoute: typeof PublicFeaturesRoute
+  PublicPricingRoute: typeof PublicPricingRoute
+  PublicPrivacyRoute: typeof PublicPrivacyRoute
+  PublicRoadmapRoute: typeof PublicRoadmapRoute
+  PublicStatusRoute: typeof PublicStatusRoute
+  PublicTermsRoute: typeof PublicTermsRoute
+  PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
@@ -432,16 +433,17 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicStatusRoute: PublicStatusRoute,
   PublicTermsRoute: PublicTermsRoute,
   PublicIndexRoute: PublicIndexRoute,
-};
+}
 
-const PublicRouteWithChildren = PublicRoute._addFileChildren(PublicRouteChildren);
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

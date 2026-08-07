@@ -9,7 +9,7 @@ import { queryClient } from "./query-client";
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         {children}
         <Toaster richColors position="top-right" />
         {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} position="bottom" />}

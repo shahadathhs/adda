@@ -132,7 +132,7 @@ function FeaturesPage() {
             <p className="max-w-xl text-muted-foreground">
               Create your community and go live in minutes — no setup headaches.
             </p>
-            <Link to="/register">
+            <Link to="/login">
               <Button size="lg">
                 Get started free <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>

@@ -98,7 +98,7 @@ function DocsPage() {
             <p className="max-w-md text-muted-foreground">
               Create your account and start building your community today.
             </p>
-            <Link to="/register">
+            <Link to="/login">
               <Button size="lg">
                 Get started <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>

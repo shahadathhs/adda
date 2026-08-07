@@ -40,13 +40,8 @@ export function Navbar() {
 
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden md:block">
             <Link to="/login">
-              <Button variant="ghost" size="sm">
-                Log in
-              </Button>
-            </Link>
-            <Link to="/register">
               <Button size="sm">Get started</Button>
             </Link>
           </div>
@@ -72,13 +67,6 @@ export function Navbar() {
                 <div className="mt-4 flex flex-col gap-2">
                   <SheetClose asChild>
                     <Link to="/login">
-                      <Button variant="outline" className="w-full">
-                        Log in
-                      </Button>
-                    </Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link to="/register">
                       <Button className="w-full">Get started</Button>
                     </Link>
                   </SheetClose>

@@ -111,7 +111,7 @@ function LandingPage() {
               in one home that's actually yours.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link to="/register">
+              <Link to="/login">
                 <Button size="lg" className="w-full sm:w-auto">
                   Get started free <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Button>
@@ -233,7 +233,7 @@ function LandingPage() {
                   Low-latency streaming means your chat reacts in real time. No more "am I lagging?"
                   — just you and your audience, in sync.
                 </p>
-                <Link to="/register" className="mt-6 inline-block">
+                <Link to="/login" className="mt-6 inline-block">
                   <Button>
                     Start your community <ArrowRight className="ml-1.5 h-4 w-4" />
                   </Button>
@@ -268,7 +268,7 @@ function LandingPage() {
             <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
               Create your community today and bring your people together.
             </p>
-            <Link to="/register" className="mt-8 inline-block">
+            <Link to="/login" className="mt-8 inline-block">
               <Button size="lg" variant="secondary">
                 Get started free <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>

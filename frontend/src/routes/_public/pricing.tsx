@@ -16,7 +16,7 @@ const PLANS = [
     cadence: "forever",
     description: "Everything you need to go live and build your first community.",
     cta: "Get started",
-    to: "/register" as const,
+    to: "/login" as const,
     featured: false,
     features: [
       "1 community",
@@ -32,7 +32,7 @@ const PLANS = [
     cadence: "per month",
     description: "For creators growing an audience around their live content.",
     cta: "Start Creator",
-    to: "/register" as const,
+    to: "/login" as const,
     featured: true,
     features: [
       "Up to 5 communities",
@@ -49,7 +49,7 @@ const PLANS = [
     cadence: "per month",
     description: "For large communities and organizations that need scale and control.",
     cta: "Contact sales",
-    to: "/register" as const,
+    to: "/contact" as const,
     featured: false,
     features: [
       "Unlimited communities",
@@ -157,7 +157,7 @@ function PricingPage() {
         <Container>
           <div className="flex flex-col items-center gap-4 rounded-2xl bg-gradient-to-r from-primary to-purple-500 px-6 py-12 text-center text-primary-foreground">
             <h2 className="text-2xl font-bold sm:text-3xl">Start free today</h2>
-            <Link to="/register">
+            <Link to="/login">
               <Button size="lg" variant="secondary">
                 Get started <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
