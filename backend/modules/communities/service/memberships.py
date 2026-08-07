@@ -23,9 +23,7 @@ async def join_community(
     user_id: uuid.UUID,
     role: CommunityRole = CommunityRole.member,
 ) -> Membership:
-    membership = Membership(
-        user_id=user_id, community_id=community_id, role=role
-    )
+    membership = Membership(user_id=user_id, community_id=community_id, role=role)
     db.add(membership)
     await db.commit()
     await db.refresh(membership)
@@ -37,10 +35,6 @@ async def leave_community(db: AsyncSession, membership: Membership) -> None:
     await db.commit()
 
 
-async def list_members(
-    db: AsyncSession, community_id: uuid.UUID
-) -> list[Membership]:
-    result = await db.execute(
-        select(Membership).where(Membership.community_id == community_id)
-    )
+async def list_members(db: AsyncSession, community_id: uuid.UUID) -> list[Membership]:
+    result = await db.execute(select(Membership).where(Membership.community_id == community_id))
     return list(result.scalars().all())

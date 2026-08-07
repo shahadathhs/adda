@@ -16,9 +16,9 @@ from pydantic import BaseModel
 
 # ── Client → Server ───────────────────────────────────────────────
 ClientMessageType = Literal[
-    "subscribe",      # join a channel
-    "unsubscribe",    # leave a channel
-    "chat_message",   # send a chat message
+    "subscribe",  # join a channel
+    "unsubscribe",  # leave a channel
+    "chat_message",  # send a chat message
     "ping",
 ]
 
@@ -26,10 +26,10 @@ ClientMessageType = Literal[
 ServerMessageType = Literal[
     "subscribed",
     "unsubscribed",
-    "chat_message",   # echoes + broadcasts new chat messages
-    "presence",       # online members in a channel
+    "chat_message",  # echoes + broadcasts new chat messages
+    "presence",  # online members in a channel
     "stream_status",  # a community went live / offline
-    "notification",   # personal notification
+    "notification",  # personal notification
     "error",
     "pong",
 ]

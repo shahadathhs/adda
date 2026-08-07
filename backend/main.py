@@ -44,9 +44,7 @@ async def startup() -> None:
     from modules.realtime.manager import manager
 
     await manager.start()
-    logging.getLogger("adda").info(
-        "Backend startup complete. Debug=%s", settings.debug
-    )
+    logging.getLogger("adda").info("Backend startup complete. Debug=%s", settings.debug)
 
 
 @app.get("/health")

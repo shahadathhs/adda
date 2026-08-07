@@ -1,14 +1,15 @@
 """Streaming routes: public playback info + admin live-stream controls."""
+
 import uuid
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
+from core.database import get_db
 from core.exceptions import NotFoundException
 from core.security.deps import get_current_user
 from core.security.guards import require_admin
-from core.database import get_db
 from models.user import User
 from modules.communities.service.queries import get_community
 from modules.streaming.schemas import LiveStreamOut
@@ -84,17 +85,11 @@ async def list_live(
         c = await get_community(db, uuid.UUID(cid))
         if c is None:
             continue
-        out.append(
-            LiveStreamOut(
-                community_id=cid, name=c.name, viewers=await viewer_count(cid)
-            )
-        )
+        out.append(LiveStreamOut(community_id=cid, name=c.name, viewers=await viewer_count(cid)))
     return out
 
 
-@admin_router.post(
-    "/communities/{community_id}/stop", status_code=status.HTTP_204_NO_CONTENT
-)
+@admin_router.post("/communities/{community_id}/stop", status_code=status.HTTP_204_NO_CONTENT)
 async def stop_stream(
     community_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

@@ -1,9 +1,10 @@
 """Admin platform-stats route (gated by `require_admin` at the router level)."""
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.security.guards import require_admin
 from core.database import get_db
+from core.security.guards import require_admin
 from modules.stats.schemas import StatsOut
 from modules.stats.service import stats as stats_service
 

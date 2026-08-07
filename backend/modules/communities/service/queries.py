@@ -17,9 +17,7 @@ async def get_community_by_slug(db: AsyncSession, slug: str) -> Community | None
     return result.scalar_one_or_none()
 
 
-async def list_communities(
-    db: AsyncSession, limit: int = 50, offset: int = 0
-) -> list[Community]:
+async def list_communities(db: AsyncSession, limit: int = 50, offset: int = 0) -> list[Community]:
     """Public listing — suspended communities are hidden."""
     result = await db.execute(
         select(Community)
@@ -39,9 +37,7 @@ async def list_all_communities(db: AsyncSession) -> list[Community]:
 
 async def count_members(db: AsyncSession, community_id: uuid.UUID) -> int:
     result = await db.execute(
-        select(func.count())
-        .select_from(Membership)
-        .where(Membership.community_id == community_id)
+        select(func.count()).select_from(Membership).where(Membership.community_id == community_id)
     )
     return int(result.scalar() or 0)
 

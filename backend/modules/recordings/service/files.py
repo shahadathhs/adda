@@ -5,7 +5,7 @@ Recordings live under <recordings>/community. New layout:
 """
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from core.config import settings
 
@@ -14,9 +14,7 @@ def _base() -> str:
     return os.path.realpath(settings.recordings_dir)
 
 
-def scan_recordings(
-    community_id: str | None = None, ids: set[str] | None = None
-) -> list[dict]:
+def scan_recordings(community_id: str | None = None, ids: set[str] | None = None) -> list[dict]:
     """List .mp4 recordings under <recordings>/community.
 
     When `community_id` is given, only that community's files are returned.
@@ -52,7 +50,7 @@ def scan_recordings(
                     "name": fn,
                     "path": rel,
                     "size_bytes": st.st_size,
-                    "created_at": datetime.fromtimestamp(st.st_mtime, tz=timezone.utc),
+                    "created_at": datetime.fromtimestamp(st.st_mtime, tz=UTC),
                 }
             )
     out.sort(key=lambda r: r["created_at"], reverse=True)

@@ -13,6 +13,8 @@ cd backend
 uv sync
 uv run alembic upgrade head          # apply migrations
 uv run uvicorn main:app --reload --port 7001
+uv run ruff check .                   # lint (must pass)
+uv run ruff format .                  # format
 uv run pyright                        # type checking (must pass, no new warnings)
 ```
 
@@ -32,8 +34,11 @@ pnpm build                                # tsc + vite build
 docker compose up -d --build              # postgres + redis + mediamtx + backend + frontend
 ```
 
-## Testing & quality policy
+## Quality policy
 
+- Run lint after every backend change: `cd backend && uv run ruff check .`.
+  Auto-format with `uv run ruff format .` (and `uv run ruff check --fix .` for
+  import sorting).
 - Run type checking after every backend change: `cd backend && uv run pyright`.
   No new warnings in changed files.
 - Run frontend lint/build after frontend changes: `cd frontend && pnpm lint && pnpm build`.

@@ -7,7 +7,7 @@ next feature.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
@@ -50,9 +50,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             try:
                 msg = IncomingMessage.model_validate(raw)
             except Exception:
-                await manager.send_to(
-                    conn, outgoing("error", data={"message": "Invalid message"})
-                )
+                await manager.send_to(conn, outgoing("error", data={"message": "Invalid message"}))
                 continue
 
             if msg.type == "ping":
@@ -79,12 +77,10 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     "username": conn.username,
                     "display_name": conn.display_name,
                     "content": content,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
                     "reply_to": msg.data.get("reply_to"),
                 }
-                await manager.broadcast(
-                    msg.channel, outgoing("chat_message", msg.channel, payload)
-                )
+                await manager.broadcast(msg.channel, outgoing("chat_message", msg.channel, payload))
 
     except WebSocketDisconnect:
         pass

@@ -1,4 +1,5 @@
 """Recording routes: public list/play + admin list/delete."""
+
 import uuid
 
 from fastapi import APIRouter, Depends, status
@@ -6,9 +7,9 @@ from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import get_db
 from core.exceptions import BadRequestException, NotFoundException
 from core.security.guards import require_admin
-from core.database import get_db
 from models.community import Community
 from modules.recordings.schemas import RecordingOut
 from modules.recordings.service.files import delete_recording, resolve_recording, scan_recordings
@@ -55,9 +56,7 @@ async def list_recordings_admin(
     if community_id is not None:
         recs = scan_recordings(str(community_id))
     else:
-        ids = {
-            str(i) for i in (await db.execute(select(Community.id))).scalars().all()
-        }
+        ids = {str(i) for i in (await db.execute(select(Community.id))).scalars().all()}
         recs = scan_recordings(None, ids)
     return [RecordingOut(**r) for r in recs]
 

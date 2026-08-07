@@ -1,7 +1,8 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from core.config import settings
 from models.community import Community, new_stream_key
 from modules.communities.schemas import StreamCredentialsOut
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def build_stream_credentials(community: Community) -> StreamCredentialsOut:

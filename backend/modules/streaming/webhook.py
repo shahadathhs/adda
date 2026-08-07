@@ -8,6 +8,7 @@ A publish is allowed only when:
   * the path is `community/<uuid>`, and
   * the request carries `?key=<stream_key>` matching that community's key.
 """
+
 import uuid
 from urllib.parse import parse_qs
 
@@ -24,9 +25,7 @@ _COMMUNITY_PREFIX = "community/"
 
 
 @router.post("/auth")
-async def mediamtx_auth(
-    request: Request, db: AsyncSession = Depends(get_db)
-) -> Response:
+async def mediamtx_auth(request: Request, db: AsyncSession = Depends(get_db)) -> Response:
     try:
         body = await request.json()
     except Exception:
@@ -43,7 +42,7 @@ async def mediamtx_auth(
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
-        community_id = uuid.UUID(raw_path[len(_COMMUNITY_PREFIX):])
+        community_id = uuid.UUID(raw_path[len(_COMMUNITY_PREFIX) :])
     except ValueError:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 

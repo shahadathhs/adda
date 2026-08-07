@@ -18,7 +18,6 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
-import redis.asyncio as redis
 from fastapi import WebSocket
 
 from core.redis_client import redis_client
@@ -105,8 +104,7 @@ class ConnectionManager:
     async def _presence_remove(self, channel: str, user_id: str) -> None:
         # Only remove if no other local connection for this user is subscribed.
         still_local = any(
-            user_id == c.user_id and channel in c.channels
-            for c in self.connections.values()
+            user_id == c.user_id and channel in c.channels for c in self.connections.values()
         )
         if not still_local:
             await redis_client.srem(PRESENCE_PREFIX + channel, user_id)

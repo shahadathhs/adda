@@ -1,12 +1,13 @@
 """Community routes: CRUD, stream-key management, and membership (join/leave/list)."""
+
 import uuid
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import get_db
 from core.exceptions import ConflictException, ForbiddenException, NotFoundException
 from core.security.deps import get_current_user
-from core.database import get_db
 from models.community import Community
 from models.user import User
 from modules.communities.schemas import (
@@ -24,6 +25,8 @@ from modules.communities.service.memberships import (
     get_membership,
     join_community,
     leave_community,
+)
+from modules.communities.service.memberships import (
     list_members as list_members_service,
 )
 from modules.communities.service.queries import (
@@ -64,9 +67,7 @@ async def _get_owned_community(
 # ── Communities ───────────────────────────────────────────────────────
 @router.get("", response_model=list[CommunityOut])
 @router.get("/", response_model=list[CommunityOut], include_in_schema=False)
-async def list_all(
-    limit: int = 50, offset: int = 0, db: AsyncSession = Depends(get_db)
-):
+async def list_all(limit: int = 50, offset: int = 0, db: AsyncSession = Depends(get_db)):
     communities = await list_communities(db, limit=limit, offset=offset)
     return [await _serialize(db, c) for c in communities]
 
@@ -147,9 +148,7 @@ async def rotate_stream_key(
 
 
 # ── Members ───────────────────────────────────────────────────────────
-@router.get(
-    "/{community_id}/members", response_model=list[UserOut], tags=["members"]
-)
+@router.get("/{community_id}/members", response_model=list[UserOut], tags=["members"])
 async def list_members(community_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     memberships = await list_members_service(db, community_id)
     users: list[UserOut] = []
@@ -183,9 +182,7 @@ async def join(
     return UserOut.model_validate(current_user, from_attributes=True)
 
 
-@router.delete(
-    "/{community_id}/members", status_code=status.HTTP_204_NO_CONTENT, tags=["members"]
-)
+@router.delete("/{community_id}/members", status_code=status.HTTP_204_NO_CONTENT, tags=["members"])
 async def leave(
     community_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

@@ -40,7 +40,7 @@ class Community(Base):
         index=True,
     )
 
-    members: Mapped[list["Membership"]] = relationship(  # noqa: F821
+    members: Mapped[list[Membership]] = relationship(
         "Membership",
         back_populates="community",
         cascade="all, delete-orphan",

@@ -1,15 +1,15 @@
 """Admin community-management routes (gated by `require_admin` at the router level)."""
+
 import uuid
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import get_db
 from core.exceptions import BadRequestException, NotFoundException
 from core.security.guards import require_admin
-from core.database import get_db
 from models.community import Community
 from models.membership import CommunityRole
-from models.user import User
 from modules.communities.schemas import (
     AdminCommunityOut,
     AdminCommunityUpdate,
@@ -20,6 +20,8 @@ from modules.communities.service.commands import delete_community
 from modules.communities.service.memberships import (
     get_membership,
     leave_community,
+)
+from modules.communities.service.memberships import (
     list_members as list_members_service,
 )
 from modules.communities.service.queries import (
@@ -54,9 +56,7 @@ async def _community_out(db: AsyncSession, c: Community) -> AdminCommunityOut:
     )
 
 
-async def _get_community_or_404(
-    db: AsyncSession, community_id: uuid.UUID
-) -> Community:
+async def _get_community_or_404(db: AsyncSession, community_id: uuid.UUID) -> Community:
     c = await get_community(db, community_id)
     if c is None:
         raise NotFoundException("Community not found")
@@ -108,9 +108,7 @@ async def list_members(
     return out
 
 
-@router.delete(
-    "/{community_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/{community_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def kick_member(
     community_id: uuid.UUID,
     user_id: uuid.UUID,

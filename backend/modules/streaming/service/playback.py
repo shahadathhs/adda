@@ -7,10 +7,7 @@ from modules.streaming.service.mediamtx import community_path, list_paths
 async def is_community_live(community_id: str) -> bool:
     """True if a ready source exists for the community's stream path."""
     path = community_path(community_id)
-    for item in await list_paths():
-        if item.get("name") == path and item.get("ready", False):
-            return True
-    return False
+    return any(item.get("name") == path and item.get("ready", False) for item in await list_paths())
 
 
 async def list_live_community_ids() -> list[str]:

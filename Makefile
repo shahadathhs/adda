@@ -18,8 +18,8 @@ ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 .PHONY: help setup env dirs toolchain install \
         up down restart build logs logs-backend logs-frontend ps \
         dev backend frontend \
-        migrate migration reset reset-migrate db-up test typecheck \
-        lint build-web \
+        migrate migration reset reset-migrate db-up typecheck \
+        lint lint-backend lint-web format build-web \
         check clean clean-recordings
 
 help: ## Show this help
@@ -121,23 +121,29 @@ migration: ## Generate a migration: make migration m="add posts"
 	$(ALEMBIC) revision --autogenerate -m "$(m)"
 	@echo "If upgrade()/downgrade() are just 'pass', there were no model changes — delete the file."
 
-test: ## Run backend tests (pytest)
-	@cd $(BACKEND_DIR) && $(UV) pytest
-
 typecheck: ## Run backend type checking (pyright)
 	@cd $(BACKEND_DIR) && $(UV) pyright
 
+lint-backend: ## Lint backend (ruff)
+	@cd $(BACKEND_DIR) && $(UV) ruff check .
+
+format: ## Format backend (ruff)
+	@cd $(BACKEND_DIR) && $(UV) ruff format .
+	@cd $(BACKEND_DIR) && $(UV) ruff check --fix .
+
 # ── Frontend ──────────────────────────────────────────────────────────
 
-lint: ## Run frontend ESLint
+lint-web: ## Lint frontend (ESLint)
 	@cd $(FRONTEND_DIR) && $(PNPM) lint
+
+lint: lint-backend lint-web ## Lint backend (ruff) + frontend (eslint)
 
 build-web: ## Build frontend (tsc + vite)
 	@cd $(FRONTEND_DIR) && $(PNPM) build
 
 # ── Quality & cleanup ─────────────────────────────────────────────────
 
-check: test typecheck lint build-web ## Run all quality gates
+check: typecheck lint build-web ## Run all quality gates
 
 clean-recordings: ## Delete ALL recordings (keeps the folder) — DESTRUCTIVE
 	@rm -rf recordings && mkdir recordings
