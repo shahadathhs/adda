@@ -5,7 +5,7 @@ import type { ChatMessage, ServerMessage } from "../types";
 type MessageHandler = (msg: ServerMessage) => void;
 
 /**
- * WebSocket client. Mirrors the protocol in backend/ws/protocol.py.
+ * WebSocket client. Mirrors the protocol in backend/modules/realtime/protocol.py.
  * Auto-reconnects with backoff and re-subscribes to active channels.
  */
 class AddaSocket {

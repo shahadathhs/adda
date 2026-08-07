@@ -92,7 +92,7 @@ export interface ChatMessage {
   reply_to: string | null;
 }
 
-// ── WebSocket protocol (must mirror backend/ws/protocol.py) ──
+// ── WebSocket protocol (must mirror backend/modules/realtime/protocol.py) ──
 export type ClientMessageType =
   | "subscribe"
   | "unsubscribe"
