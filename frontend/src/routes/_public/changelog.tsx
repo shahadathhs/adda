@@ -5,6 +5,20 @@ import { Container } from "@/shared/ui/container";
 import { PageHeader } from "@/features/site/components/page-header";
 
 export const Route = createFileRoute("/_public/changelog")({
+  head: () => ({
+    title: "Changelog — adda",
+    meta: [
+      {
+        name: "description",
+        content: "What's new in adda — features, fixes, and improvements.",
+      },
+      { property: "og:title", content: "Changelog — adda" },
+      {
+        property: "og:description",
+        content: "What's new in adda — features, fixes, and improvements.",
+      },
+    ],
+  }),
   component: ChangelogPage,
 });
 

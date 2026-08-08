@@ -2,6 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LiveTab } from "@/features/admin/components/LiveTab";
 
 export const Route = createFileRoute("/admin/live")({
+  head: () => ({
+    title: "Live — adda Admin",
+    meta: [
+      {
+        name: "description",
+        content: "Monitor and control live streams.",
+      },
+      { property: "og:title", content: "Live — adda Admin" },
+      { property: "og:description", content: "Monitor and control live streams." },
+    ],
+  }),
   component: LivePage,
 });
 

@@ -3,6 +3,17 @@ import { useMe } from "@/features/auth/hooks";
 import { UsersTab } from "@/features/admin/components/UsersTab";
 
 export const Route = createFileRoute("/admin/users")({
+  head: () => ({
+    title: "Users — adda Admin",
+    meta: [
+      {
+        name: "description",
+        content: "Manage users, roles, and permissions.",
+      },
+      { property: "og:title", content: "Users — adda Admin" },
+      { property: "og:description", content: "Manage users, roles, and permissions." },
+    ],
+  }),
   component: UsersPage,
 });
 

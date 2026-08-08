@@ -3,6 +3,20 @@ import { PageHeader } from "@/features/site/components/page-header";
 import { DocLayout, type DocSection } from "@/features/site/components/doc-layout";
 
 export const Route = createFileRoute("/_public/privacy")({
+  head: () => ({
+    title: "Privacy Policy — adda",
+    meta: [
+      {
+        name: "description",
+        content: "How adda handles your data on self-hosted instances.",
+      },
+      { property: "og:title", content: "Privacy Policy — adda" },
+      {
+        property: "og:description",
+        content: "How adda handles your data on self-hosted instances.",
+      },
+    ],
+  }),
   component: PrivacyPage,
 });
 

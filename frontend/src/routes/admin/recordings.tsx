@@ -2,6 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RecordingsTab } from "@/features/admin/components/RecordingsTab";
 
 export const Route = createFileRoute("/admin/recordings")({
+  head: () => ({
+    title: "Recordings — adda Admin",
+    meta: [
+      { name: "description", content: "Manage stream recordings." },
+      { property: "og:title", content: "Recordings — adda Admin" },
+      { property: "og:description", content: "Manage stream recordings." },
+    ],
+  }),
   component: RecordingsPage,
 });
 

@@ -6,6 +6,22 @@ import { Card } from "@/shared/ui/card";
 import { Container } from "@/shared/ui/container";
 
 export const Route = createFileRoute("/_public/about")({
+  head: () => ({
+    title: "About — adda",
+    meta: [
+      {
+        name: "description",
+        content:
+          "Learn about adda, the self-hosted community platform built for communities that stream.",
+      },
+      { property: "og:title", content: "About — adda" },
+      {
+        property: "og:description",
+        content:
+          "Learn about adda, the self-hosted community platform built for communities that stream.",
+      },
+    ],
+  }),
   component: AboutPage,
 });
 

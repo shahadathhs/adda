@@ -3,6 +3,20 @@ import { PageHeader } from "@/features/site/components/page-header";
 import { DocLayout, type DocSection } from "@/features/site/components/doc-layout";
 
 export const Route = createFileRoute("/_public/terms")({
+  head: () => ({
+    title: "Terms of Service — adda",
+    meta: [
+      {
+        name: "description",
+        content: "Terms of service for adda self-hosted instances.",
+      },
+      { property: "og:title", content: "Terms of Service — adda" },
+      {
+        property: "og:description",
+        content: "Terms of service for adda self-hosted instances.",
+      },
+    ],
+  }),
   component: TermsPage,
 });
 

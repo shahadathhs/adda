@@ -5,6 +5,14 @@ import { Container } from "@/shared/ui/container";
 import { PageHeader } from "@/features/site/components/page-header";
 
 export const Route = createFileRoute("/_public/status")({
+  head: () => ({
+    title: "Status — adda",
+    meta: [
+      { name: "description", content: "Service status and uptime for adda." },
+      { property: "og:title", content: "Status — adda" },
+      { property: "og:description", content: "Service status and uptime for adda." },
+    ],
+  }),
   component: StatusPage,
 });
 

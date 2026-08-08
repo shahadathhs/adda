@@ -5,6 +5,20 @@ import { Container } from "@/shared/ui/container";
 import { PageHeader } from "@/features/site/components/page-header";
 
 export const Route = createFileRoute("/_public/blog")({
+  head: () => ({
+    title: "Blog — adda",
+    meta: [
+      {
+        name: "description",
+        content: "Updates, tutorials, and stories from the adda community platform.",
+      },
+      { property: "og:title", content: "Blog — adda" },
+      {
+        property: "og:description",
+        content: "Updates, tutorials, and stories from the adda community platform.",
+      },
+    ],
+  }),
   component: BlogPage,
 });
 

@@ -3,6 +3,14 @@ import { useAdminStats } from "@/features/admin/hooks";
 import { Card } from "@/shared/ui/card";
 
 export const Route = createFileRoute("/admin/overview")({
+  head: () => ({
+    title: "Overview — adda Admin",
+    meta: [
+      { name: "description", content: "Platform overview and statistics." },
+      { property: "og:title", content: "Overview — adda Admin" },
+      { property: "og:description", content: "Platform overview and statistics." },
+    ],
+  }),
   component: OverviewPage,
 });
 

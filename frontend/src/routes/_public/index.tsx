@@ -24,6 +24,25 @@ export const Route = createFileRoute("/_public/")({
       throw redirect({ to: "/home" });
     }
   },
+  head: () => ({
+    title: "adda — Communities that happen to stream",
+    meta: [
+      {
+        name: "description",
+        content:
+          "Self-hosted community platform with live streaming. Telegram Channels meets Discord meets Twitch.",
+      },
+      {
+        property: "og:title",
+        content: "adda — Communities that happen to stream",
+      },
+      {
+        property: "og:description",
+        content:
+          "Self-hosted community platform with live streaming. Telegram Channels meets Discord meets Twitch.",
+      },
+    ],
+  }),
   component: LandingPage,
 });
 

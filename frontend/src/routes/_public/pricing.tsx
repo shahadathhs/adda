@@ -6,6 +6,20 @@ import { Card } from "@/shared/ui/card";
 import { Container } from "@/shared/ui/container";
 
 export const Route = createFileRoute("/_public/pricing")({
+  head: () => ({
+    title: "Pricing — adda",
+    meta: [
+      {
+        name: "description",
+        content: "adda is open source and free to self-host. Optional managed hosting coming soon.",
+      },
+      { property: "og:title", content: "Pricing — adda" },
+      {
+        property: "og:description",
+        content: "adda is open source and free to self-host. Optional managed hosting coming soon.",
+      },
+    ],
+  }),
   component: PricingPage,
 });
 

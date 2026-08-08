@@ -5,6 +5,20 @@ import { Container } from "@/shared/ui/container";
 import { PageHeader } from "@/features/site/components/page-header";
 
 export const Route = createFileRoute("/_public/roadmap")({
+  head: () => ({
+    title: "Roadmap — adda",
+    meta: [
+      {
+        name: "description",
+        content: "What's coming next for the adda community platform.",
+      },
+      { property: "og:title", content: "Roadmap — adda" },
+      {
+        property: "og:description",
+        content: "What's coming next for the adda community platform.",
+      },
+    ],
+  }),
   component: RoadmapPage,
 });
 

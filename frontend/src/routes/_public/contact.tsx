@@ -11,6 +11,14 @@ import { Textarea } from "@/shared/ui/textarea";
 import { PageHeader } from "@/features/site/components/page-header";
 
 export const Route = createFileRoute("/_public/contact")({
+  head: () => ({
+    title: "Contact — adda",
+    meta: [
+      { name: "description", content: "Get in touch with the adda team." },
+      { property: "og:title", content: "Contact — adda" },
+      { property: "og:description", content: "Get in touch with the adda team." },
+    ],
+  }),
   component: ContactPage,
 });
 

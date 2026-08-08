@@ -17,6 +17,22 @@ import { Card } from "@/shared/ui/card";
 import { Container } from "@/shared/ui/container";
 
 export const Route = createFileRoute("/_public/features")({
+  head: () => ({
+    title: "Features — adda",
+    meta: [
+      {
+        name: "description",
+        content:
+          "Communities, live streaming, realtime chat, recordings, and more — all self-hosted.",
+      },
+      { property: "og:title", content: "Features — adda" },
+      {
+        property: "og:description",
+        content:
+          "Communities, live streaming, realtime chat, recordings, and more — all self-hosted.",
+      },
+    ],
+  }),
   component: FeaturesPage,
 });
 

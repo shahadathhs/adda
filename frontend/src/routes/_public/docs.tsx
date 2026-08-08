@@ -6,6 +6,20 @@ import { Container } from "@/shared/ui/container";
 import { PageHeader } from "@/features/site/components/page-header";
 
 export const Route = createFileRoute("/_public/docs")({
+  head: () => ({
+    title: "Documentation — adda",
+    meta: [
+      {
+        name: "description",
+        content: "Guides and API documentation for the adda community platform.",
+      },
+      { property: "og:title", content: "Documentation — adda" },
+      {
+        property: "og:description",
+        content: "Guides and API documentation for the adda community platform.",
+      },
+    ],
+  }),
   component: DocsPage,
 });
 
