@@ -112,3 +112,5 @@ export const socket = new AddaSocket();
 export const chatChannel = (communityId: string) => `community/${communityId}/chat`;
 export const presenceChannel = (communityId: string) => `community/${communityId}/presence`;
 export const communityChannel = (communityId: string) => `community/${communityId}`;
+// DB-backed channel topic: channel:<uuid> — gateway parses + persists.
+export const channelTopic = (channelId: string) => `channel:${channelId}`;

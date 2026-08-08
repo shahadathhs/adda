@@ -9,11 +9,15 @@ from core.database import get_db
 from core.exceptions import ConflictException, ForbiddenException, NotFoundException
 from core.security.deps import get_current_user
 from models.community import Community
+from models.membership import CommunityRole
 from models.user import User
 from modules.communities.schemas import (
     CommunityCreate,
     CommunityOut,
     CommunityUpdate,
+    JoinRequestOut,
+    MemberOut,
+    RoleUpdateBody,
     StreamCredentialsOut,
 )
 from modules.communities.service.commands import (
@@ -22,9 +26,16 @@ from modules.communities.service.commands import (
     update_community,
 )
 from modules.communities.service.memberships import (
+    approve_join_request,
+    create_join_request,
+    deny_join_request,
+    get_join_request,
     get_membership,
+    has_pending_request,
     join_community,
     leave_community,
+    list_pending_join_requests,
+    update_member_role,
 )
 from modules.communities.service.memberships import (
     list_members as list_members_service,
@@ -33,6 +44,7 @@ from modules.communities.service.queries import (
     count_members,
     get_community,
     get_community_by_slug,
+    get_member_role,
     list_communities,
 )
 from modules.communities.service.stream_keys import (
@@ -148,24 +160,40 @@ async def rotate_stream_key(
 
 
 # ── Members ───────────────────────────────────────────────────────────
-@router.get("/{community_id}/members", response_model=list[UserOut], tags=["members"])
-async def list_members(community_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+ADMIN_ROLES = {CommunityRole.owner, CommunityRole.admin}
+
+
+@router.get(
+    "/{community_id}/members", response_model=list[MemberOut], tags=["members"]
+)
+async def list_members(
+    community_id: uuid.UUID, db: AsyncSession = Depends(get_db)
+):
     memberships = await list_members_service(db, community_id)
-    users: list[UserOut] = []
+    out: list[MemberOut] = []
     for m in memberships:
         await db.refresh(m, attribute_names=["user"])
         if m.user is not None:
-            users.append(UserOut.model_validate(m.user, from_attributes=True))
-    return users
+            out.append(
+                MemberOut(
+                    user_id=m.user_id,
+                    username=m.user.username,
+                    display_name=m.user.display_name,
+                    avatar_url=m.user.avatar_url,
+                    bio=m.user.bio,
+                    role=m.role.value,
+                    joined_at=m.created_at,
+                )
+            )
+    return out
 
 
 @router.post(
     "/{community_id}/members",
     status_code=status.HTTP_201_CREATED,
-    response_model=UserOut,
     tags=["members"],
 )
-async def join(
+async def join_or_request(
     community_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -178,11 +206,19 @@ async def join(
     if existing is not None:
         raise ConflictException("Already a member")
 
+    if community.is_private:
+        if await has_pending_request(db, community_id, current_user.id):
+            raise ConflictException("Join request already pending")
+        await create_join_request(db, community_id, current_user.id)
+        return {"status": "pending"}
+
     await join_community(db, community_id, current_user.id)
-    return UserOut.model_validate(current_user, from_attributes=True)
+    return {"status": "joined"}
 
 
-@router.delete("/{community_id}/members", status_code=status.HTTP_204_NO_CONTENT, tags=["members"])
+@router.delete(
+    "/{community_id}/members", status_code=status.HTTP_204_NO_CONTENT, tags=["members"]
+)
 async def leave(
     community_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -192,3 +228,146 @@ async def leave(
     if membership is None:
         raise NotFoundException("Not a member")
     await leave_community(db, membership)
+
+
+# ── Role management (admin+) ──────────────────────────────────────────
+@router.patch(
+    "/{community_id}/members/{user_id}",
+    response_model=MemberOut,
+    tags=["members"],
+)
+async def change_role(
+    community_id: uuid.UUID,
+    user_id: uuid.UUID,
+    data: RoleUpdateBody,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    my_role = await get_member_role(db, community_id, current_user.id)
+    if my_role not in ADMIN_ROLES:
+        raise ForbiddenException("Only admins can manage roles")
+    membership = await get_membership(db, community_id, user_id)
+    if membership is None:
+        raise NotFoundException("Member not found")
+    if membership.role == CommunityRole.owner:
+        raise ForbiddenException("Can't change the owner's role")
+    if user_id == current_user.id:
+        raise ForbiddenException("Can't change your own role")
+    await update_member_role(db, membership, data.role)
+    await db.refresh(membership, attribute_names=["user"])
+    return MemberOut(
+        user_id=membership.user_id,
+        username=membership.user.username,
+        display_name=membership.user.display_name,
+        avatar_url=membership.user.avatar_url,
+        bio=membership.user.bio,
+        role=membership.role.value,
+        joined_at=membership.created_at,
+    )
+
+
+@router.delete(
+    "/{community_id}/members/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["members"],
+)
+async def kick_member(
+    community_id: uuid.UUID,
+    user_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    my_role = await get_member_role(db, community_id, current_user.id)
+    if my_role not in ADMIN_ROLES:
+        raise ForbiddenException("Only admins can kick members")
+    membership = await get_membership(db, community_id, user_id)
+    if membership is None:
+        raise NotFoundException("Member not found")
+    if membership.role == CommunityRole.owner:
+        raise ForbiddenException("Can't kick the owner")
+    if user_id == current_user.id:
+        raise ForbiddenException("Can't kick yourself")
+    await leave_community(db, membership)
+
+
+# ── Join requests (private communities, admin+) ───────────────────────
+@router.get(
+    "/{community_id}/join-requests",
+    response_model=list[JoinRequestOut],
+    tags=["members"],
+)
+async def list_join_requests(
+    community_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    my_role = await get_member_role(db, community_id, current_user.id)
+    if my_role not in ADMIN_ROLES:
+        raise ForbiddenException("Only admins can view join requests")
+    requests = await list_pending_join_requests(db, community_id)
+    out: list[JoinRequestOut] = []
+    for r in requests:
+        user = await db.get(User, r.user_id)
+        if user is not None:
+            out.append(
+                JoinRequestOut(
+                    id=r.id,
+                    user_id=r.user_id,
+                    username=user.username,
+                    display_name=user.display_name,
+                    avatar_url=user.avatar_url,
+                    status=r.status,
+                    created_at=r.created_at,
+                )
+            )
+    return out
+
+
+@router.post(
+    "/{community_id}/join-requests/{request_id}/approve",
+    response_model=MemberOut,
+    tags=["members"],
+)
+async def approve_request(
+    community_id: uuid.UUID,
+    request_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    my_role = await get_member_role(db, community_id, current_user.id)
+    if my_role not in ADMIN_ROLES:
+        raise ForbiddenException("Only admins can approve requests")
+    request = await get_join_request(db, request_id)
+    if request is None or request.community_id != community_id:
+        raise NotFoundException("Join request not found")
+    membership = await approve_join_request(db, request)
+    await db.refresh(membership, attribute_names=["user"])
+    return MemberOut(
+        user_id=membership.user_id,
+        username=membership.user.username,
+        display_name=membership.user.display_name,
+        avatar_url=membership.user.avatar_url,
+        bio=membership.user.bio,
+        role=membership.role.value,
+        joined_at=membership.created_at,
+    )
+
+
+@router.post(
+    "/{community_id}/join-requests/{request_id}/deny",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["members"],
+)
+async def deny_request(
+    community_id: uuid.UUID,
+    request_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    my_role = await get_member_role(db, community_id, current_user.id)
+    if my_role not in ADMIN_ROLES:
+        raise ForbiddenException("Only admins can deny requests")
+    request = await get_join_request(db, request_id)
+    if request is None or request.community_id != community_id:
+        raise NotFoundException("Join request not found")
+    await deny_join_request(db, request)

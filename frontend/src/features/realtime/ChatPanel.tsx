@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
-import { useChat } from "./useChat";
+import { useCommunityChat } from "./useChat";
 
 function formatTime(iso: string): string {
   try {
@@ -11,8 +11,14 @@ function formatTime(iso: string): string {
   }
 }
 
-export default function ChatPanel({ communityId }: { communityId: string }) {
-  const { messages, onlineCount, send } = useChat(communityId);
+export default function ChatPanel({
+  communityId,
+  channelId,
+}: {
+  communityId: string;
+  channelId?: string;
+}) {
+  const { messages, onlineCount, send } = useCommunityChat(communityId, channelId);
   const [text, setText] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 

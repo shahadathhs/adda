@@ -13,8 +13,10 @@ import { useStreamStatus } from "@/features/streaming/hooks";
 import LivePlayer from "@/features/streaming/LivePlayer";
 import ChatPanel from "@/features/realtime/ChatPanel";
 import RecordingsPanel from "@/features/recordings/RecordingsPanel";
+import ChannelView from "@/features/channels/ChannelView";
+import MembersPanel from "@/features/communities/MembersPanel";
 
-const TABS = ["Posts", "Live", "Media", "Files", "Members", "Recordings"] as const;
+const TABS = ["Live", "Channels", "Posts", "Media", "Files", "Members", "Recordings"] as const;
 type Tab = (typeof TABS)[number];
 
 function ComingSoon({ label }: { label: string }) {
@@ -120,7 +122,7 @@ export default function CommunityPage() {
                       <p className="text-sm font-medium text-foreground">No live stream</p>
                       <p className="max-w-sm text-xs text-muted-foreground">
                         {isOwner
-                          ? "Start broadcasting in OBS to go live — grab your URL from “Stream setup” below."
+                          ? 'Start broadcasting in OBS to go live — grab your URL from "Stream setup" below.'
                           : "This community isn't broadcasting right now. Check back soon."}
                       </p>
                     </div>
@@ -136,7 +138,7 @@ export default function CommunityPage() {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Paste the <strong>Stream url</strong> into OBS → Settings → Stream → Server,
+                      Paste the <strong>Stream URL</strong> into OBS → Settings → Stream → Server,
                       and leave the Stream Key field empty.
                     </p>
                     <CopyField label="Stream URL" value={creds.stream_url} />
@@ -146,9 +148,10 @@ export default function CommunityPage() {
               </div>
             )}
             {tab === "Posts" && <ComingSoon label="Announcements & posts" />}
+            {tab === "Channels" && <ChannelView communityId={community.id} canManage={isOwner} />}
             {tab === "Media" && <ComingSoon label="Photo / video gallery" />}
             {tab === "Files" && <ComingSoon label="Shared files" />}
-            {tab === "Members" && <ComingSoon label="Member list" />}
+            {tab === "Members" && <MembersPanel communityId={community.id} canManage={isOwner} />}
             {tab === "Recordings" && <RecordingsPanel communityId={community.id} />}
           </div>
 

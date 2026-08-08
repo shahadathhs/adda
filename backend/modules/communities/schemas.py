@@ -49,8 +49,24 @@ class MemberOut(BaseModel):
     user_id: uuid.UUID
     username: str
     display_name: str
+    avatar_url: str | None = None
+    bio: str | None = None
     role: str
     joined_at: datetime
+
+
+class RoleUpdateBody(BaseModel):
+    role: str  # admin, moderator, streamer, member, guest
+
+
+class JoinRequestOut(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    username: str
+    display_name: str
+    avatar_url: str | None = None
+    status: str
+    created_at: datetime
 
 
 # ── Admin community management ────────────────────────────────────────
