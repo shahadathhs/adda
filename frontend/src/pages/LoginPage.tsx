@@ -104,7 +104,7 @@ function LoginForm() {
     setBusy(true);
     try {
       const token = await login.mutateAsync(values);
-      navigate({ to: token.user.is_admin ? "/admin" : "/home" });
+      navigate({ to: token.user.is_admin ? "/admin/overview" : "/home" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {

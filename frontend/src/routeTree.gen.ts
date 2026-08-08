@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as PublicRouteImport } from './routes/_public'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
-import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
 import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
@@ -27,6 +27,12 @@ import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as PublicRoadmapRouteImport } from './routes/_public/roadmap'
 import { Route as PublicStatusRouteImport } from './routes/_public/status'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminCommunitiesRouteImport } from './routes/admin/communities'
+import { Route as AdminLiveRouteImport } from './routes/admin/live'
+import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
+import { Route as AdminRecordingsRouteImport } from './routes/admin/recordings'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AuthedCommunityIdRouteImport } from './routes/_authed/community.$id'
 
 const AuthedRoute = AuthedRouteImport.update({
@@ -35,6 +41,11 @@ const AuthedRoute = AuthedRouteImport.update({
 } as any)
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -46,11 +57,6 @@ const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthedAdminRoute = AuthedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedHomeRoute = AuthedHomeRouteImport.update({
   id: '/home',
@@ -117,6 +123,36 @@ const PublicTermsRoute = PublicTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => PublicRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommunitiesRoute = AdminCommunitiesRouteImport.update({
+  id: '/communities',
+  path: '/communities',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLiveRoute = AdminLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOverviewRoute = AdminOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRecordingsRoute = AdminRecordingsRouteImport.update({
+  id: '/recordings',
+  path: '/recordings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthedCommunityIdRoute = AuthedCommunityIdRouteImport.update({
   id: '/community/$id',
   path: '/community/$id',
@@ -125,9 +161,9 @@ const AuthedCommunityIdRoute = AuthedCommunityIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin': typeof AuthedAdminRoute
   '/home': typeof AuthedHomeRoute
   '/about': typeof PublicAboutRoute
   '/blog': typeof PublicBlogRoute
@@ -140,13 +176,18 @@ export interface FileRoutesByFullPath {
   '/roadmap': typeof PublicRoadmapRoute
   '/status': typeof PublicStatusRoute
   '/terms': typeof PublicTermsRoute
+  '/admin/communities': typeof AdminCommunitiesRoute
+  '/admin/live': typeof AdminLiveRoute
+  '/admin/overview': typeof AdminOverviewRoute
+  '/admin/recordings': typeof AdminRecordingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/': typeof AdminIndexRoute
   '/community/$id': typeof AuthedCommunityIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin': typeof AuthedAdminRoute
   '/home': typeof AuthedHomeRoute
   '/about': typeof PublicAboutRoute
   '/blog': typeof PublicBlogRoute
@@ -159,15 +200,21 @@ export interface FileRoutesByTo {
   '/roadmap': typeof PublicRoadmapRoute
   '/status': typeof PublicStatusRoute
   '/terms': typeof PublicTermsRoute
+  '/admin/communities': typeof AdminCommunitiesRoute
+  '/admin/live': typeof AdminLiveRoute
+  '/admin/overview': typeof AdminOverviewRoute
+  '/admin/recordings': typeof AdminRecordingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin': typeof AdminIndexRoute
   '/community/$id': typeof AuthedCommunityIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authed': typeof AuthedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_authed/admin': typeof AuthedAdminRoute
   '/_authed/home': typeof AuthedHomeRoute
   '/_public/about': typeof PublicAboutRoute
   '/_public/blog': typeof PublicBlogRoute
@@ -180,16 +227,22 @@ export interface FileRoutesById {
   '/_public/roadmap': typeof PublicRoadmapRoute
   '/_public/status': typeof PublicStatusRoute
   '/_public/terms': typeof PublicTermsRoute
+  '/admin/communities': typeof AdminCommunitiesRoute
+  '/admin/live': typeof AdminLiveRoute
+  '/admin/overview': typeof AdminOverviewRoute
+  '/admin/recordings': typeof AdminRecordingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/_public/': typeof PublicIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/_authed/community/$id': typeof AuthedCommunityIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/login'
     | '/register'
-    | '/admin'
     | '/home'
     | '/about'
     | '/blog'
@@ -202,13 +255,18 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
+    | '/admin/communities'
+    | '/admin/live'
+    | '/admin/overview'
+    | '/admin/recordings'
+    | '/admin/users'
+    | '/admin/'
     | '/community/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/register'
-    | '/admin'
     | '/home'
     | '/about'
     | '/blog'
@@ -221,14 +279,20 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
+    | '/admin/communities'
+    | '/admin/live'
+    | '/admin/overview'
+    | '/admin/recordings'
+    | '/admin/users'
+    | '/admin'
     | '/community/$id'
   id:
     | '__root__'
     | '/_authed'
     | '/_public'
+    | '/admin'
     | '/login'
     | '/register'
-    | '/_authed/admin'
     | '/_authed/home'
     | '/_public/about'
     | '/_public/blog'
@@ -241,13 +305,20 @@ export interface FileRouteTypes {
     | '/_public/roadmap'
     | '/_public/status'
     | '/_public/terms'
+    | '/admin/communities'
+    | '/admin/live'
+    | '/admin/overview'
+    | '/admin/recordings'
+    | '/admin/users'
     | '/_public/'
+    | '/admin/'
     | '/_authed/community/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
 }
@@ -268,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -281,13 +359,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authed/admin': {
-      id: '/_authed/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthedAdminRouteImport
-      parentRoute: typeof AuthedRoute
     }
     '/_authed/home': {
       id: '/_authed/home'
@@ -380,6 +451,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicTermsRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/communities': {
+      id: '/admin/communities'
+      path: '/communities'
+      fullPath: '/admin/communities'
+      preLoaderRoute: typeof AdminCommunitiesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/live': {
+      id: '/admin/live'
+      path: '/live'
+      fullPath: '/admin/live'
+      preLoaderRoute: typeof AdminLiveRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/overview': {
+      id: '/admin/overview'
+      path: '/overview'
+      fullPath: '/admin/overview'
+      preLoaderRoute: typeof AdminOverviewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/recordings': {
+      id: '/admin/recordings'
+      path: '/recordings'
+      fullPath: '/admin/recordings'
+      preLoaderRoute: typeof AdminRecordingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_authed/community/$id': {
       id: '/_authed/community/$id'
       path: '/community/$id'
@@ -391,13 +504,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedRouteChildren {
-  AuthedAdminRoute: typeof AuthedAdminRoute
   AuthedHomeRoute: typeof AuthedHomeRoute
   AuthedCommunityIdRoute: typeof AuthedCommunityIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedAdminRoute: AuthedAdminRoute,
   AuthedHomeRoute: AuthedHomeRoute,
   AuthedCommunityIdRoute: AuthedCommunityIdRoute,
 }
@@ -438,9 +549,30 @@ const PublicRouteChildren: PublicRouteChildren = {
 const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
+interface AdminRouteChildren {
+  AdminCommunitiesRoute: typeof AdminCommunitiesRoute
+  AdminLiveRoute: typeof AdminLiveRoute
+  AdminOverviewRoute: typeof AdminOverviewRoute
+  AdminRecordingsRoute: typeof AdminRecordingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCommunitiesRoute: AdminCommunitiesRoute,
+  AdminLiveRoute: AdminLiveRoute,
+  AdminOverviewRoute: AdminOverviewRoute,
+  AdminRecordingsRoute: AdminRecordingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
 }
