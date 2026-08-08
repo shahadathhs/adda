@@ -3,7 +3,9 @@ import {
   createCommunity,
   getCommunity,
   getStreamKey,
+  joinCommunity,
   listCommunities,
+  listMembers,
   rotateStreamKey,
 } from "./api";
 import type { Community, StreamCredentials } from "./types";
@@ -52,3 +54,21 @@ export const useRotateStreamKey = (id: string) => {
     },
   });
 };
+
+export function useMembers(communityId: string | undefined) {
+  return useQuery({
+    queryKey: ["members", communityId],
+    queryFn: () => listMembers(communityId!),
+    enabled: !!communityId,
+  });
+}
+
+export function useJoinCommunity(communityId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => joinCommunity(communityId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["members", communityId] });
+    },
+  });
+}

@@ -8,7 +8,13 @@ import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import CopyField from "@/shared/ui/CopyField";
 import { useMe } from "@/features/auth/hooks";
-import { useCommunity, useRotateStreamKey, useStreamKey } from "@/features/communities/hooks";
+import {
+  useCommunity,
+  useJoinCommunity,
+  useMembers,
+  useRotateStreamKey,
+  useStreamKey,
+} from "@/features/communities/hooks";
 import { useStreamStatus } from "@/features/streaming/hooks";
 import LivePlayer from "@/features/streaming/LivePlayer";
 import ChatPanel from "@/features/realtime/ChatPanel";
@@ -38,8 +44,11 @@ export default function CommunityPage() {
   const { data: creds } = useStreamKey(id, isOwner);
   const { data: status } = useStreamStatus(id, tab === "Live");
   const rotateMutation = useRotateStreamKey(id);
+  const { data: members } = useMembers(id);
+  const joinMut = useJoinCommunity(id);
 
   const isLive = status?.is_live ?? community?.is_live ?? false;
+  const isMember = members?.some((m) => m.user_id === user?.id) ?? false;
 
   useEffect(() => {
     if (isError) {
@@ -86,9 +95,33 @@ export default function CommunityPage() {
               {community.description || `@${community.slug}`} · {community.member_count} members
             </p>
           </div>
-          <Button variant={isOwner ? "outline" : "default"} size="sm">
-            {isOwner ? "Your community" : "Joined"}
-          </Button>
+          {isOwner ? (
+            <Button variant="outline" size="sm" disabled>
+              Your community
+            </Button>
+          ) : isMember ? (
+            <Button variant="outline" size="sm" disabled>
+              Joined
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              disabled={joinMut.isPending}
+              onClick={() =>
+                joinMut.mutate(undefined, {
+                  onSuccess: (data) =>
+                    toast.success(
+                      data.status === "pending"
+                        ? "Join request sent — wait for admin approval."
+                        : "Joined!",
+                    ),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to join"),
+                })
+              }
+            >
+              {joinMut.isPending ? "…" : community.is_private ? "Request to join" : "Join"}
+            </Button>
+          )}
         </div>
 
         {/* Tabs */}
