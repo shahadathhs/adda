@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { UserAvatar } from "@/shared/ui/user-avatar";
+import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/dialog";
 import {
   useAdminDeleteUser,
   useAdminResetUserPassword,
@@ -15,10 +17,13 @@ import type { AdminUser } from "@/features/admin/types";
 export function UsersTab({ selfId }: { selfId?: string }) {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState<string | undefined>(undefined);
+  const [pwTarget, setPwTarget] = useState<AdminUser | null>(null);
+  const [pwValue, setPwValue] = useState("");
   const { data: users = [], isLoading: loading } = useAdminUsers(search);
   const updateMutation = useAdminUpdateUser();
   const resetMutation = useAdminResetUserPassword();
   const deleteMutation = useAdminDeleteUser();
+  const { confirm, dialog } = useConfirm();
 
   const update = (u: AdminUser, patch: { is_admin?: boolean; is_active?: boolean }) =>
     updateMutation.mutate(
@@ -27,21 +32,20 @@ export function UsersTab({ selfId }: { selfId?: string }) {
     );
 
   const resetPw = (u: AdminUser) => {
-    const password = window.prompt(`New password for ${u.username} (min 8 chars):`);
-    if (!password) return;
-    resetMutation.mutate(
-      { id: u.id, password },
-      {
-        onSuccess: () => toast.success("Password reset"),
-        onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-      },
-    );
+    setPwTarget(u);
+    setPwValue("");
   };
 
   const remove = (u: AdminUser) => {
-    if (!window.confirm(`Delete ${u.username}? Removes their communities/memberships too.`)) return;
-    deleteMutation.mutate(u.id, {
-      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    confirm({
+      title: "Delete user",
+      description: `Delete ${u.username}? Removes their communities and memberships.`,
+      confirmText: "Delete",
+      destructive: true,
+      onConfirm: () =>
+        deleteMutation.mutate(u.id, {
+          onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+        }),
     });
   };
 
@@ -151,6 +155,48 @@ export function UsersTab({ selfId }: { selfId?: string }) {
           </tbody>
         </table>
       </Card>
+      {dialog}
+      <Dialog open={!!pwTarget} onOpenChange={(o) => !o && setPwTarget(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogTitle className="text-base font-semibold">Reset password</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            New password for {pwTarget?.username} (min 8 chars)
+          </DialogDescription>
+          <Input
+            type="password"
+            value={pwValue}
+            onChange={(e) => setPwValue(e.target.value)}
+            placeholder="New password"
+            className="mt-3"
+            autoFocus
+          />
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setPwTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              disabled={pwValue.length < 8}
+              onClick={() => {
+                if (!pwTarget) return;
+                resetMutation.mutate(
+                  { id: pwTarget.id, password: pwValue },
+                  {
+                    onSuccess: () => {
+                      toast.success("Password reset");
+                      setPwTarget(null);
+                      setPwValue("");
+                    },
+                    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+                  },
+                );
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

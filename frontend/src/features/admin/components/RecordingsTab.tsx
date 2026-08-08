@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import {
@@ -20,12 +21,19 @@ export function RecordingsTab() {
   const { data: items = [], isLoading: loading } = useAdminRecordings(filter || undefined);
   const { data: communities = [] } = useAdminCommunities();
   const deleteMutation = useAdminDeleteRecording();
+  const { confirm, dialog } = useConfirm();
 
   const remove = (r: Recording) => {
-    if (!window.confirm(`Delete recording ${r.name}?`)) return;
-    deleteMutation.mutate(r.path, {
-      onSuccess: () => toast.success("Recording deleted"),
-      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    confirm({
+      title: "Delete recording",
+      description: `Delete ${r.name}? This cannot be undone.`,
+      confirmText: "Delete",
+      destructive: true,
+      onConfirm: () =>
+        deleteMutation.mutate(r.path, {
+          onSuccess: () => toast.success("Recording deleted"),
+          onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+        }),
     });
   };
 
@@ -83,6 +91,7 @@ export function RecordingsTab() {
           </table>
         </Card>
       )}
+      {dialog}
     </div>
   );
 }

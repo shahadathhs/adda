@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FiHash, FiLock, FiPlus, FiRadio, FiTrash2, FiVideoOff, FiVolume1 } from "react-icons/fi";
 import { toast } from "sonner";
 import { HLS_BASE_URL } from "@/shared/config";
+import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import ChatPanel from "@/features/realtime/ChatPanel";
@@ -29,6 +30,7 @@ export default function ChannelView({
   const createMut = useCreateChannel(communityId);
   const updateMut = useUpdateChannel(communityId);
   const deleteMut = useDeleteChannel(communityId);
+  const { confirm, dialog } = useConfirm();
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -62,13 +64,19 @@ export default function ChannelView({
   };
 
   const handleDelete = (ch: Channel) => {
-    if (!confirm(`Delete #${ch.slug}? Messages will be lost.`)) return;
-    deleteMut.mutate(ch.id, {
-      onSuccess: () => {
-        if (activeId === ch.id) setActiveId(null);
-        toast.success("Channel deleted");
-      },
-      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    confirm({
+      title: "Delete channel",
+      description: `Delete #${ch.slug}? All messages will be lost.`,
+      confirmText: "Delete",
+      destructive: true,
+      onConfirm: () =>
+        deleteMut.mutate(ch.id, {
+          onSuccess: () => {
+            if (activeId === ch.id) setActiveId(null);
+            toast.success("Channel deleted");
+          },
+          onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+        }),
     });
   };
 
@@ -216,6 +224,7 @@ export default function ChannelView({
 
       {/* Center content */}
       <div className="flex-1 overflow-hidden">{renderCenter()}</div>
+      {dialog}
     </div>
   );
 }

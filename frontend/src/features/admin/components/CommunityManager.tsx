@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { useConfirm } from "@/shared/ui/use-confirm";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
 import CopyField from "@/shared/ui/CopyField";
@@ -15,20 +16,32 @@ export function CommunityManager({ community }: { community: AdminCommunity }) {
   const { data: creds } = useAdminCommunityStreamKey(community.id);
   const kickMutation = useAdminKickMember(community.id);
   const rotateMutation = useAdminRotateCommunityKey(community.id);
+  const { confirm, dialog } = useConfirm();
 
   const kick = (m: AdminMember) => {
-    if (!window.confirm(`Remove ${m.username} from this community?`)) return;
-    kickMutation.mutate(m.user_id, {
-      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    confirm({
+      title: "Remove member",
+      description: `Remove ${m.username} from this community?`,
+      confirmText: "Remove",
+      destructive: true,
+      onConfirm: () =>
+        kickMutation.mutate(m.user_id, {
+          onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+        }),
     });
   };
 
   const rotate = () => {
-    if (!window.confirm("Rotate the stream key? The current OBS connection will be kicked."))
-      return;
-    rotateMutation.mutate(undefined, {
-      onSuccess: () => toast.success("Key rotated"),
-      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    confirm({
+      title: "Rotate stream key",
+      description: "The current OBS connection will be kicked immediately.",
+      confirmText: "Rotate",
+      destructive: true,
+      onConfirm: () =>
+        rotateMutation.mutate(undefined, {
+          onSuccess: () => toast.success("Key rotated"),
+          onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+        }),
     });
   };
 
@@ -74,6 +87,7 @@ export function CommunityManager({ community }: { community: AdminCommunity }) {
           </div>
         )}
       </div>
+      {dialog}
     </div>
   );
 }

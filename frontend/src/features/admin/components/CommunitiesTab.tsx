@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import {
@@ -18,6 +19,7 @@ export function CommunitiesTab() {
   const updateMutation = useAdminUpdateCommunity();
   const stopMutation = useAdminStopStream();
   const deleteMutation = useAdminDeleteCommunity();
+  const { confirm, dialog } = useConfirm();
 
   const toggleSuspend = (c: AdminCommunity) =>
     updateMutation.mutate(
@@ -32,9 +34,15 @@ export function CommunitiesTab() {
     });
 
   const remove = (c: AdminCommunity) => {
-    if (!window.confirm(`Delete community ${c.name}?`)) return;
-    deleteMutation.mutate(c.id, {
-      onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    confirm({
+      title: "Delete community",
+      description: `Delete ${c.name}? This cannot be undone.`,
+      confirmText: "Delete",
+      destructive: true,
+      onConfirm: () =>
+        deleteMutation.mutate(c.id, {
+          onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+        }),
     });
   };
 
@@ -126,6 +134,7 @@ export function CommunitiesTab() {
           )}
         </tbody>
       </table>
+      {dialog}
     </Card>
   );
 }

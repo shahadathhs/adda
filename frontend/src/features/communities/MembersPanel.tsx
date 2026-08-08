@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiShield, FiUser, FiVideo, FiUserCheck, FiEye } from "react-icons/fi";
 import { toast } from "sonner";
 import { UserAvatar } from "@/shared/ui/user-avatar";
+import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import * as api from "./api";
@@ -36,6 +37,7 @@ export default function MembersPanel({
   canManage: boolean;
 }) {
   const qc = useQueryClient();
+  const { confirm, dialog } = useConfirm();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
 
@@ -182,10 +184,15 @@ export default function MembersPanel({
             member={m}
             canManage={canManage}
             onRoleChange={(role) => roleMut.mutate({ userId: m.user_id, role })}
-            onKick={() => {
-              if (confirm(`Remove ${m.display_name} from this community?`))
-                kickMut.mutate(m.user_id);
-            }}
+            onKick={() =>
+              confirm({
+                title: "Remove member",
+                description: `Remove ${m.display_name} from this community?`,
+                onConfirm: () => kickMut.mutate(m.user_id),
+                confirmText: "Remove",
+                destructive: true,
+              })
+            }
           />
         ))}
         {filtered.length === 0 && (
@@ -194,6 +201,7 @@ export default function MembersPanel({
           </p>
         )}
       </div>
+      {dialog}
     </div>
   );
 }
