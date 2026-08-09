@@ -18,7 +18,7 @@ Communities
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 · TypeScript · Vite · Tailwind · Zustand · Radix UI |
+| Frontend | React 18 · TypeScript · TanStack Router · TanStack Query · Tailwind · shadcn/ui · hls.js |
 | Backend  | FastAPI · async SQLAlchemy 2.0 · Pydantic v2 · PyJWT |
 | Database | PostgreSQL (async) · Redis (pub/sub + presence) |
 | Streaming | mediamtx (RTMP ingest → HLS playback) |
@@ -108,7 +108,6 @@ make reset-migrate     # drop all tables, re-apply from scratch (destroys data)
 make reset             # full factory reset: containers + volumes + recordings → fresh
 
 # Quality gates
-make test              # backend pytest
 make typecheck         # backend pyright
 make lint              # frontend eslint
 make build-web         # frontend tsc + vite build
@@ -139,18 +138,19 @@ make clean-recordings  # delete all recording files (keeps the folder)
 
 ### Backend modules
 
-Each domain is self-contained under `backend/`:
+Each domain is self-contained under `backend/modules/` (shared infra in `core/`):
 
 ```
-auth/           register, login, JWT, suspend
-communities/    CRUD + join/leave + roles + stream keys + suspend
-members/        membership & permissions
-ws/             realtime gateway + Redis pub/sub + presence
-streaming/      live status, viewer counts, publisher kick
-streams/        mediamtx publish-auth webhook
-recordings/     list + serve community VODs (.mp4)
-admin/          dashboard: users, communities, live, recordings
-seed.py         idempotent startup seeding (admin + test users)
+core/              config, database, redis, security/, seed, exceptions, email
+models/            shared SQLAlchemy models (User, Community, Membership)
+modules/
+  auth/            register, login, JWT, password reset, Google OAuth
+  communities/     CRUD + join/leave + stream keys + suspend (router + admin_router)
+  realtime/        WS gateway + Redis pub/sub + presence (no persistence yet)
+  streaming/       live status, viewer counts, force-stop + mediamtx auth webhook
+  recordings/      list + serve + delete community VODs
+  stats/           dashboard aggregate counts
+  users/           admin user management (promote/suspend/reset-pw/delete)
 ```
 
 ## Ports
@@ -174,16 +174,16 @@ adda/
 ├── .env.example          root env (compose interpolation)
 ├── backend/              FastAPI app (uv, Python 3.12)
 │   ├── main.py           app entry, router registration, startup seed
-│   ├── config.py         settings (pydantic-settings)
-│   ├── seed.py           idempotent user seeding
-│   ├── auth/ communities/ members/ ws/ streaming/ streams/ recordings/ admin/
+│   ├── core/             shared infra (config, database, redis, security/, seed)
+│   ├── models/           SQLAlchemy models (User, Community, Membership)
+│   ├── modules/          feature modules (auth, communities, realtime, …)
 │   └── alembic/          migrations
 ├── frontend/             React app (pnpm + Vite)
 │   └── src/
-│       ├── pages/        Landing, Login, Home, Community, Admin
-│       ├── components/   LivePlayer, ChatPanel, CopyField, WebRTCPlayer, UI kit
-│       ├── store/        Zustand stores (auth)
-│       └── lib/          api + ws clients
+│       ├── routes/       file-based routes (TanStack Router)
+│       ├── pages/        page components
+│       ├── features/     feature-sliced domains (api.ts, hooks.ts, types.ts)
+│       └── shared/       UI kit + api client + config
 ├── mediamtx/             mediamtx config (Dockerfile-baked) + recording retention
 └── recordings/           stream recordings (gitignored, bind-mounted)
 ```

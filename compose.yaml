@@ -56,6 +56,15 @@ services:
       HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
       WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
       RECORDINGS_DIR: /recordings
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-adda <noreply@localhost>}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      PASSWORD_RESET_URL: ${PASSWORD_RESET_URL:-http://localhost:5173/reset-password}
+      RESET_TOKEN_EXPIRE_MINUTES: ${RESET_TOKEN_EXPIRE_MINUTES:-30}
     ports:
       - "${BACKEND_PORT:-7001}:7001"
     volumes:
@@ -79,6 +88,7 @@ services:
       VITE_WS_BASE_URL: ws://localhost:${BACKEND_PORT:-7001}
       VITE_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
       VITE_WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
+      VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     depends_on:

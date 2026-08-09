@@ -3,15 +3,19 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from auth import router as auth_router
-from communities import router as communities_router
-from config import settings
-from members import router as members_router
-from recordings.router import router as recordings_router
-from streaming import router as streaming_router
-from admin.router import router as admin_router
-from streams.router import router as streams_router
-from ws import router as ws_router
+from core.config import settings
+from modules.auth.router import router as auth_router
+from modules.channels.router import router as channels_router
+from modules.communities.admin_router import router as communities_admin_router
+from modules.communities.router import router as communities_router
+from modules.realtime.gateway import router as ws_router
+from modules.recordings.router import admin_router as recordings_admin_router
+from modules.recordings.router import router as recordings_router
+from modules.stats.router import router as stats_router
+from modules.streaming.router import admin_router as streaming_admin_router
+from modules.streaming.router import router as streaming_router
+from modules.streaming.webhook import router as streams_router
+from modules.users.router import router as users_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -34,16 +38,14 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup() -> None:
-    from seed import seed_db
+    from core.seed import seed_db
 
     await seed_db()
 
-    from ws.manager import manager
+    from modules.realtime.manager import manager
 
     await manager.start()
-    logging.getLogger("adda").info(
-        "Backend startup complete. Debug=%s", settings.debug
-    )
+    logging.getLogger("adda").info("Backend startup complete. Debug=%s", settings.debug)
 
 
 @app.get("/health")
@@ -51,13 +53,18 @@ async def health() -> dict[str, str]:
     return {"status": "ok", "app": settings.app_name}
 
 
-# Routers
+# ── Routers ───────────────────────────────────────────────────────────
+# All HTTP routers mount under the /api prefix; the WebSocket gateway sits
+# at the root (no prefix).
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
-app.include_router(members_router, prefix=settings.api_prefix)
-app.include_router(recordings_router, prefix=settings.api_prefix)
+app.include_router(channels_router, prefix=settings.api_prefix)
+app.include_router(communities_admin_router, prefix=settings.api_prefix)
+app.include_router(users_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)
+app.include_router(streaming_admin_router, prefix=settings.api_prefix)
 app.include_router(streams_router, prefix=settings.api_prefix)
-app.include_router(admin_router, prefix=settings.api_prefix)
-# WebSocket gateway sits at the root (no api prefix)
+app.include_router(recordings_router, prefix=settings.api_prefix)
+app.include_router(recordings_admin_router, prefix=settings.api_prefix)
+app.include_router(stats_router, prefix=settings.api_prefix)
 app.include_router(ws_router)
