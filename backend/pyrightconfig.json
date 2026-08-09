@@ -1,7 +1,5 @@
 {
-  "include": ["main.py", "config.py", "database.py", "redis_client.py",
-              "auth", "communities", "members", "streaming", "ws",
-              "models", "schemas"],
+  "include": ["main.py", "core", "models", "modules"],
   "exclude": ["**/__pycache__", "alembic"],
   "typeCheckingMode": "standard",
   "reportMissingImports": "error",

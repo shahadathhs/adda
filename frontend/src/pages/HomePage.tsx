@@ -1,44 +1,34 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Avatar } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import { Input } from "../components/ui/Input";
-import { api } from "../lib/api";
-import type { Community } from "../types";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/shared/ui/form";
+import { useCommunities, useCreateCommunity } from "@/features/communities/hooks";
+import { createCommunitySchema, type CreateCommunityValues } from "@/features/communities/schemas";
 
 export default function HomePage() {
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: communities = [], isLoading: loading } = useCommunities();
+  const createMutation = useCreateCommunity();
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: "", slug: "", description: "" });
+  const form = useForm<CreateCommunityValues>({
+    resolver: zodResolver(createCommunitySchema),
+    defaultValues: { name: "", slug: "", description: "" },
+  });
 
-  const load = async () => {
-    try {
-      setCommunities(await api.listCommunities());
-    } catch (err) {
-      toast.error("Failed to load communities");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const create = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const c = await api.createCommunity(form);
-      setCommunities([c, ...communities]);
-      setForm({ name: "", slug: "", description: "" });
-      setCreating(false);
-      toast.success("Community created");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to create");
-    }
+  const create = (values: CreateCommunityValues) => {
+    createMutation.mutate(values, {
+      onSuccess: () => {
+        form.reset({ name: "", slug: "", description: "" });
+        setCreating(false);
+        toast.success("Community created");
+      },
+      onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to create"),
+    });
   };
 
   return (
@@ -55,17 +45,52 @@ export default function HomePage() {
 
       {creating && (
         <Card className="mb-6 p-4">
-          <form onSubmit={create} className="grid gap-3 sm:grid-cols-2">
-            <Input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-            <Input placeholder="slug (lowercase, hyphens)" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required />
-            <Input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="sm:col-span-2" />
-            <div className="flex gap-2 sm:col-span-2">
-              <Button type="submit">Create</Button>
-              <Button type="button" variant="ghost" onClick={() => setCreating(false)}>
-                Cancel
-              </Button>
-            </div>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(create)} className="grid gap-3 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="slug (lowercase, hyphens)" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormControl>
+                      <Input placeholder="Description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex gap-2 sm:col-span-2">
+                <Button type="submit">Create</Button>
+                <Button type="button" variant="ghost" onClick={() => setCreating(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
         </Card>
       )}
 
@@ -78,10 +103,10 @@ export default function HomePage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {communities.map((c) => (
-            <Link key={c.id} to={`/community/${c.id}`}>
+            <Link key={c.id} to="/community/$id" params={{ id: c.id }}>
               <Card className="cursor-pointer p-4 transition-colors hover:border-primary">
                 <div className="flex items-start gap-3">
-                  <Avatar name={c.name} src={c.avatar_url} className="h-12 w-12 text-base" />
+                  <UserAvatar name={c.name} src={c.avatar_url} className="h-12 w-12 text-base" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="truncate font-semibold">{c.name}</h3>
@@ -94,9 +119,7 @@ export default function HomePage() {
                     <p className="line-clamp-2 text-sm text-muted-foreground">
                       {c.description || `@${c.slug}`}
                     </p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {c.member_count} members
-                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">{c.member_count} members</p>
                   </div>
                 </div>
               </Card>
