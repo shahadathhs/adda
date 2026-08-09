@@ -1,81 +1,79 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { useAuthStore } from "../store/auth-store";
+import { Link } from "@tanstack/react-router";
+import { MessageCircle, Radio, Users } from "lucide-react";
+import { LoginForm } from "@/features/auth/components/login-form";
+import { RegisterForm } from "@/features/auth/components/register-form";
 
-export default function LoginPage({ initialMode = "login" }: { initialMode?: "login" | "register" }) {
-  const { login, register } = useAuthStore();
-  const navigate = useNavigate();
+export default function LoginPage({
+  initialMode = "login",
+}: {
+  initialMode?: "login" | "register";
+}) {
   const [mode, setMode] = useState<"login" | "register">(initialMode);
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-    display_name: "",
-  });
-  const [busy, setBusy] = useState(false);
-
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm({ ...form, [k]: e.target.value });
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      if (mode === "login") {
-        await login(form.email, form.password);
-        // Admins land on the admin dashboard; everyone else on communities.
-        const admin = useAuthStore.getState().user?.is_admin;
-        navigate(admin ? "/admin" : "/");
-      } else {
-        await register(form);
-        navigate("/");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  };
+  const isLogin = mode === "login";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <Link to="/" className="inline-block bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-4xl font-extrabold text-transparent">
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Brand panel */}
+      <aside className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary to-purple-600 p-12 text-primary-foreground lg:flex">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_50%_at_15%_10%,rgba(255,255,255,0.18),transparent)]"
+        />
+        <Link to="/" className="relative text-2xl font-extrabold">
+          adda
+        </Link>
+        <div className="relative space-y-6">
+          <h2 className="text-3xl font-bold leading-tight">Bring your community to life.</h2>
+          <p className="text-primary-foreground/80">
+            Live streaming, realtime chat, and a real home for your audience — all in one place.
+          </p>
+          <ul className="space-y-3">
+            {[
+              { icon: Radio, t: "HD live streaming" },
+              { icon: MessageCircle, t: "Realtime chat with presence" },
+              { icon: Users, t: "Members, roles, and posts" },
+            ].map((b) => (
+              <li key={b.t} className="flex items-center gap-3 text-sm">
+                <b.icon className="h-4 w-4" /> {b.t}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="relative text-xs text-primary-foreground/70">
+          © {new Date().getFullYear()} adda
+        </p>
+      </aside>
+
+      {/* Form side */}
+      <div className="flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-sm">
+          <Link
+            to="/"
+            className="mb-8 inline-block bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-2xl font-extrabold text-transparent lg:hidden"
+          >
             adda
           </Link>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Communities that happen to stream.
+
+          <h1 className="text-2xl font-bold tracking-tight">
+            {isLogin ? "Welcome back" : "Create your account"}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {isLogin ? "Log in to continue to adda." : "Start building your community in minutes."}
+          </p>
+
+          <div className="mt-8">{isLogin ? <LoginForm /> : <RegisterForm />}</div>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+            <button
+              className="font-medium text-primary hover:underline"
+              onClick={() => setMode(isLogin ? "register" : "login")}
+            >
+              {isLogin ? "Sign up" : "Log in"}
+            </button>
           </p>
         </div>
-
-        <form onSubmit={submit} className="space-y-3 rounded-xl border border-border bg-card p-6">
-          {mode === "register" && (
-            <>
-              <Input placeholder="Display name" value={form.display_name} onChange={set("display_name")} required />
-              <Input placeholder="Username" value={form.username} onChange={set("username")} required />
-            </>
-          )}
-          <Input type="email" placeholder="Email" value={form.email} onChange={set("email")} required />
-          <Input type="password" placeholder="Password" value={form.password} onChange={set("password")} required />
-
-          <Button type="submit" className="w-full" disabled={busy}>
-            {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
-          </Button>
-        </form>
-
-        <p className="text-center text-sm text-muted-foreground">
-          {mode === "login" ? "New here?" : "Already have an account?"}{" "}
-          <button
-            className="font-medium text-primary hover:underline"
-            onClick={() => setMode(mode === "login" ? "register" : "login")}
-          >
-            {mode === "login" ? "Create an account" : "Log in"}
-          </button>
-        </p>
       </div>
     </div>
   );

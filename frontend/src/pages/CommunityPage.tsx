@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { FiVideoOff } from "react-icons/fi";
-import toast from "react-hot-toast";
-import { Avatar } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import ChatPanel from "../components/ChatPanel";
-import CopyField from "../components/CopyField";
-import LivePlayer from "../components/LivePlayer";
-import { api } from "../lib/api";
-import { useAuthStore } from "../store/auth-store";
-import { HLS_BASE_URL, API_BASE_URL } from "../config";
-import type { Community, Recording, StreamCredentials } from "../types";
+import { toast } from "sonner";
+import { HLS_BASE_URL } from "@/shared/config";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import CopyField from "@/shared/ui/CopyField";
+import { useMe } from "@/features/auth/hooks";
+import {
+  useCommunity,
+  useJoinCommunity,
+  useMembers,
+  useRotateStreamKey,
+  useStreamKey,
+} from "@/features/communities/hooks";
+import { useStreamStatus } from "@/features/streaming/hooks";
+import LivePlayer from "@/features/streaming/LivePlayer";
+import ChatPanel from "@/features/realtime/ChatPanel";
+import RecordingsPanel from "@/features/recordings/RecordingsPanel";
+import ChannelView from "@/features/channels/ChannelView";
+import MembersPanel from "@/features/communities/MembersPanel";
 
-const TABS = ["Posts", "Live", "Media", "Files", "Members", "Recordings"] as const;
+const TABS = ["Live", "Channels", "Posts", "Media", "Files", "Members", "Recordings"] as const;
 type Tab = (typeof TABS)[number];
 
 function ComingSoon({ label }: { label: string }) {
@@ -24,141 +33,42 @@ function ComingSoon({ label }: { label: string }) {
   );
 }
 
-function fmtSize(n: number) {
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function RecordingsPanel({ communityId }: { communityId: string }) {
-  const [recs, setRecs] = useState<Recording[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [active, setActive] = useState<Recording | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    api
-      .recordings(communityId)
-      .then((r) => setRecs(r))
-      .catch(() => toast.error("Failed to load recordings"))
-      .finally(() => setLoading(false));
-  }, [communityId]);
-
-  const src = active
-    ? `${API_BASE_URL}/api/recordings/file?path=${encodeURIComponent(active.path)}`
-    : null;
-
-  if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>;
-  if (recs.length === 0)
-    return (
-      <Card className="flex aspect-video flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-sm font-medium">No recordings yet</p>
-        <p className="max-w-sm text-xs text-muted-foreground">
-          Recordings show up here automatically after a stream ends.
-        </p>
-      </Card>
-    );
-
-  return (
-    <div className="space-y-4">
-      {src && (
-        <video
-          key={src}
-          controls
-          autoPlay
-          className="aspect-video w-full rounded-lg bg-black"
-          src={src}
-        />
-      )}
-      <Card className="divide-y divide-border">
-        {recs.map((r) => (
-          <button
-            key={r.path}
-            onClick={() => setActive(r)}
-            className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm transition-colors hover:bg-muted/50 ${
-              active?.path === r.path ? "bg-muted/50" : ""
-            }`}
-          >
-            <div className="min-w-0">
-              <div className="truncate font-medium">
-                {new Date(r.created_at).toLocaleString()}
-              </div>
-              <div className="text-xs text-muted-foreground">{fmtSize(r.size_bytes)}</div>
-            </div>
-            <span className="shrink-0 text-xs text-primary">
-              {active?.path === r.path ? "Playing" : "Play"}
-            </span>
-          </button>
-        ))}
-      </Card>
-    </div>
-  );
-}
-
 export default function CommunityPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams({ from: "/_authed/community/$id" });
   const navigate = useNavigate();
-  const { user } = useAuthStore();
-  const [community, setCommunity] = useState<Community | null>(null);
+  const { data: user } = useMe();
   const [tab, setTab] = useState<Tab>("Live");
-  const [isLive, setIsLive] = useState(false);
-  const [creds, setCreds] = useState<StreamCredentials | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const { data: community, isLoading: loading, isError } = useCommunity(id);
+  const isOwner = !!community && !!user && community.owner_id === user.id;
+  const { data: creds } = useStreamKey(id, isOwner);
+  const { data: status } = useStreamStatus(id, tab === "Live");
+  const rotateMutation = useRotateStreamKey(id);
+  const { data: members } = useMembers(id);
+  const joinMut = useJoinCommunity(id);
+
+  const isLive = status?.is_live ?? community?.is_live ?? false;
+  const isMember = members?.some((m) => m.user_id === user?.id) ?? false;
 
   useEffect(() => {
-    if (!id) return;
-    (async () => {
-      try {
-        const c = await api.getCommunity(id);
-        setCommunity(c);
-        setIsLive(c.is_live);
-      } catch {
-        toast.error("Community not found");
-        navigate("/");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id, navigate]);
-
-  // Owner-only: load the stream URL + key for the OBS setup panel.
-  useEffect(() => {
-    if (!id || !user || community?.owner_id !== user.id) {
-      setCreds(null);
-      return;
+    if (isError) {
+      toast.error("Community not found");
+      navigate({ to: "/home" });
     }
-    api.getStreamKey(id).then(setCreds).catch(() => setCreds(null));
-  }, [id, user, community?.owner_id]);
+  }, [isError, navigate]);
 
-  const rotateKey = async () => {
-    if (!id) return;
-    try {
-      setCreds(await api.rotateStreamKey(id));
-      toast.success("Stream key rotated — update OBS with the new URL.");
-    } catch {
-      toast.error("Could not rotate the stream key");
-    }
+  const rotateKey = () => {
+    rotateMutation.mutate(undefined, {
+      onSuccess: () => toast.success("Stream key rotated — update OBS with the new URL."),
+      onError: () => toast.error("Could not rotate the stream key"),
+    });
   };
-
-  // Poll stream status while on the Live tab (cheap; mediamtx API).
-  useEffect(() => {
-    if (!id || tab !== "Live") return;
-    const t = setInterval(async () => {
-      try {
-        const s = await api.streamStatus(id);
-        setIsLive(s.is_live);
-      } catch {
-        /* ignore */
-      }
-    }, 5000);
-    return () => clearInterval(t);
-  }, [id, tab]);
 
   if (loading || !community) {
     return <div className="p-6 text-muted-foreground">Loading…</div>;
   }
 
   const hlsUrl = `${HLS_BASE_URL}/community/${community.id}/index.m3u8`;
-  const isOwner = community.owner_id === user?.id;
   const showPlayer = isLive;
 
   return (
@@ -167,7 +77,11 @@ export default function CommunityPage() {
       <div className="h-32 bg-gradient-to-r from-primary/40 to-purple-500/40" />
       <div className="mx-auto w-full max-w-6xl px-6">
         <div className="-mt-10 flex items-end gap-4">
-          <Avatar name={community.name} src={community.avatar_url} className="h-20 w-20 text-2xl ring-4 ring-background" />
+          <UserAvatar
+            name={community.name}
+            src={community.avatar_url}
+            className="h-20 w-20 text-2xl ring-4 ring-background"
+          />
           <div className="flex-1 pb-1">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{community.name}</h1>
@@ -181,9 +95,33 @@ export default function CommunityPage() {
               {community.description || `@${community.slug}`} · {community.member_count} members
             </p>
           </div>
-          <Button variant={isOwner ? "outline" : "default"} size="sm">
-            {isOwner ? "Your community" : "Joined"}
-          </Button>
+          {isOwner ? (
+            <Button variant="outline" size="sm" disabled>
+              Your community
+            </Button>
+          ) : isMember ? (
+            <Button variant="outline" size="sm" disabled>
+              Joined
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              disabled={joinMut.isPending}
+              onClick={() =>
+                joinMut.mutate(undefined, {
+                  onSuccess: (data) =>
+                    toast.success(
+                      data.status === "pending"
+                        ? "Join request sent — wait for admin approval."
+                        : "Joined!",
+                    ),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to join"),
+                })
+              }
+            >
+              {joinMut.isPending ? "…" : community.is_private ? "Request to join" : "Join"}
+            </Button>
+          )}
         </div>
 
         {/* Tabs */}
@@ -193,7 +131,9 @@ export default function CommunityPage() {
               key={t}
               onClick={() => setTab(t)}
               className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-                tab === t ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                tab === t
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               {t}
@@ -215,7 +155,7 @@ export default function CommunityPage() {
                       <p className="text-sm font-medium text-foreground">No live stream</p>
                       <p className="max-w-sm text-xs text-muted-foreground">
                         {isOwner
-                          ? "Start broadcasting in OBS to go live — grab your URL from “Stream setup” below."
+                          ? 'Start broadcasting in OBS to go live — grab your URL from "Stream setup" below.'
                           : "This community isn't broadcasting right now. Check back soon."}
                       </p>
                     </div>
@@ -231,8 +171,8 @@ export default function CommunityPage() {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Paste the <strong>Stream URL</strong> into OBS → Settings →
-                      Stream → Server, and leave the Stream Key field empty.
+                      Paste the <strong>Stream URL</strong> into OBS → Settings → Stream → Server,
+                      and leave the Stream Key field empty.
                     </p>
                     <CopyField label="Stream URL" value={creds.stream_url} />
                     <CopyField label="Stream Key" value={creds.stream_key} />
@@ -241,9 +181,10 @@ export default function CommunityPage() {
               </div>
             )}
             {tab === "Posts" && <ComingSoon label="Announcements & posts" />}
+            {tab === "Channels" && <ChannelView communityId={community.id} canManage={isOwner} />}
             {tab === "Media" && <ComingSoon label="Photo / video gallery" />}
             {tab === "Files" && <ComingSoon label="Shared files" />}
-            {tab === "Members" && <ComingSoon label="Member list" />}
+            {tab === "Members" && <MembersPanel communityId={community.id} canManage={isOwner} />}
             {tab === "Recordings" && <RecordingsPanel communityId={community.id} />}
           </div>
 

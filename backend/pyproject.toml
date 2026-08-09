@@ -15,18 +15,36 @@ dependencies = [
     "pydantic[email]>=2.10.0",
     "pydantic-settings>=2.7.0",
     "pyjwt>=2.10.0",
+    "cryptography>=43.0.0",
     "bcrypt>=4.2.0",
     "python-multipart>=0.0.20",
     "httpx>=0.28.1",
+    "aiosmtplib>=5.1.2",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.0",
-    "pytest-asyncio>=0.25.0",
     "pyright>=1.1.391",
-    "aiosqlite>=0.20.0",
+    "ruff>=0.8.0",
 ]
 
 [tool.uv]
 package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["alembic"]
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, I isort, UP pyupgrade, B bugbear,
+# SIM simplify, C4 comprehensions, RUF ruff-specific.
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "RUF"]
+ignore = [
+    "B008",  # FastAPI uses Depends() in argument defaults by design.
+    "UP042", # StrEnum rewrite is risky for the DB-backed CommunityRole enum.
+]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__.py re-exports are intentional.
+"__init__.py" = ["F401"]
