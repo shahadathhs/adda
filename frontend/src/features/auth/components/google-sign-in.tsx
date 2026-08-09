@@ -15,7 +15,10 @@ export function GoogleSignIn() {
           onSuccess: (token) => {
             navigate({ to: redirectAfterLogin(token.user.system_role) });
           },
-          onError: (e: Error) => toast.error(e.message),
+          onError: (e: Error) => {
+            console.error("[Google Login] Backend error:", e);
+            toast.error(e.message);
+          },
         });
       }}
       onError={() => toast.error("Google sign-in failed")}

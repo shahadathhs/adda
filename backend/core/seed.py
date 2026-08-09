@@ -51,9 +51,9 @@ async def seed_db() -> None:
                 db,
                 settings.superadmin_username,
                 settings.superadmin_email,
-            settings.superadmin_password,
-            system_role=SystemRole.SUPERADMIN,
-        )
+                settings.superadmin_password,
+                system_role=SystemRole.SUPERADMIN,
+            )
             if settings.seed_test_users:
                 await _ensure_user(db, "alice", "alice@example.com", settings.seed_test_password)
                 await _ensure_user(db, "bob", "bob@example.com", settings.seed_test_password)

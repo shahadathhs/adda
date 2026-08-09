@@ -167,9 +167,7 @@ async def set_password_endpoint(
     db: AsyncSession = Depends(get_db),
 ):
     if current_user.password_hash is not None:
-        raise BadRequestException(
-            "Password is already set. Use change-password instead."
-        )
+        raise BadRequestException("Password is already set. Use change-password instead.")
     await set_password(db, current_user, data.new_password)
     return {"message": "Password has been set."}
 
@@ -318,7 +316,5 @@ async def google_link(
     if existing and existing.google_id and existing.id != current_user.id:
         raise ConflictException("That Google account is linked to another user.")
 
-    user = await link_google_account(
-        db, current_user, google_id, payload.get("picture")
-    )
+    user = await link_google_account(db, current_user, google_id, payload.get("picture"))
     return user

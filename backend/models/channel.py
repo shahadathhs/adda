@@ -31,7 +31,7 @@ class Channel(Base):
         Boolean, default=False, server_default=text("false")
     )
 
-    messages: Mapped[list["Message"]] = relationship(
+    messages: Mapped[list[Message]] = relationship(
         "Message",
         back_populates="channel",
         cascade="all, delete-orphan",

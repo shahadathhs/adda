@@ -36,9 +36,7 @@ class User(Base):
         String(20), default=SystemRole.USER, server_default=text("'user'")
     )
     # Suspended accounts cannot log in (admin moderation lever).
-    is_active: Mapped[bool] = mapped_column(
-        Boolean, default=True, server_default=text("true")
-    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=text("true"))
     # Email-based two-factor authentication.
     two_factor_enabled: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default=text("false")

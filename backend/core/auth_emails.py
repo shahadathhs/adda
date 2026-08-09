@@ -69,7 +69,8 @@ async def send_google_linked_email(to: str) -> None:
     await send_email(
         to,
         "Google account linked to your adda account",
-        "Your adda account was just linked to a Google account. You can now sign in with either method.",
+        "Your adda account was just linked to a Google account. "
+        "You can now sign in with either method.",
         f"""\
 <div style="font-family:sans-serif;line-height:1.6;max-width:560px;margin:auto">
   <h2 style="color:#7c3aed">Google account linked</h2>

@@ -1,5 +1,3 @@
-from models.user import SystemRole
-
 """Community routes: CRUD, stream-key management, and membership (join/leave/list)."""
 
 import uuid
@@ -12,7 +10,7 @@ from core.exceptions import ConflictException, ForbiddenException, NotFoundExcep
 from core.security.deps import get_current_user
 from models.community import Community
 from models.membership import CommunityRole
-from models.user import User
+from models.user import SystemRole, User
 from modules.communities.schemas import (
     CommunityCreate,
     CommunityOut,
@@ -55,7 +53,6 @@ from modules.communities.service.stream_keys import (
 )
 from modules.streaming.service.mediamtx import kick_publisher
 from modules.streaming.service.playback import is_community_live
-from modules.users.schemas import UserOut
 
 router = APIRouter(prefix="/communities", tags=["communities"])
 
@@ -165,12 +162,8 @@ async def rotate_stream_key(
 ADMIN_ROLES = {CommunityRole.owner, CommunityRole.admin}
 
 
-@router.get(
-    "/{community_id}/members", response_model=list[MemberOut], tags=["members"]
-)
-async def list_members(
-    community_id: uuid.UUID, db: AsyncSession = Depends(get_db)
-):
+@router.get("/{community_id}/members", response_model=list[MemberOut], tags=["members"])
+async def list_members(community_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     memberships = await list_members_service(db, community_id)
     out: list[MemberOut] = []
     for m in memberships:
@@ -218,9 +211,7 @@ async def join_or_request(
     return {"status": "joined"}
 
 
-@router.delete(
-    "/{community_id}/members", status_code=status.HTTP_204_NO_CONTENT, tags=["members"]
-)
+@router.delete("/{community_id}/members", status_code=status.HTTP_204_NO_CONTENT, tags=["members"])
 async def leave(
     community_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

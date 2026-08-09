@@ -124,9 +124,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                         "reply_to": reply_to,
                     }
 
-                await manager.broadcast(
-                    msg.channel, outgoing("chat_message", msg.channel, payload)
-                )
+                await manager.broadcast(msg.channel, outgoing("chat_message", msg.channel, payload))
 
     except WebSocketDisconnect:
         pass

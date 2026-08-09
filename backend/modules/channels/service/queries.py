@@ -15,9 +15,7 @@ from modules.channels.schemas import ChannelMemberOut, MessageOut
 ADMIN_ROLES = {CommunityRole.owner, CommunityRole.admin}
 
 
-async def list_channels(
-    db: AsyncSession, community_id: uuid.UUID
-) -> list[Channel]:
+async def list_channels(db: AsyncSession, community_id: uuid.UUID) -> list[Channel]:
     result = await db.execute(
         select(Channel)
         .where(Channel.community_id == community_id)
@@ -26,9 +24,7 @@ async def list_channels(
     return list(result.scalars().all())
 
 
-async def get_channel(
-    db: AsyncSession, channel_id: uuid.UUID
-) -> Channel | None:
+async def get_channel(db: AsyncSession, channel_id: uuid.UUID) -> Channel | None:
     result = await db.execute(select(Channel).where(Channel.id == channel_id))
     return result.scalar_one_or_none()
 
@@ -91,9 +87,7 @@ async def get_channel_messages(
     ]
 
 
-async def list_channel_members(
-    db: AsyncSession, channel_id: uuid.UUID
-) -> list[ChannelMemberOut]:
+async def list_channel_members(db: AsyncSession, channel_id: uuid.UUID) -> list[ChannelMemberOut]:
     result = await db.execute(
         select(ChannelMember, User)
         .join(User, ChannelMember.user_id == User.id)

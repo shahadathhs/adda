@@ -34,9 +34,7 @@ DEFAULT_SLUGS = {"general", "announcements", "live"}
 MOD_ROLES = {CommunityRole.owner, CommunityRole.admin, CommunityRole.moderator}
 
 
-async def _role(
-    db: AsyncSession, community_id: uuid.UUID, user_id: uuid.UUID
-) -> CommunityRole:
+async def _role(db: AsyncSession, community_id: uuid.UUID, user_id: uuid.UUID) -> CommunityRole:
     role = await get_member_role(db, community_id, user_id)
     if role is None:
         raise ForbiddenException("Not a member of this community")
@@ -86,8 +84,14 @@ async def create_channel(
         **{
             k: getattr(ch, k)
             for k in (
-                "id", "community_id", "name", "slug", "type",
-                "position", "is_restricted", "created_at",
+                "id",
+                "community_id",
+                "name",
+                "slug",
+                "type",
+                "position",
+                "is_restricted",
+                "created_at",
             )
         },
         has_access=True,
@@ -113,8 +117,14 @@ async def update_channel(
         **{
             k: getattr(ch, k)
             for k in (
-                "id", "community_id", "name", "slug", "type",
-                "position", "is_restricted", "created_at",
+                "id",
+                "community_id",
+                "name",
+                "slug",
+                "type",
+                "position",
+                "is_restricted",
+                "created_at",
             )
         },
         has_access=True,
@@ -155,14 +165,10 @@ async def list_messages(
         raise NotFoundException("Channel not found")
     if not await queries.check_channel_access(db, ch, current_user.id, role):
         raise ForbiddenException("You don't have access to this channel")
-    return await queries.get_channel_messages(
-        db, channel_id, before=before, limit=limit
-    )
+    return await queries.get_channel_messages(db, channel_id, before=before, limit=limit)
 
 
-@router.delete(
-    "/{channel_id}/messages/{message_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/{channel_id}/messages/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_message(
     community_id: uuid.UUID,
     channel_id: uuid.UUID,
@@ -230,9 +236,7 @@ async def add_member(
     )
 
 
-@router.delete(
-    "/{channel_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/{channel_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_member(
     community_id: uuid.UUID,
     channel_id: uuid.UUID,

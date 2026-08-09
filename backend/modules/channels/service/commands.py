@@ -12,9 +12,7 @@ from modules.channels.schemas import ChannelCreate, ChannelUpdate
 DEFAULT_SLUGS = {"general", "announcements", "live"}
 
 
-async def create_channel(
-    db: AsyncSession, community_id: uuid.UUID, data: ChannelCreate
-) -> Channel:
+async def create_channel(db: AsyncSession, community_id: uuid.UUID, data: ChannelCreate) -> Channel:
     channel = Channel(
         community_id=community_id,
         name=data.name,
@@ -29,9 +27,7 @@ async def create_channel(
     return channel
 
 
-async def update_channel(
-    db: AsyncSession, channel: Channel, data: ChannelUpdate
-) -> Channel:
+async def update_channel(db: AsyncSession, channel: Channel, data: ChannelUpdate) -> Channel:
     for field in ("name", "position", "is_restricted"):
         value = getattr(data, field)
         if value is not None:

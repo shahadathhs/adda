@@ -9,17 +9,14 @@ from sqlalchemy.orm import Mapped, mapped_column
 from models.base import Base
 
 if TYPE_CHECKING:
-    from models.channel import Channel
-    from models.user import User
+    pass
 
 
 class ChannelMember(Base):
     """Per-channel access grant (Discord-style: owner assigns who can access)."""
 
     __tablename__ = "channel_members"
-    __table_args__ = (
-        UniqueConstraint("channel_id", "user_id", name="uq_channel_member"),
-    )
+    __table_args__ = (UniqueConstraint("channel_id", "user_id", name="uq_channel_member"),)
 
     channel_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), index=True

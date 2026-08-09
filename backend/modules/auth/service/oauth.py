@@ -10,7 +10,7 @@ from core.config import settings
 # PyJWKClient fetches + caches Google's signing keys (rotated automatically).
 _jwk_client = PyJWKClient("https://www.googleapis.com/oauth2/v3/certs")
 
-_GOOGLE_ISSUER = "accounts.google.com"
+_GOOGLE_ISSUERS = {"accounts.google.com", "https://accounts.google.com"}
 
 
 def verify_google_id_token(id_token: str) -> dict[str, Any] | None:
@@ -32,7 +32,7 @@ def verify_google_id_token(id_token: str) -> dict[str, Any] | None:
     except Exception:
         return None
 
-    if payload.get("iss") != _GOOGLE_ISSUER:
+    if payload.get("iss") not in _GOOGLE_ISSUERS:
         return None
     if not payload.get("email_verified"):
         return None

@@ -37,18 +37,12 @@ async def leave_community(db: AsyncSession, membership: Membership) -> None:
     await db.commit()
 
 
-async def list_members(
-    db: AsyncSession, community_id: uuid.UUID
-) -> list[Membership]:
-    result = await db.execute(
-        select(Membership).where(Membership.community_id == community_id)
-    )
+async def list_members(db: AsyncSession, community_id: uuid.UUID) -> list[Membership]:
+    result = await db.execute(select(Membership).where(Membership.community_id == community_id))
     return list(result.scalars().all())
 
 
-async def update_member_role(
-    db: AsyncSession, membership: Membership, role: str
-) -> Membership:
+async def update_member_role(db: AsyncSession, membership: Membership, role: str) -> Membership:
     membership.role = CommunityRole(role)
     await db.commit()
     await db.refresh(membership)
@@ -93,18 +87,12 @@ async def list_pending_join_requests(
     return list(result.scalars().all())
 
 
-async def get_join_request(
-    db: AsyncSession, request_id: uuid.UUID
-) -> JoinRequest | None:
-    result = await db.execute(
-        select(JoinRequest).where(JoinRequest.id == request_id)
-    )
+async def get_join_request(db: AsyncSession, request_id: uuid.UUID) -> JoinRequest | None:
+    result = await db.execute(select(JoinRequest).where(JoinRequest.id == request_id))
     return result.scalar_one_or_none()
 
 
-async def approve_join_request(
-    db: AsyncSession, request: JoinRequest
-) -> Membership:
+async def approve_join_request(db: AsyncSession, request: JoinRequest) -> Membership:
     request.status = "approved"
     membership = Membership(
         user_id=request.user_id,

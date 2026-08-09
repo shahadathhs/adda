@@ -9,8 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from models.base import Base
 
 if TYPE_CHECKING:
-    from models.community import Community
-    from models.user import User
+    pass
 
 
 class JoinRequest(Base):

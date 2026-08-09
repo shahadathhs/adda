@@ -45,7 +45,9 @@ class TokenData(BaseModel):
 
 # ── Profile update ────────────────────────────────────────────────────
 class UpdateProfileRequest(BaseModel):
-    username: str | None = Field(default=None, min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$")
+    username: str | None = Field(
+        default=None, min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$"
+    )
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
     avatar_url: str | None = Field(default=None, max_length=512)
     bio: str | None = Field(default=None, max_length=500)

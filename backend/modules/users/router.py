@@ -44,11 +44,17 @@ async def update_user(
     ):
         raise BadRequestException("You can't demote or suspend yourself")
     # Only superadmins can promote to admin/superadmin.
-    if data.system_role is not None and data.system_role in SystemRole.STAFF:
-        if current_user.system_role != SystemRole.SUPERADMIN:
-            raise ForbiddenException("Only superadmins can assign staff roles")
+    if (
+        data.system_role is not None
+        and data.system_role in SystemRole.STAFF
+        and current_user.system_role != SystemRole.SUPERADMIN
+    ):
+        raise ForbiddenException("Only superadmins can assign staff roles")
     # Nobody can demote a superadmin (except another superadmin).
-    if user.system_role == SystemRole.SUPERADMIN and current_user.system_role != SystemRole.SUPERADMIN:
+    if (
+        user.system_role == SystemRole.SUPERADMIN
+        and current_user.system_role != SystemRole.SUPERADMIN
+    ):
         raise ForbiddenException("Can't modify a superadmin")
     return await admin_service.update_user_fields(db, user, data)
 
