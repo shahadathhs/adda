@@ -25,7 +25,7 @@ export function UsersTab({ selfId }: { selfId?: string }) {
   const deleteMutation = useAdminDeleteUser();
   const { confirm, dialog } = useConfirm();
 
-  const update = (u: AdminUser, patch: { is_admin?: boolean; is_active?: boolean }) =>
+  const update = (u: AdminUser, patch: { system_role?: string; is_active?: boolean }) =>
     updateMutation.mutate(
       { id: u.id, data: patch },
       { onError: (e) => toast.error(e instanceof Error ? e.message : "Failed") },
@@ -104,7 +104,7 @@ export function UsersTab({ selfId }: { selfId?: string }) {
                     </td>
                     <td className="p-3">
                       <div className="flex flex-col gap-1">
-                        {u.is_admin && (
+                        {(u.system_role === "admin" || u.system_role === "superadmin") && (
                           <span className="w-fit rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
                             admin
                           </span>
@@ -114,7 +114,7 @@ export function UsersTab({ selfId }: { selfId?: string }) {
                             suspended
                           </span>
                         )}
-                        {u.is_active && !u.is_admin && (
+                        {u.is_active && u.system_role === "user" && (
                           <span className="text-xs text-muted-foreground">active</span>
                         )}
                       </div>
@@ -128,9 +128,22 @@ export function UsersTab({ selfId }: { selfId?: string }) {
                           size="sm"
                           variant="outline"
                           disabled={self}
-                          onClick={() => update(u, { is_admin: !u.is_admin })}
+                          onClick={() =>
+                            update(u, {
+                              system_role:
+                                u.system_role === "user"
+                                  ? "admin"
+                                  : u.system_role === "admin"
+                                    ? "superadmin"
+                                    : "user",
+                            })
+                          }
                         >
-                          {u.is_admin ? "Demote" : "Promote"}
+                          {u.system_role === "user"
+                            ? "Promote"
+                            : u.system_role === "admin"
+                              ? "Promote ↑"
+                              : "Demote"}
                         </Button>
                         <Button
                           size="sm"

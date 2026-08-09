@@ -15,7 +15,10 @@ class UserOut(BaseModel):
     display_name: str
     avatar_url: str | None = None
     bio: str | None = None
-    is_admin: bool = False
+    system_role: str = "user"
+    google_id: str | None = None
+    two_factor_enabled: bool = False
+    has_password: bool = True
 
     @field_validator("id", mode="before")
     @classmethod
@@ -31,13 +34,13 @@ class AdminUserOut(BaseModel):
     username: str
     email: str
     display_name: str
-    is_admin: bool
+    system_role: str
     is_active: bool
     created_at: datetime
 
 
 class AdminUserUpdate(BaseModel):
-    is_admin: bool | None = None
+    system_role: str | None = None
     is_active: bool | None = None
 
 

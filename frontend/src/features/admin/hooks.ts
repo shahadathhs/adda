@@ -43,7 +43,7 @@ export const useAdminUsers = (q?: string) =>
 export const useAdminUpdateUser = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: { id: string; data: { is_admin?: boolean; is_active?: boolean } }) =>
+    mutationFn: (vars: { id: string; data: { system_role?: string; is_active?: boolean } }) =>
       adminUpdateUser(vars.id, vars.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: adminKeys.users() }),
   });

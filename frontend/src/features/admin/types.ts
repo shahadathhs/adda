@@ -9,7 +9,7 @@ export interface AdminUser {
   username: string;
   email: string;
   display_name: string;
-  is_admin: boolean;
+  system_role: "user" | "admin" | "superadmin";
   is_active: boolean;
   created_at: string;
 }

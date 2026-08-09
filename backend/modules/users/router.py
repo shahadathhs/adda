@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from core.exceptions import BadRequestException, NotFoundException
+from core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from core.security.deps import get_current_user
 from core.security.guards import require_admin
-from models.user import User
+from models.user import SystemRole, User
 from modules.users.schemas import AdminPasswordReset, AdminUserOut, AdminUserUpdate
 from modules.users.service import admin as admin_service
 from modules.users.service import queries
@@ -38,8 +38,18 @@ async def update_user(
     if user is None:
         raise NotFoundException("User not found")
     # Guard against locking yourself out.
-    if user.id == current_user.id and ((data.is_admin is False) or (data.is_active is False)):
-        raise BadRequestException("You can't revoke your own admin role or suspend yourself")
+    if user.id == current_user.id and (
+        (data.system_role is not None and data.system_role != SystemRole.SUPERADMIN)
+        or (data.is_active is False)
+    ):
+        raise BadRequestException("You can't demote or suspend yourself")
+    # Only superadmins can promote to admin/superadmin.
+    if data.system_role is not None and data.system_role in SystemRole.STAFF:
+        if current_user.system_role != SystemRole.SUPERADMIN:
+            raise ForbiddenException("Only superadmins can assign staff roles")
+    # Nobody can demote a superadmin (except another superadmin).
+    if user.system_role == SystemRole.SUPERADMIN and current_user.system_role != SystemRole.SUPERADMIN:
+        raise ForbiddenException("Can't modify a superadmin")
     return await admin_service.update_user_fields(db, user, data)
 
 

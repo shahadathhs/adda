@@ -1,3 +1,5 @@
+from models.user import SystemRole
+
 """Community routes: CRUD, stream-key management, and membership (join/leave/list)."""
 
 import uuid
@@ -71,7 +73,7 @@ async def _get_owned_community(
     community = await get_community(db, community_id)
     if community is None:
         raise NotFoundException("Community not found")
-    if community.owner_id != current_user.id and not current_user.is_admin:
+    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
         raise ForbiddenException("Only the owner can view or rotate the stream key")
     return community
 
@@ -114,7 +116,7 @@ async def update(
     community = await get_community(db, community_id)
     if community is None:
         raise NotFoundException("Community not found")
-    if community.owner_id != current_user.id and not current_user.is_admin:
+    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
         raise ForbiddenException("Only the owner can update this community")
     community = await update_community(db, community, data)
     return await _serialize(db, community)
@@ -129,7 +131,7 @@ async def remove(
     community = await get_community(db, community_id)
     if community is None:
         raise NotFoundException("Community not found")
-    if community.owner_id != current_user.id and not current_user.is_admin:
+    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
         raise ForbiddenException("Only the owner can delete this community")
     await delete_community(db, community)
 

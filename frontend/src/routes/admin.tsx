@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin")({
   beforeLoad: ({ context }) => {
     const user = readUser(context.queryClient);
     if (!user) throw redirect({ to: "/login" });
-    if (!user.is_admin) throw redirect({ to: "/home" });
+    if (user.system_role === "user") throw redirect({ to: "/home" });
   },
   head: () => ({
     title: "Admin — adda",

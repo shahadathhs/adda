@@ -4,9 +4,10 @@ import secrets
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.auth_emails import send_google_linked_email
 from core.security.password import hash_password, verify_password
 from models.user import User
-from modules.auth.schemas import UserRegister
+from modules.auth.schemas import UpdateProfileRequest, UserRegister
 
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
@@ -39,6 +40,16 @@ async def create_user(db: AsyncSession, data: UserRegister) -> User:
 
 async def set_password(db: AsyncSession, user: User, new_password: str) -> User:
     user.password_hash = hash_password(new_password)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+async def update_profile(db: AsyncSession, user: User, data: UpdateProfileRequest) -> User:
+    for field in ("username", "display_name", "avatar_url", "bio"):
+        value = getattr(data, field)
+        if value is not None:
+            setattr(user, field, value)
     await db.commit()
     await db.refresh(user)
     return user
@@ -81,8 +92,13 @@ async def get_or_create_google_user(
     user = await get_user_by_email(db, email)
     if user is not None:
         user.google_id = google_id
+        if picture and not user.avatar_url:
+            user.avatar_url = picture
         await db.commit()
         await db.refresh(user)
+        # Send security notification email.
+        if user.email:
+            await send_google_linked_email(user.email)
         return user
 
     username = await _unique_username(db, email)
@@ -96,4 +112,18 @@ async def get_or_create_google_user(
     db.add(user)
     await db.commit()
     await db.refresh(user)
+    return user
+
+
+async def link_google_account(
+    db: AsyncSession, user: User, google_id: str, picture: str | None
+) -> User:
+    """Link a Google account to an existing logged-in user."""
+    user.google_id = google_id
+    if picture and not user.avatar_url:
+        user.avatar_url = picture
+    await db.commit()
+    await db.refresh(user)
+    if user.email:
+        await send_google_linked_email(user.email)
     return user

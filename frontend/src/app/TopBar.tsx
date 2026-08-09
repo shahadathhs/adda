@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { Settings } from "lucide-react";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
@@ -18,7 +19,7 @@ export function TopBar() {
         >
           adda
         </Link>
-        {user?.is_admin && (
+        {(user?.system_role === "admin" || user?.system_role === "superadmin") && (
           <Link
             to="/admin"
             className="rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -31,6 +32,13 @@ export function TopBar() {
         <ThemeToggle />
         {user && (
           <>
+            <Link
+              to="/settings"
+              className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
             <div className="flex items-center gap-2">
               <UserAvatar name={user.display_name} src={user.avatar_url} />
               <span className="hidden text-sm text-muted-foreground sm:inline">

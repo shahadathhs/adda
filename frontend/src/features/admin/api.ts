@@ -10,7 +10,7 @@ export const adminStats = () => request<AdminStats>("/api/admin/stats");
 export const adminUsers = (q?: string) =>
   request<AdminUser[]>(`/api/admin/users${q ? `?q=${encodeURIComponent(q)}` : ""}`);
 
-export const adminUpdateUser = (id: string, data: { is_admin?: boolean; is_active?: boolean }) =>
+export const adminUpdateUser = (id: string, data: { system_role?: string; is_active?: boolean }) =>
   request<AdminUser>(`/api/admin/users/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),

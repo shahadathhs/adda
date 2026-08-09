@@ -14,7 +14,9 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
+import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
 import { Route as PublicBlogRouteImport } from './routes/_public/blog'
@@ -58,9 +60,19 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedHomeRoute = AuthedHomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthedRoute,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -164,7 +176,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/home': typeof AuthedHomeRoute
+  '/settings': typeof AuthedSettingsRoute
   '/about': typeof PublicAboutRoute
   '/blog': typeof PublicBlogRoute
   '/changelog': typeof PublicChangelogRoute
@@ -188,7 +202,9 @@ export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/home': typeof AuthedHomeRoute
+  '/settings': typeof AuthedSettingsRoute
   '/about': typeof PublicAboutRoute
   '/blog': typeof PublicBlogRoute
   '/changelog': typeof PublicChangelogRoute
@@ -215,7 +231,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authed/home': typeof AuthedHomeRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
   '/_public/about': typeof PublicAboutRoute
   '/_public/blog': typeof PublicBlogRoute
   '/_public/changelog': typeof PublicChangelogRoute
@@ -243,7 +261,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/home'
+    | '/settings'
     | '/about'
     | '/blog'
     | '/changelog'
@@ -267,7 +287,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/home'
+    | '/settings'
     | '/about'
     | '/blog'
     | '/changelog'
@@ -293,7 +315,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/_authed/home'
+    | '/_authed/settings'
     | '/_public/about'
     | '/_public/blog'
     | '/_public/changelog'
@@ -321,6 +345,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -360,11 +385,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed/home': {
       id: '/_authed/home'
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof AuthedHomeRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_public/': {
@@ -505,11 +544,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthedRouteChildren {
   AuthedHomeRoute: typeof AuthedHomeRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
   AuthedCommunityIdRoute: typeof AuthedCommunityIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedHomeRoute: AuthedHomeRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
   AuthedCommunityIdRoute: AuthedCommunityIdRoute,
 }
 
@@ -575,6 +616,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

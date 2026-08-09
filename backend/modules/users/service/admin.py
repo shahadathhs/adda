@@ -6,8 +6,8 @@ from modules.users.schemas import AdminUserUpdate
 
 
 async def update_user_fields(db: AsyncSession, user: User, data: AdminUserUpdate) -> User:
-    if data.is_admin is not None:
-        user.is_admin = data.is_admin
+    if data.system_role is not None:
+        user.system_role = data.system_role
     if data.is_active is not None:
         user.is_active = data.is_active
     await db.commit()

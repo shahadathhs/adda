@@ -1,7 +1,18 @@
-from sqlalchemy import String
+from sqlalchemy import Boolean, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
+
+
+class SystemRole:
+    """Platform-level roles (separate from per-community CommunityRole)."""
+
+    USER = "user"
+    ADMIN = "admin"
+    SUPERADMIN = "superadmin"
+
+    ALL = (USER, ADMIN, SUPERADMIN)
+    STAFF = (ADMIN, SUPERADMIN)  # anyone who can access the admin dashboard
 
 
 class User(Base):
@@ -19,10 +30,24 @@ class User(Base):
     avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     bio: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
-    # Global role (per-community roles live on Membership)
-    is_admin: Mapped[bool] = mapped_column(default=False)
+    # Platform-level role: "user", "admin", or "superadmin".
+    # This is separate from per-community roles (CommunityRole on Membership).
+    system_role: Mapped[str] = mapped_column(
+        String(20), default=SystemRole.USER, server_default=text("'user'")
+    )
     # Suspended accounts cannot log in (admin moderation lever).
-    is_active: Mapped[bool] = mapped_column(default=True)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, default=True, server_default=text("true")
+    )
+    # Email-based two-factor authentication.
+    two_factor_enabled: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=text("false")
+    )
+
+    @property
+    def has_password(self) -> bool:
+        """True if the user can log in with a password (not Google-only)."""
+        return self.password_hash is not None
 
     def to_public_dict(self) -> dict[str, str | bool | None]:
         return {
@@ -31,5 +56,5 @@ class User(Base):
             "display_name": self.display_name,
             "avatar_url": self.avatar_url,
             "bio": self.bio,
-            "is_admin": self.is_admin,
+            "system_role": self.system_role,
         }
