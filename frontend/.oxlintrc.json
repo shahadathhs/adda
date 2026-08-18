@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "react-hooks"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "eslint/no-console": ["warn", { "allow": ["warn", "error", "info", "group", "groupEnd"] }],
+    "eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "eslint/no-unused-expressions": "error",
+    "typescript/no-empty-object-type": "warn",
+    "typescript/no-namespace": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "ignorePatterns": ["node_modules", "dist", "src/routeTree.gen.ts"],
+  "overrides": [
+    {
+      "files": ["src/main.tsx", "src/routes/**/*.{ts,tsx}", "src/shared/ui/**/*.{ts,tsx}"],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
+  ]
+}
