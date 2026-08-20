@@ -50,6 +50,12 @@ export const resetPassword = (token: string, password: string) =>
 
 export const me = () => request<User>("/api/auth/me");
 
+export const logout = (refresh_token: string) =>
+  request<{ message: string }>("/api/auth/logout", {
+    method: "POST",
+    body: JSON.stringify({ refresh_token }),
+  });
+
 export const updateProfile = (data: {
   username?: string;
   display_name?: string;

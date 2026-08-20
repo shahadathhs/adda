@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { FiVideoOff } from "react-icons/fi";
 import { toast } from "sonner";
-import { HLS_BASE_URL } from "@/shared/config";
+import { hlsBaseUrl } from "@/shared/config";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -68,7 +68,7 @@ export default function CommunityPage() {
     return <div className="p-6 text-muted-foreground">Loading…</div>;
   }
 
-  const hlsUrl = `${HLS_BASE_URL}/community/${community.id}/index.m3u8`;
+  const hlsUrl = `${hlsBaseUrl()}/community/${community.id}/index.m3u8`;
   const showPlayer = isLive;
 
   return (

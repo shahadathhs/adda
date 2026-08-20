@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiHash, FiLock, FiPlus, FiRadio, FiTrash2, FiVideoOff, FiVolume1 } from "react-icons/fi";
 import { toast } from "sonner";
-import { HLS_BASE_URL } from "@/shared/config";
+import { hlsBaseUrl } from "@/shared/config";
 import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -37,16 +37,12 @@ export default function ChannelView({
   const [editId, setEditId] = useState<string | null>(null);
 
   const isLive = status?.is_live ?? false;
-  const active = channels?.find((c) => c.id === activeId);
-  const hlsUrl = `${HLS_BASE_URL}/community/${communityId}/index.m3u8`;
-
-  // Auto-select first accessible non-live channel.
-  useEffect(() => {
-    if (channels?.length && !activeId) {
-      const first = channels.find((c) => c.type !== "live" && c.has_access);
-      setActiveId(first?.id ?? channels[0]?.id ?? null);
-    }
-  }, [channels, activeId]);
+  // Auto-select first accessible non-live channel (derived during render).
+  const active =
+    channels?.find((c) => c.id === activeId) ??
+    channels?.find((c) => c.type !== "live" && c.has_access) ??
+    channels?.[0];
+  const hlsUrl = `${hlsBaseUrl()}/community/${communityId}/index.m3u8`;
 
   const handleCreate = (data: {
     name: string;

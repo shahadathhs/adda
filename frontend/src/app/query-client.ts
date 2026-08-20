@@ -1,15 +1,16 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
-import { ApiError, clearToken } from "@/shared/api/client";
+import { ApiError, clearSession } from "@/shared/api/client";
 
 /**
- * On a 401 from any query/mutation, the session is gone — clear the token and
- * bounce to /login with a full reload (drops stale cache + React state).
- * The auth store's own `/me` call on boot is handled separately (it catches
- * 401 gracefully to show the landing page instead).
+ * On a 401 from any query/mutation, the session is gone (the request helper
+ * already tried a refresh) — clear tokens and bounce to /login with a full
+ * reload (drops stale cache + React state). The auth store's own `/me` call on
+ * boot is handled separately (it catches 401 gracefully to show the landing
+ * page instead).
  */
 function onAuthFailure(err: unknown) {
   if (err instanceof ApiError && err.status === 401) {
-    clearToken();
+    clearSession();
     if (typeof window !== "undefined") {
       window.location.assign("/login");
     }

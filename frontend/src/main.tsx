@@ -5,7 +5,9 @@ import { RouterProvider } from "@tanstack/react-router";
 import { Providers } from "./app/providers";
 import { router } from "./app/router";
 import { getToken } from "@/shared/api/client";
+import { hasServerConfig, isDesktopApp } from "@/shared/config";
 import { useMe } from "@/features/auth/hooks";
+import { ServerSetupScreen } from "@/features/server-config/ServerSetupScreen";
 import { GOOGLE_CLIENT_ID } from "@/features/auth/google-config";
 import "./index.css";
 
@@ -15,9 +17,14 @@ import "./index.css";
  * of racing the fetch.
  */
 function Boot() {
+  const needsServer = isDesktopApp && !hasServerConfig();
   const token = getToken();
   const { isLoading } = useMe();
 
+  // Desktop first run: no server configured yet — ask for one.
+  if (needsServer) {
+    return <ServerSetupScreen />;
+  }
   if (token && isLoading) {
     return (
       <div className="flex h-screen items-center justify-center text-muted-foreground">

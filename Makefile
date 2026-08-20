@@ -16,8 +16,8 @@ PNPM         := pnpm
 ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 
 .PHONY: help setup env dirs toolchain install \
-        up down restart build logs logs-backend logs-frontend ps \
-        dev backend frontend \
+        up down restart build logs logs-backend logs-frontend logs-desktop ps \
+        dev backend frontend desktop desktop-dev desktop-build desktop-clean release \
         migrate migration reset reset-migrate db-up typecheck \
         lint lint-backend lint-web format build-web \
         check clean clean-recordings
@@ -73,6 +73,9 @@ logs-backend: ## Tail backend logs
 logs-frontend: ## Tail frontend logs
 	$(COMPOSE) logs -f --tail=100 frontend
 
+logs-desktop: ## Tail desktop-builder logs
+	$(COMPOSE) --profile desktop logs -f --tail=100 desktop
+
 ps: ## List running containers
 	$(COMPOSE) ps
 
@@ -89,6 +92,45 @@ backend: ## Run backend dev server on :7001 (uvicorn --reload)
 
 frontend: ## Run frontend dev server on :5173 (vite)
 	@cd $(FRONTEND_DIR) && $(PNPM) dev
+
+# ── Desktop app (Tauri) ───────────────────────────────────────────────
+# The desktop app is a client of the running stack — start the server side
+# first (make up, or make dev in another terminal).
+
+desktop-dev: ## Run the desktop app in dev mode (needs local Rust + running stack)
+	@cd $(FRONTEND_DIR) && \
+	  if lsof -i :5173 -sTCP:LISTEN >/dev/null 2>&1; then \
+	    echo "vite already running on :5173 — attaching to it"; \
+	    $(PNPM) tauri dev --config '{"build":{"beforeDevCommand":""}}'; \
+	  else \
+	    $(PNPM) desktop:dev; \
+	  fi
+
+desktop-build: ## Build desktop installers natively (needs local Rust; macOS/Windows only)
+	@cd $(FRONTEND_DIR) && $(PNPM) desktop:build
+
+desktop: ## Build Linux desktop installers via Docker (no Rust needed) → ./dist-desktop/
+	$(COMPOSE) --profile desktop build desktop
+	$(COMPOSE) --profile desktop run --rm desktop
+	@echo "Installers ready in ./dist-desktop/ (deb + appimage)."
+
+desktop-clean: ## Remove desktop build caches (Docker volumes + dist-desktop/)
+	$(COMPOSE) --profile desktop down --volume --remove-orphans
+	@rm -rf dist-desktop
+
+# ── Release ───────────────────────────────────────────────────────────
+# Bumps the version and commits. When the bump lands on main, CI builds
+# all desktop installers and publishes the GitHub release (tag included).
+
+release: ## Prepare a release: make release v=0.2.0 (bump + commit + push; merge to main to build)
+	@test -n "$(v)" || { echo 'Usage: make release v=0.2.0'; exit 1; }
+	./scripts/bump-version.sh $(v)
+	git add frontend/package.json frontend/src-tauri/tauri.conf.json frontend/src-tauri/Cargo.toml
+	git commit -m "chore: release v$(v)"
+	git push origin $$(git rev-parse --abbrev-ref HEAD)
+	@echo ""
+	@echo "Version bumped to v$(v) and pushed. Merge this branch into main —"
+	@echo "CI will build the installers and publish the release automatically."
 
 # ── Backend: migrations, tests, typecheck ──────────────────────────────
 # Alembic autogenerate diffs models against the LIVE database, so we always

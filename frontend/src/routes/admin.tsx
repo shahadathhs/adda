@@ -13,7 +13,7 @@ import {
 import { readUser, useMe } from "@/features/auth/hooks";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
-import { clearToken } from "@/shared/api/client";
+import { clearSession } from "@/shared/api/client";
 import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/admin")({
@@ -46,7 +46,7 @@ function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
-    clearToken();
+    clearSession();
     window.location.href = "/login";
   };
 

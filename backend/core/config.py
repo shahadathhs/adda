@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     # Auth
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+    access_token_expire_minutes: int = 60 * 24  # 1 day
+    refresh_token_expire_days: int = 30
     # Password reset tokens (signed JWT, separate purpose).
     reset_token_expire_minutes: int = 30
     # Frontend URL the reset email links to (token appended as ?token=…).
@@ -51,8 +52,9 @@ class Settings(BaseSettings):
     # docker the container path (/recordings) is set via RECORDINGS_DIR.
     recordings_dir: str = "../recordings"
 
-    # CORS origins (comma-separated)
-    cors_origins: str = "http://localhost:5173"
+    # CORS origins (comma-separated). The tauri:// entries cover the desktop
+    # app (macOS/Linux uses tauri://localhost, Windows http://tauri.localhost).
+    cors_origins: str = "http://localhost:5173,tauri://localhost,http://tauri.localhost"
 
     # Bootstrap accounts — seeded idempotently on startup (only created if they
     # don't already exist). Override all of these in prod with strong values.

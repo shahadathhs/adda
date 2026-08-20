@@ -21,7 +21,6 @@ from core.exceptions import (
 from core.otp import generate_otp, verify_otp
 from core.redis_client import redis_client
 from core.security.deps import get_current_user
-from core.security.jwt import create_access_token
 from core.security.password import verify_password
 from core.security.tokens import create_reset_token, verify_reset_token
 from models.user import User
@@ -33,6 +32,7 @@ from modules.auth.schemas import (
     Login2faVerify,
     OtpRequest,
     OtpVerify,
+    RefreshRequest,
     ResetPasswordRequest,
     SetPasswordRequest,
     Token,
@@ -53,6 +53,11 @@ from modules.auth.service.auth_service import (
     update_profile,
 )
 from modules.auth.service.oauth import verify_google_id_token
+from modules.auth.service.refresh_tokens import (
+    create_session,
+    revoke_refresh_token,
+    rotate_refresh_token,
+)
 from modules.users.schemas import UserOut
 
 logger = logging.getLogger("adda.auth")
@@ -75,8 +80,7 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
         raise ConflictException("Username already taken")
 
     user = await create_user(db, data)
-    token = create_access_token(str(user.id))
-    return Token(access_token=token, user=UserOut.model_validate(user, from_attributes=True))
+    return await create_session(db, user)
 
 
 @router.post("/login")
@@ -101,8 +105,7 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
         await send_2fa_code_email(user.email, code)
         return {"requires_2fa": True, "temp_token": temp_token}
 
-    token = create_access_token(str(user.id))
-    return Token(access_token=token, user=UserOut.model_validate(user, from_attributes=True))
+    return await create_session(db, user)
 
 
 @router.post("/login/verify-2fa", response_model=Token)
@@ -121,8 +124,23 @@ async def login_verify_2fa(data: Login2faVerify, db: AsyncSession = Depends(get_
     if user is None or not user.is_active:
         raise ForbiddenException("Account suspended")
 
-    token = create_access_token(str(user.id))
-    return Token(access_token=token, user=UserOut.model_validate(user, from_attributes=True))
+    return await create_session(db, user)
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
+    """Exchange a valid refresh token for a new access + refresh token pair."""
+    session = await rotate_refresh_token(db, data.refresh_token)
+    if session is None:
+        raise UnauthorizedException("Invalid or expired refresh token")
+    return session
+
+
+@router.post("/logout")
+async def logout(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
+    """Revoke a refresh token. Idempotent — always succeeds."""
+    await revoke_refresh_token(db, data.refresh_token)
+    return {"message": "Logged out."}
 
 
 @router.get("/me", response_model=UserOut)
@@ -219,8 +237,7 @@ async def otp_verify(data: OtpVerify, db: AsyncSession = Depends(get_db)):
     user = await get_user_by_email(db, data.email)
     if user is None or not user.is_active:
         raise UnauthorizedException("Invalid or expired code")
-    token = create_access_token(str(user.id))
-    return Token(access_token=token, user=UserOut.model_validate(user, from_attributes=True))
+    return await create_session(db, user)
 
 
 # ── 2FA management ────────────────────────────────────────────────────
@@ -290,8 +307,7 @@ async def google_login(data: GoogleAuthRequest, db: AsyncSession = Depends(get_d
     if not user.is_active:
         raise ForbiddenException("Account suspended")
 
-    token = create_access_token(str(user.id))
-    return Token(access_token=token, user=UserOut.model_validate(user, from_attributes=True))
+    return await create_session(db, user)
 
 
 @router.post("/google/link", response_model=UserOut)

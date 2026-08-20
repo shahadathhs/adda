@@ -19,6 +19,7 @@ frontend/dist/
 .vite/
 pnpm-lock.yaml
 *.tsbuildinfo
+.pnpm-store/
 
 # ── Env / secrets ──
 .env
@@ -37,3 +38,4 @@ frontend/.env.local
 /media/
 /recordings/
 /uploads/
+/dist-desktop/

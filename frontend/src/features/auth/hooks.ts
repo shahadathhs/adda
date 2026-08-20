@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { clearToken, getToken, setToken } from "@/shared/api/client";
+import { clearSession, getToken, getRefreshToken, setSession } from "@/shared/api/client";
 import {
   changePassword as changePasswordApi,
   disable2fa as disable2faApi,
@@ -8,6 +8,7 @@ import {
   googleLogin,
   linkGoogle as linkGoogleApi,
   login as loginApi,
+  logout as logoutApi,
   me,
   register as registerApi,
   requestOtp,
@@ -44,7 +45,7 @@ export const useLogin = () => {
     mutationFn: loginApi,
     onSuccess: (res) => {
       if ("access_token" in res) {
-        setToken(res.access_token);
+        setSession(res);
         cacheSession(qc, res.user);
       }
       // 2FA challenges ({ requires_2fa, temp_token }) are handled by callers.
@@ -58,7 +59,7 @@ export const useVerify2faLogin = () => {
     mutationFn: (args: { temp_token: string; code: string }) =>
       verify2faLoginApi(args.temp_token, args.code),
     onSuccess: (token) => {
-      setToken(token.access_token);
+      setSession(token);
       cacheSession(qc, token.user);
     },
   });
@@ -69,7 +70,7 @@ export const useGoogleLogin = () => {
   return useMutation({
     mutationFn: (id_token: string) => googleLogin(id_token),
     onSuccess: (token) => {
-      setToken(token.access_token);
+      setSession(token);
       cacheSession(qc, token.user);
     },
   });
@@ -85,7 +86,7 @@ export const useVerifyOtp = () => {
   return useMutation({
     mutationFn: (args: { email: string; code: string }) => verifyOtpApi(args.email, args.code),
     onSuccess: (token) => {
-      setToken(token.access_token);
+      setSession(token);
       cacheSession(qc, token.user);
     },
   });
@@ -96,7 +97,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: registerApi,
     onSuccess: (token) => {
-      setToken(token.access_token);
+      setSession(token);
       cacheSession(qc, token.user);
     },
   });
@@ -109,8 +110,17 @@ export function readUser(qc: ReturnType<typeof useQueryClient>): User | null {
 
 export function useLogout() {
   const qc = useQueryClient();
-  return () => {
-    clearToken();
+  return async () => {
+    // Revoke the refresh token server-side (best-effort).
+    const refreshToken = getRefreshToken();
+    if (refreshToken) {
+      try {
+        await logoutApi(refreshToken);
+      } catch {
+        /* best-effort */
+      }
+    }
+    clearSession();
     qc.removeQueries({ queryKey: authKeys.me });
   };
 }

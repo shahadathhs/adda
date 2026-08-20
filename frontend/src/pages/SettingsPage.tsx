@@ -10,6 +10,7 @@ import { Textarea } from "@/shared/ui/textarea";
 import { Badge } from "@/shared/ui/badge";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/form";
 import { GoogleButton } from "@/features/auth/GoogleButton";
+import { ServerConnectionCard } from "@/features/server-config/ServerConnectionCard";
 import {
   useChangePassword,
   useDisable2fa,
@@ -48,6 +49,7 @@ export default function SettingsPage() {
       <PasswordSection hasPassword={!!user?.has_password} />
       <TwoFactorSection />
       <GoogleSection linked={!!user?.google_id} />
+      <ServerConnectionCard />
     </div>
   );
 }

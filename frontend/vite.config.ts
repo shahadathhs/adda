@@ -10,8 +10,11 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  // Tauri loads a fixed devUrl, so the port must not drift.
+  clearScreen: false,
   server: {
     host: true,
     port: 5173,
+    strictPort: !!process.env.TAURI_ENV_PLATFORM,
   },
 });
