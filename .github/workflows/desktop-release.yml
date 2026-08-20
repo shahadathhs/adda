@@ -9,6 +9,10 @@ on:
   push:
     branches: [main]
 
+# tauri-action creates the tag + release with GITHUB_TOKEN — needs write.
+permissions:
+  contents: write
+
 jobs:
   check:
     name: Is there a new version to release?
