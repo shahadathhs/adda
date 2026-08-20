@@ -27,8 +27,16 @@ export function useCommunityChat(communityId: string | undefined, channelId?: st
       ? chatChannel(communityId)
       : null;
 
-  useEffect(() => {
+  // Reset live messages when the topic changes (derived, not effect-driven).
+  const liveKey = topic ?? "none";
+  const [lastKey, setLastKey] = useState(liveKey);
+  if (lastKey !== liveKey) {
+    setLastKey(liveKey);
     setLive([]);
+    setOnlineCount(0);
+  }
+
+  useEffect(() => {
     if (!topic) return;
     socket.connect();
     socket.subscribe(topic);
