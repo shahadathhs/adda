@@ -254,6 +254,19 @@ make desktop         # Linux .deb/.AppImage via Docker — no Rust needed → ./
 On first launch the app asks for your server address (default
 `http://localhost:7001` for a local stack) — it remembers it afterwards.
 
+### Releasing desktop installers
+
+```bash
+./scripts/bump-version.sh 0.2.0   # bumps package.json + tauri.conf.json + Cargo.toml
+git add -A && git commit -m "chore: release v0.2.0"
+git tag v0.2.0 && git push --tags  # CI builds .dmg + .exe + .deb + .AppImage
+```
+
+Pushing a `v*` tag triggers the release workflow — installers for macOS,
+Windows, and Linux land on the GitHub release page in a few minutes.
+Binaries are currently unsigned (macOS Gatekeeper / Windows SmartScreen
+will prompt on first open).
+
 ---
 
 ## Going Live (Streaming)
