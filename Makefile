@@ -17,7 +17,7 @@ ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 
 .PHONY: help setup env dirs toolchain install \
         up down restart build logs logs-backend logs-frontend logs-desktop ps \
-        dev backend frontend desktop desktop-dev desktop-build desktop-clean \
+        dev backend frontend desktop desktop-dev desktop-build desktop-clean release \
         migrate migration reset reset-migrate db-up typecheck \
         lint lint-backend lint-web format build-web \
         check clean clean-recordings
@@ -117,6 +117,19 @@ desktop: ## Build Linux desktop installers via Docker (no Rust needed) → ./dis
 desktop-clean: ## Remove desktop build caches (Docker volumes + dist-desktop/)
 	$(COMPOSE) --profile desktop down --volume --remove-orphans
 	@rm -rf dist-desktop
+
+# ── Release ───────────────────────────────────────────────────────────
+# Tags v<version> and pushes it — CI builds all desktop installers and
+# attaches them to the GitHub release page.
+
+release: ## Cut a release: make release v=0.2.0 (bump, commit, tag, push)
+	@test -n "$(v)" || { echo 'Usage: make release v=0.2.0'; exit 1; }
+	./scripts/bump-version.sh $(v)
+	git add frontend/package.json frontend/src-tauri/tauri.conf.json frontend/src-tauri/Cargo.toml
+	git commit -m "chore: release v$(v)"
+	git tag v$(v)
+	git push origin $$(git rev-parse --abbrev-ref HEAD) --tags
+	@echo "Tagged v$(v) — installers will appear on the GitHub releases page in a few minutes."
 
 # ── Backend: migrations, tests, typecheck ──────────────────────────────
 # Alembic autogenerate diffs models against the LIVE database, so we always
