@@ -65,8 +65,9 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "22"
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          # pnpm-lock.yaml is intentionally gitignored (same as ci.yml) —
+          # no lockfile-keyed cache.
+          cache: ""
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
