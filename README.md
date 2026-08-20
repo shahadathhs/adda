@@ -256,16 +256,18 @@ On first launch the app asks for your server address (default
 
 ### Releasing desktop installers
 
+Releases are triggered by the code that lands on **main**: when a push to
+main contains a version that hasn't been released yet, CI builds the
+installers and publishes the release (tag included) automatically.
+
 ```bash
-./scripts/bump-version.sh 0.2.0   # bumps package.json + tauri.conf.json + Cargo.toml
-git add -A && git commit -m "chore: release v0.2.0"
-git tag v0.2.0 && git push --tags  # CI builds .dmg + .exe + .deb + .AppImage
+make release v=0.2.0   # bump + commit + push (on any branch)
+# then merge that branch into main → CI releases v0.2.0
 ```
 
-Pushing a `v*` tag triggers the release workflow — installers for macOS,
-Windows, and Linux land on the GitHub release page in a few minutes.
-Binaries are currently unsigned (macOS Gatekeeper / Windows SmartScreen
-will prompt on first open).
+macOS, Windows, and Linux installers land on the GitHub releases page a few
+minutes after the merge. Binaries are currently unsigned (macOS Gatekeeper /
+Windows SmartScreen will prompt on first open).
 
 ---
 

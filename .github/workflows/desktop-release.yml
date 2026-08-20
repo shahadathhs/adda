@@ -1,11 +1,42 @@
 name: Desktop Release
 
+# Releases are cut by the code that lands on main: when a push to main
+# contains a version (tauri.conf.json) that has never been released, the
+# installers are built and a v<version> tag + GitHub release are created.
+# Bump versions with: make release v=0.2.0  (then merge to main)
+
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
 
 jobs:
+  check:
+    name: Is there a new version to release?
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      needed: ${{ steps.ver.outputs.needed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history + tags to compare against
+
+      - name: Compare version against existing tags
+        id: ver
+        run: |
+          VERSION=$(node -p "require('./frontend/src-tauri/tauri.conf.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "v$VERSION already released — skipping." >> "$GITHUB_STEP_SUMMARY"
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "New version v$VERSION — building release." >> "$GITHUB_STEP_SUMMARY"
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: check
+    if: needs.check.outputs.needed == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -62,9 +93,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: frontend
-          tagName: ${{ github.ref_name }}
-          releaseName: "adda ${{ github.ref_name }}"
-          releaseBody: "Desktop installers for adda ${{ github.ref_name }}. See the assets below."
+          tagName: v${{ needs.check.outputs.version }}
+          releaseName: "adda v${{ needs.check.outputs.version }}"
+          releaseBody: "Desktop installers for adda v${{ needs.check.outputs.version }}. See the assets below."
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

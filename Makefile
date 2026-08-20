@@ -119,17 +119,18 @@ desktop-clean: ## Remove desktop build caches (Docker volumes + dist-desktop/)
 	@rm -rf dist-desktop
 
 # ── Release ───────────────────────────────────────────────────────────
-# Tags v<version> and pushes it — CI builds all desktop installers and
-# attaches them to the GitHub release page.
+# Bumps the version and commits. When the bump lands on main, CI builds
+# all desktop installers and publishes the GitHub release (tag included).
 
-release: ## Cut a release: make release v=0.2.0 (bump, commit, tag, push)
+release: ## Prepare a release: make release v=0.2.0 (bump + commit + push; merge to main to build)
 	@test -n "$(v)" || { echo 'Usage: make release v=0.2.0'; exit 1; }
 	./scripts/bump-version.sh $(v)
 	git add frontend/package.json frontend/src-tauri/tauri.conf.json frontend/src-tauri/Cargo.toml
 	git commit -m "chore: release v$(v)"
-	git tag v$(v)
-	git push origin $$(git rev-parse --abbrev-ref HEAD) --tags
-	@echo "Tagged v$(v) — installers will appear on the GitHub releases page in a few minutes."
+	git push origin $$(git rev-parse --abbrev-ref HEAD)
+	@echo ""
+	@echo "Version bumped to v$(v) and pushed. Merge this branch into main —"
+	@echo "CI will build the installers and publish the release automatically."
 
 # ── Backend: migrations, tests, typecheck ──────────────────────────────
 # Alembic autogenerate diffs models against the LIVE database, so we always
