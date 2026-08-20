@@ -1,5 +1,5 @@
-import { WS_BASE_URL } from "@/shared/config";
-import { getToken } from "@/shared/api/client";
+import { wsBaseUrl } from "@/shared/config";
+import { getToken, getRefreshToken, isTokenExpired, refreshSession } from "@/shared/api/client";
 import type { ServerMessage } from "./types";
 
 type MessageHandler = (msg: ServerMessage) => void;
@@ -22,7 +22,21 @@ class AddaSocket {
     if (!token) return;
     if (this.ws && this.ws.readyState <= WebSocket.OPEN) return;
 
-    this.ws = new WebSocket(`${WS_BASE_URL}/ws?token=${encodeURIComponent(token)}`);
+    // If the access token is about to expire, rotate it before connecting.
+    if (isTokenExpired() && getRefreshToken()) {
+      void refreshSession().then((ok) => {
+        if (ok) this.open();
+      });
+      return;
+    }
+    this.open();
+  }
+
+  private open(): void {
+    const token = getToken();
+    if (!token) return;
+
+    this.ws = new WebSocket(`${wsBaseUrl()}/ws?token=${encodeURIComponent(token)}`);
 
     this.ws.onopen = () => {
       this.connected = true;

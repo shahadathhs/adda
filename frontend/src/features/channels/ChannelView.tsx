@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FiHash, FiLock, FiPlus, FiRadio, FiTrash2, FiVideoOff, FiVolume1 } from "react-icons/fi";
 import { toast } from "sonner";
-import { HLS_BASE_URL } from "@/shared/config";
+import { hlsBaseUrl } from "@/shared/config";
 import { useConfirm } from "@/shared/ui/use-confirm";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -38,7 +38,7 @@ export default function ChannelView({
 
   const isLive = status?.is_live ?? false;
   const active = channels?.find((c) => c.id === activeId);
-  const hlsUrl = `${HLS_BASE_URL}/community/${communityId}/index.m3u8`;
+  const hlsUrl = `${hlsBaseUrl()}/community/${communityId}/index.m3u8`;
 
   // Auto-select first accessible non-live channel.
   useEffect(() => {

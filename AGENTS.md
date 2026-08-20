@@ -28,6 +28,24 @@ pnpm lint                                 # eslint
 pnpm build                                # tsc + vite build
 ```
 
+### Desktop app (Tauri v2, requires Rust toolchain)
+
+```bash
+cd frontend
+pnpm desktop:dev                          # tauri dev — needs backend+mediamtx running
+pnpm desktop:build                        # bundles installers into src-tauri/target
+```
+
+- Desktop shell lives in `frontend/src-tauri/`; it wraps the same Vite app.
+- Server URLs are runtime-configurable (`src/shared/config.ts`, persisted in
+  localStorage) — the desktop app shows a setup screen on first run.
+- Auth uses rotating refresh tokens (`/api/auth/refresh`); the frontend
+  refreshes transparently on 401 (`src/shared/api/client.ts`).
+- Linux installers can also be built without local Rust, via Docker:
+  `docker compose --profile desktop run --rm desktop` → output in
+  `./dist-desktop/` (macOS/Windows installers must be built natively with
+  `pnpm desktop:build`).
+
 ### Infra (Docker)
 
 ```bash

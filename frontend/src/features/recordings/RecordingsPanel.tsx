@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_BASE_URL } from "@/shared/config";
+import { apiBaseUrl } from "@/shared/config";
 import { Card } from "@/shared/ui/card";
 import { useRecordings } from "./hooks";
 import type { Recording } from "./types";
@@ -14,7 +14,7 @@ export default function RecordingsPanel({ communityId }: { communityId: string }
   const [active, setActive] = useState<Recording | null>(null);
 
   const src = active
-    ? `${API_BASE_URL}/api/recordings/file?path=${encodeURIComponent(active.path)}`
+    ? `${apiBaseUrl()}/api/recordings/file?path=${encodeURIComponent(active.path)}`
     : null;
 
   if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>;

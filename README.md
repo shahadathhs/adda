@@ -13,7 +13,9 @@ server.
 ## Features
 
 ### Authentication & Security
-- **JWT-based auth** with access tokens
+- **JWT-based auth** with rotating **refresh tokens** (30-day, hashed at rest,
+  reuse detection revokes the session) + 1-day access tokens; the frontend
+  refreshes transparently on 401
 - **Google OAuth** sign-in (Google Identity Services + JWKS verification)
 - **Passwordless OTP login** (6-digit code via email, Redis-backed)
 - **Two-factor authentication** (2FA) — enable/disable/verify lifecycle
@@ -69,6 +71,15 @@ server.
 - **Live** — monitor active streams, viewer counts, force-stop
 - **Recordings** — browse and delete recordings across all communities
 
+### Desktop App (Tauri v2)
+- The same React app wrapped in a native window — small binary, system webview
+- **Runtime-configurable server** — first-run "Connect to a server" screen;
+  each user points their app at their own self-hosted instance (changeable in
+  Settings → Connection)
+- One codebase, three clients: browser, desktop dev, desktop installers
+- Linux `.deb`/`.AppImage` buildable via Docker (no local Rust needed);
+  macOS/Windows installers build natively
+
 ### Public Site
 - Marketing landing page with feature showcase
 - 12 public pages (about, features, pricing, docs, blog, changelog, roadmap,
@@ -84,6 +95,7 @@ server.
 | Layer          | Technology                                                           |
 |----------------|----------------------------------------------------------------------|
 | **Frontend**   | React 19 · TypeScript · TanStack Router · TanStack Query · Tailwind CSS · Radix UI (shadcn/ui) · react-hook-form + Zod · hls.js · next-themes |
+| **Desktop**    | Tauri v2 (system webview, Rust shell)                                |
 | **Backend**    | FastAPI · async SQLAlchemy 2.0 · asyncpg · Pydantic v2 · PyJWT + cryptography · bcrypt · aiosmtplib · httpx |
 | **Database**   | PostgreSQL 16 (async) · Redis 7 (pub/sub + presence + OTP)          |
 | **Streaming**  | mediamtx (RTMP ingest → HLS/WebRTC playback)                        |
@@ -147,7 +159,8 @@ backend/
 │   ├── channel.py           Channel
 │   ├── channel_member.py    ChannelMember (per-channel access grants)
 │   ├── message.py           Message (persisted chat)
-│   └── join_request.py      JoinRequest (private community workflow)
+│   ├── join_request.py      JoinRequest (private community workflow)
+│   └── refresh_token.py     RefreshToken (hashed, revocable sessions)
 ├── modules/                 Feature modules (one folder per domain)
 │   ├── auth/                Register, login, JWT, 2FA, OTP, Google OAuth, password reset
 │   ├── communities/         CRUD, stream keys, membership, join requests (+ admin_router)
@@ -230,6 +243,17 @@ make backend     # uvicorn --reload on :7001
 make frontend    # vite dev server on :5173
 ```
 
+### Desktop app (Tauri v2)
+
+```bash
+make desktop-dev     # run the app in dev mode (needs Rust: brew install rust)
+make desktop-build   # native installers (.dmg on macOS, .exe on Windows)
+make desktop         # Linux .deb/.AppImage via Docker — no Rust needed → ./dist-desktop/
+```
+
+On first launch the app asks for your server address (default
+`http://localhost:7001` for a local stack) — it remembers it afterwards.
+
 ---
 
 ## Going Live (Streaming)
@@ -266,6 +290,11 @@ make ps                # list running containers
 make dev               # backend + frontend together
 make backend           # uvicorn --reload on :7001
 make frontend          # vite dev server on :5173
+
+# Desktop app
+make desktop-dev       # run desktop app in dev mode (needs Rust)
+make desktop-build     # native installers (macOS/Windows)
+make desktop           # Linux installers via Docker → ./dist-desktop/
 
 # Database
 make migrate                       # apply Alembic migrations
@@ -312,10 +341,11 @@ adda/
 │   ├── modules/             8 feature modules
 │   └── alembic/             9 migrations
 ├── frontend/                React app (pnpm + Vite)
-│   └── src/
-│       ├── routes/          28 file-based routes (TanStack Router)
-│       ├── features/        8 feature-sliced domains
-│       └── shared/          UI kit (19 components) + API client + config
+│   ├── src/                 # the app (browser + desktop share it)
+│   │   ├── routes/          28 file-based routes (TanStack Router)
+│   │   ├── features/        8 feature-sliced domains
+│   │   └── shared/          UI kit (19 components) + API client + config
+│   └── src-tauri/           Tauri v2 desktop shell (Rust + icons + Dockerfile)
 ├── mediamtx/                mediamtx config (Dockerfile-baked) + recording retention
 └── recordings/              stream recordings (gitignored, bind-mounted)
 ```
@@ -324,12 +354,14 @@ adda/
 
 ## Roadmap
 
-**Shipped:** authentication (JWT + Google OAuth + 2FA + OTP + password reset),
-communities (CRUD + membership + join requests + private communities), channels
-(Discord-style + permissions + message persistence), live streaming (RTMP → HLS
-via mediamtx with per-community keys), recordings (auto-record + VOD playback),
-real-time infrastructure (WebSocket + Redis pub/sub + presence), admin dashboard
-(users + communities + live + recordings), public marketing site (12 pages).
+**Shipped:** authentication (JWT + refresh tokens + Google OAuth + 2FA + OTP +
+password reset), communities (CRUD + membership + join requests + private
+communities), channels (Discord-style + permissions + message persistence), live
+streaming (RTMP → HLS via mediamtx with per-community keys), recordings
+(auto-record + VOD playback), real-time infrastructure (WebSocket + Redis
+pub/sub + presence), admin dashboard (users + communities + live + recordings),
+public marketing site (12 pages), desktop app (Tauri v2 with runtime server
+config).
 
 **Next:** profile pages, posts/announcements, notifications, discovery/search,
 media gallery, file sharing, events, DMs.

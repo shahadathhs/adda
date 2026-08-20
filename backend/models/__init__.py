@@ -5,6 +5,7 @@ from models.community import Community
 from models.join_request import JoinRequest
 from models.membership import CommunityRole, Membership
 from models.message import Message
+from models.refresh_token import RefreshToken
 from models.user import User
 
 __all__ = [
@@ -16,5 +17,6 @@ __all__ = [
     "JoinRequest",
     "Membership",
     "Message",
+    "RefreshToken",
     "User",
 ]
