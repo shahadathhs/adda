@@ -98,7 +98,13 @@ frontend: ## Run frontend dev server on :5173 (vite)
 # first (make up, or make dev in another terminal).
 
 desktop-dev: ## Run the desktop app in dev mode (needs local Rust + running stack)
-	@cd $(FRONTEND_DIR) && $(PNPM) desktop:dev
+	@cd $(FRONTEND_DIR) && \
+	  if lsof -i :5173 -sTCP:LISTEN >/dev/null 2>&1; then \
+	    echo "vite already running on :5173 — attaching to it"; \
+	    $(PNPM) tauri dev --config '{"build":{"beforeDevCommand":""}}'; \
+	  else \
+	    $(PNPM) desktop:dev; \
+	  fi
 
 desktop-build: ## Build desktop installers natively (needs local Rust; macOS/Windows only)
 	@cd $(FRONTEND_DIR) && $(PNPM) desktop:build
