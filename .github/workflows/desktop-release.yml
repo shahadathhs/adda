@@ -94,8 +94,27 @@ jobs:
         with:
           projectPath: frontend
           tagName: v${{ needs.check.outputs.version }}
-          releaseName: "adda v${{ needs.check.outputs.version }}"
-          releaseBody: "Desktop installers for adda v${{ needs.check.outputs.version }}. See the assets below."
+          releaseName: "adda Desktop ${{ needs.check.outputs.version }}"
+          releaseBody: |
+            ## adda Desktop v${{ needs.check.outputs.version }}
+
+            Self-hosted community platform — desktop client for
+            **macOS**, **Windows**, and **Linux**.
+
+            ### Downloads
+
+            | Platform | File |
+            |----------|------|
+            | macOS (Apple Silicon) | `adda_${{ needs.check.outputs.version }}_aarch64.dmg` |
+            | Windows | `adda_${{ needs.check.outputs.version }}_x64-setup.exe` |
+            | Linux (Debian/Ubuntu) | `adda_${{ needs.check.outputs.version }}_amd64.deb` |
+            | Linux (any distro) | `adda_${{ needs.check.outputs.version }}_amd64.AppImage` |
+
+            On first launch, enter your server address (e.g.
+            `https://your-adda-server.com`) — the app remembers it.
+
+            > Binaries are unsigned — macOS Gatekeeper / Windows SmartScreen
+            > will ask for confirmation on first open.
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
