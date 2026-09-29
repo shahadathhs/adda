@@ -44,6 +44,26 @@ TECH CHECK (one thing I could not verify from the repo):
     is phrased to be safe either way, but double-check your deployed
     config.
 
+RESEARCH vs. EXISTING CONTENT (2026-09-29 web sweep):
+  · Nobody has written a third-party tutorial on real per-entity
+    publish-auth webhooks — the mechanism exists only in official docs.
+    That's the moat; sections 2–3 lead with it.
+  · "Self-hosted Twitch" search results = Owncast setup guides +
+    legacy nginx-rtmp tutorials (2013–2022). Added the "Why not
+    Owncast (or nginx-rtmp)?" section to capture comparison-intent
+    traffic (owncast vs / nginx-rtmp alternative) and position the
+    piece as the multi-tenant/embeddable angle nobody covers.
+  · The rotate-key-but-stream-keeps-going story exists only as
+    fragments: SRS API docs, Wowza forum threads, nginx-rtmp's
+    /control/drop endpoint. No cohesive article. Section 3 owns it.
+  · WebRTC-in-Docker ICE trap: scattered GitHub discussions only —
+    section 4 is the cohesive write-up. Added the two footnotes the
+    discussions converge on: Linux needs
+    extra_hosts: host-gateway, and 8189/udp must be published.
+  · Newer mediamtx supports authJWTJWKS — noted as the zero-webhook
+    alternative in "What's still weak". Docs URL updated to
+    mediamtx.org (readthedocs is stale).
+
 Companion repo: https://github.com/shahadathhs/adda
 =====================================================================
 -->
@@ -89,6 +109,18 @@ One more thing, the trick that makes the whole integration small: **the stream p
 
 ---
 
+## Why not Owncast (or nginx-rtmp)?
+
+Fair question — this space has two default answers, and neither fit.
+
+**[Owncast](https://owncast.online)** is a turnkey, self-hosted, single-channel Twitch: one streamer, built-in chat, a nice UI, done. If that's your product, stop reading and install it — it's genuinely good at that job. But it's *one streamer per instance*. adda needed **many** streamers — every community with its own key, its own live tab, its own recordings. That's multi-tenant, and multi-tenant means you don't want a streaming *app*, you want a streaming *component* to embed.
+
+**nginx-rtmp** is the classic tutorial path — it's what most "build your own streaming server" articles walk through. But the module is effectively unmaintained, it speaks RTMP→HLS but not WebRTC, and per-user publish auth means grappling with `on_publish` callbacks inside nginx config. It was the right answer in 2015.
+
+mediamtx splits the difference: one zero-dependency binary that speaks every ingest and playback protocol, with authentication delegated to **your** server over a webhook, plus a clean REST API for control. (SRS is the other solid contender — similar shape, fine choice too.) You bring the product; it brings the pipes.
+
+---
+
 ## 1. The naive version (and why "it works" is a warning)
 
 mediamtx is famous for working with zero config. Download, run, and this already streams:
@@ -112,7 +144,7 @@ So, requirements for the real thing:
 
 ---
 
-## 2. Locking the door: per-community keys + a 60-line webhook
+## 2. Wall #1 — locking the door: per-community keys + a 60-line webhook
 
 mediamtx has no users table and doesn't want one. Instead it has `authMethod: http` — on every action, it POSTs a JSON description of that action to *your* server, and your server says yes or no. Authentication becomes your problem, which is exactly what you want, because you already have users.
 
@@ -272,6 +304,11 @@ webrtcAdditionalHosts: ["host.docker.internal", "127.0.0.1"]
 
 This is my favorite class of bug: **everything is "up," nothing is wrong in the logs, and the product is broken.** When WebRTC mysteriously doesn't connect in containers, check what addresses ICE is advertising before you check anything else.
 
+Two footnotes that save the next person an afternoon:
+
+- **On Linux hosts**, `host.docker.internal` doesn't resolve from inside a container by default. Compose needs one line: `extra_hosts: ["host.docker.internal:host-gateway"]`. (Docker Desktop on macOS/Windows does this for you, which is exactly why the bug "works on my machine.")
+- **Publish the UDP port.** The WebRTC *handshake* is HTTP on 8889, but the *media* flows over UDP on 8189. If you only publish the TCP port, you get — again — a successful handshake, fine-looking logs, and no video. My compose maps `8189:8189/udp` for exactly this reason.
+
 <!-- ✏️ Personalize: how long did the ICE thing take, and what did you
      try first? (NAT? firewall? TURN server research spiral?) -->
 
@@ -350,6 +387,7 @@ In the spirit of *including the failures*:
 - **Polling for live status** instead of event webhooks. Fine now, sloppy at scale.
 - **The stream key is a bearer secret in a URL.** It shows up in OBS logs and possibly in router logs on the ingest side. Acceptable for this threat model; wouldn't be for payments-grade auth.
 - **WebRTC encryption is off** in my dev config (`webrtcEncryption: no`) — fine for localhost, must be revisited for any real deployment.
+- Newer mediamtx versions also speak **JWT natively** (`authJWTJWKS`) — if your auth decision fits inside token claims instead of a database lookup, you can skip the webhook entirely. Mine doesn't (keys live per-community in Postgres, and I want rotation to be a DB write), so webhook it is.
 
 ---
 
@@ -406,9 +444,10 @@ ONE POLL = the dashboard
 
 ## What to learn next
 
-- [mediamtx docs](https://mediamtx.readthedocs.io/) — read the `authHTTPAddress` and `record*` sections even if you use nothing else; it's the best-documented streaming server I've used
+- [mediamtx docs](https://mediamtx.org/docs/) — read the `authHTTPAddress` and `record*` sections even if you use nothing else; it's the best-documented streaming server I've used
 - [Low-Latency HLS in hls.js](https://github.com/video-dev/hls.js/) — if you're serving web players, LL-HLS is the default you want
 - WebRTC ICE candidates — the concept that cost me an afternoon in section 4
+- [Owncast](https://owncast.online) — if you read section "Why not Owncast" and realized single-streamer turnkey *is* your product
 
 **Related reading:** [Docker Explained Through a Real Backend Application](https://medium.com/@shahadathhs) — the shared-bind-mount pattern in section 6 comes straight from there. [Deploying a pnpm Monorepo on a Small AWS Instance](https://medium.com/@shahadathhs) — same "small box, real constraints" philosophy.
 
