@@ -25,6 +25,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/ui/dialog";
 import { Input } from "@/ui/input";
 import { CommandPalette, type PaletteAction } from "@/ui/command-palette";
 import { TabStrip } from "@/ui/tab-strip";
+import { WindowControls } from "@/ui/window-controls";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAdminLive, useMyChannels, useStreamEvents } from "@/lib/data";
 import { useLogout } from "@/lib/session";
 import { checkForUpdate, isNewer } from "@/lib/update-check";
@@ -306,23 +308,36 @@ export function ConsoleLayout({ user }: { user: User }) {
 
   return (
     <div className="flex h-full flex-col bg-bg">
-      {/* Tab strip */}
-      <TabStrip
-        tabs={tabs.map((t) => {
-          const Icon = VIEW_ICONS[t.view];
-          return {
-            id: t.id,
-            label: tabLabel(t),
-            icon: <Icon className="h-3 w-3" />,
-          };
-        })}
-        activeId={activeId}
-        onSelect={activate}
-        onClose={closeTab}
-        onDuplicate={duplicate}
-        onCloseOthers={closeOthers}
-        onNew={openNewTab}
-      />
+      {/* Titlebar-embedded tab strip (Chrome-style): the strip lives where
+          the native titlebar was — drag it to move the window; on non-mac
+          platforms custom window controls sit on the right end. */}
+      <header
+        data-tauri-drag-region
+        onDoubleClick={() => void getCurrentWindow().toggleMaximize()}
+        className={cn(
+          "flex items-center border-b border-line bg-bg",
+          // Leave room for the macOS traffic lights.
+          /Mac/.test(navigator.userAgent) ? "h-11 pl-20" : "h-9",
+        )}
+      >
+        <TabStrip
+          tabs={tabs.map((t) => {
+            const Icon = VIEW_ICONS[t.view];
+            return {
+              id: t.id,
+              label: tabLabel(t),
+              icon: <Icon className="h-3 w-3" />,
+            };
+          })}
+          activeId={activeId}
+          onSelect={activate}
+          onClose={closeTab}
+          onDuplicate={duplicate}
+          onCloseOthers={closeOthers}
+          onNew={openNewTab}
+        />
+        {!/Mac/.test(navigator.userAgent) && <WindowControls />}
+      </header>
 
       <div className="flex min-h-0 flex-1">
         {/* Sidebar */}

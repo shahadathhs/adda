@@ -27,6 +27,7 @@ export function TabStrip({
   onDuplicate,
   onCloseOthers,
   onNew,
+  className,
 }: {
   tabs: TabStripTab[];
   activeId: string;
@@ -35,9 +36,10 @@ export function TabStrip({
   onDuplicate: (id: string) => void;
   onCloseOthers: (id: string) => void;
   onNew: () => void;
+  className?: string;
 }) {
   return (
-    <div className="flex h-8 items-end gap-1 border-b border-line bg-bg px-1.5 pt-1.5">
+    <div className={cn("flex flex-1 items-center gap-1 px-1.5", className)}>
       {tabs.map((t) => {
         const isActive = t.id === activeId;
         return (
