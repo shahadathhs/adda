@@ -2,10 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, Heart, Send } from "lucide-react";
+import { Eye, Heart, KeyRound, Send } from "lucide-react";
 import { toast } from "sonner";
-import { joinCommunity, listMembers } from "@adda/api-client";
-import type { ChatMessage, Community } from "@adda/types";
+import {
+  getStreamKey,
+  joinCommunity,
+  listMembers,
+  rotateStreamKey,
+  updateCommunity,
+} from "@adda/api-client";
+import type { ChatMessage, Community, StreamCredentials } from "@adda/types";
 import { hlsBaseUrl } from "@adda/shared";
 import {
   useCommunityChat,
@@ -146,6 +152,90 @@ function RecordingsSection({ communityId }: { communityId: string }) {
   );
 }
 
+/** Owner-only: OBS setup — stream URL/key, rotation, live title. */
+function StreamSetupCard({ community }: { community: Community }) {
+  const qc = useQueryClient();
+  const [title, setTitle] = useState(community.stream_title ?? "");
+  const { data: creds } = useQuery({
+    queryKey: ["stream-key", community.id],
+    queryFn: () => getStreamKey(community.id),
+  });
+  const rotate = useMutation({
+    mutationFn: () => rotateStreamKey(community.id),
+    onSuccess: (c: StreamCredentials) => {
+      qc.setQueryData(["stream-key", community.id], c);
+      toast.success("Key rotated — update OBS with the new URL.");
+    },
+    onError: () => toast.error("Could not rotate the key"),
+  });
+  const saveTitle = useMutation({
+    mutationFn: () => updateCommunity(community.id, { stream_title: title.trim() || null }),
+    onSuccess: () => {
+      toast.success("Stream title saved");
+      qc.invalidateQueries({ queryKey: webKeys.detail(community.id) });
+    },
+    onError: () => toast.error("Could not save the title"),
+  });
+
+  return (
+    <Card className="space-y-3 p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold">Stream setup (OBS)</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={rotate.isPending}
+          onClick={() => rotate.mutate()}
+        >
+          <KeyRound className="h-4 w-4" /> Rotate key
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        OBS → Settings → Stream → Service: <strong>Custom</strong>, paste the Stream URL as the
+        server, leave the Stream Key field empty.
+      </p>
+      {creds && (
+        <>
+          <div>
+            <Meta className="mb-1">Stream URL (includes your key)</Meta>
+            <p className="break-all rounded-md border border-border bg-muted px-2 py-1.5 font-mono text-xs">
+              {creds.stream_url}
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                void navigator.clipboard.writeText(creds.stream_url);
+                toast.success("Stream URL copied");
+              }}
+            >
+              Copy URL
+            </Button>
+          </div>
+        </>
+      )}
+      <div className="flex gap-2 border-t border-border pt-3">
+        <Input
+          value={title}
+          maxLength={200}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Stream title (shown while live)"
+        />
+        <Button
+          variant="primary"
+          size="sm"
+          disabled={saveTitle.isPending || title === (community.stream_title ?? "")}
+          onClick={() => saveTitle.mutate()}
+        >
+          Save
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 export function ChannelView({ community }: { community: Community }) {
   const { data: user } = useMeSession();
   const qc = useQueryClient();
@@ -168,6 +258,7 @@ export function ChannelView({ community }: { community: Community }) {
   const viewers = status?.viewers ?? 0;
   const isMember = members.some((m) => m.user_id === user?.id);
   const isFollowing = followState?.following ?? false;
+  const isOwner = user?.id === community.owner_id;
 
   const joinMut = useMutation({
     mutationFn: () => joinCommunity(community.id),
@@ -257,6 +348,7 @@ export function ChannelView({ community }: { community: Community }) {
               </p>
             </Card>
           )}
+          {isOwner && <StreamSetupCard community={community} />}
           <RecordingsSection communityId={community.id} />
         </div>
         <ChatRail communityId={community.id} />

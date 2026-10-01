@@ -21,7 +21,7 @@ ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
         up down restart build logs logs-backend logs-web logs-desktop ps \
         dev backend web desktop desktop-dev desktop-build desktop-clean release \
         migrate migration reset reset-migrate db-up typecheck \
-        lint lint-backend lint-web format build-web \
+        lint lint-backend lint-web format build-web build-desktop \
         site-dev site-build site-preview \
         check clean clean-recordings
 
@@ -183,8 +183,11 @@ lint-web: ## Lint web app (oxlint + eslint + prettier)
 
 lint: lint-backend lint-web ## Lint backend (ruff) + web (oxlint/eslint/prettier)
 
-build-web: ## Build web app (tsc + vite)
+build-web: ## Build web app (next build)
 	@cd $(FRONTEND_DIR) && $(PNPM) build
+
+build-desktop: ## Build desktop console UI (tsc + vite)
+	@cd $(DESKTOP_DIR) && $(PNPM) build
 
 # ── Marketing / docs site (Astro + Starlight) ─────────────────────────
 # Deps come from the root workspace: `pnpm install` (see: make install).
@@ -200,7 +203,7 @@ site-preview: ## Preview the built docs site
 
 # ── Quality & cleanup ─────────────────────────────────────────────────
 
-check: typecheck lint build-web ## Run all quality gates
+check: typecheck lint build-web build-desktop site-build ## Run all quality gates (backend + web + desktop + site)
 
 clean-recordings: ## Delete ALL recordings (keeps the folder) — DESTRUCTIVE
 	@rm -rf recordings && mkdir recordings

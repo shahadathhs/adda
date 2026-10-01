@@ -2,9 +2,17 @@
 
 A self-hosted, **multi-tenant live-streaming platform** (think self-hosted
 Twitch) with **real-time community chat**. One instance hosts many channels —
-each with its own stream key, live page, chat, and recordings. Built as a
-full-stack monorepo with a FastAPI backend, React/TypeScript web app + Tauri
-desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
+each with its own stream key, live page, chat, and recordings.
+
+Three UIs, three deployment targets, one backend:
+
+- **Viewer web app** (`apps/web`) — Next.js, deployed with your stack
+- **Desktop console** (`apps/desktop`) — Tauri operator client, downloaded and
+  pointed at your server
+- **Marketing/docs site** (`site/`) — Astro/Starlight, hosted on Vercel
+
+Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
+`shared`) — logic is shared, **UI never is**.
 
 > **adda** (আড্ডা /ˈ_add_ːa/) — Bengali for an informal, wide-ranging conversation
 > among friends.
@@ -68,13 +76,19 @@ desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
 - Channel-namespace routing: `community:<id>`, `community:<id>:chat`,
   `community:<id>:presence`, `channel:<uuid>`, `user:<id>`
 
-### Admin Dashboard
-- Sidebar layout with collapsible navigation
-- **Overview** — platform stats (user count, community count, live count)
-- **Users** — search, promote/demote roles, suspend, reset password, delete
-- **Communities** — manage any community, suspend, rotate keys, view members
-- **Live** — monitor active streams, viewer counts, force-stop
-- **Recordings** — browse and delete recordings across all communities
+### Operator Tools (Desktop Console)
+- **Dedicated operator client** — dense, dark, keyboard-first desktop app
+  (not a wrapped website): Dashboard (stats + active streams), Streams
+  (live monitor, viewer counts, force-stop), Communities (members, kick,
+  stream-key reveal/rotate, suspend, delete), Users (roles, suspend,
+  password reset, delete), Recordings (play/download/delete), Chat
+  moderation, Settings
+- **⌘K command palette**, ⌘1–⌘7 view switching, `⌘/` shortcut help
+- **Native notifications** the moment any channel goes live
+- Window state + last view remembered across launches; update-available
+  check against GitHub releases
+- Signs in with an operator account (admin/superadmin); stream owners
+  manage their own stream from the web channel page
 
 ### Desktop Console (Tauri v2)
 - **Operator client** — its own app (own UI, dense + dark + keyboard-first),
@@ -88,19 +102,12 @@ desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
 - Linux `.deb`/`.AppImage` buildable via Docker (no local Rust needed);
   macOS/Windows installers build natively
 
-### Docs & Marketing Site (Astro + Starlight)
-- Static site with landing page, full guides (quickstart, self-hosting,
-  streaming with OBS, desktop app, administration), configuration + API
-  reference, and FAQ
-- Zero-JS static output, SEO-ready, served from `site/dist/`
-
-### Public Site
-- Marketing landing page with feature showcase
-- 12 public pages (about, features, pricing, docs, blog, changelog, roadmap,
-  contact, privacy, terms, status)
-- Per-page SEO via TanStack Router `head()` metadata
-- Dark/light theme toggle
-- Responsive design
+### Docs & Marketing Site (Astro + Starlight → Vercel)
+- Splash landing with hero CTAs and feature tour
+- Full guides: quickstart, self-hosting (TLS/proxy/persistence/scaling),
+  going live with OBS, desktop console, administration
+- Reference: configuration (every env var) + API/WebSocket overview, FAQ
+- Zero-JS static output, SEO-ready, sitemap + search included
 
 ---
 
@@ -122,28 +129,17 @@ desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
 ## Architecture
 
 ```
-                         ┌─────────────────────────────────────────────────┐
-                         │                  Frontend (:5173)                │
-                         │  React 19 · TanStack Router · TanStack Query     │
-                         │  Radix UI · hls.js · next-themes                 │
-                         └────────┬──────────────────┬──────────────────────┘
-                                  │ REST /api        │ WebSocket /ws
-                                  ▼                  ▼
-┌──────────────────┐    ┌──────────────────────────────────────┐    ┌─────────────┐
-│  mediamtx        │    │         Backend FastAPI (:7001)        │    │   Redis 7   │
-│  :1935  RTMP     │◄───│                                        │───►│  pub/sub    │
-│  :8888  HLS      │    │  modules/ (auth, communities, channels,│    │  presence   │
-│  :8889  WebRTC   │    │    streaming, recordings, stats, users,│    │  OTP store  │
-│  :9997  API      │───►│    realtime)  core/ (config, database, │    └─────────────┘
-│                  │    │    security, seed, email, exceptions)   │
-│  auth webhook    │    │                                        │    ┌─────────────┐
-│  recordings dump │    │  Alembic migrations · Pydantic v2 DTOs │───►│ PostgreSQL  │
-└──────────────────┘    └────────────────────────────────────────┘    │    16       │
-       │                                                               └─────────────┘
-       ▼
-┌──────────────────┐
-│  ./recordings/   │  ← bind-mounted (mediamtx writes, backend serves)
-└──────────────────┘
+   Vercel (product site)      Streamer's server                     Streamer's laptop
+┌───────────────────┐   ┌───────────────────────────────────┐   ┌─────────────────────┐
+│ site/             │   │ apps/web  Next.js viewer (:5173)  │   │ apps/desktop        │
+│ Astro + Starlight │   │   SSR browse + channel pages      │   │ Tauri console       │
+│ marketing + docs  │   │ backend/  FastAPI (:7001)         │◄──│ operator client     │
+└───────────────────┘   │   REST /api · WebSocket /ws      │   │ (runtime server URL)│
+                        │ postgres 16 · redis 7            │   └─────────────────────┘
+                        │ mediamtx :1935/:8888/:8889/:9997 │
+                        └───────────────────────────────────┘
+                              ▲
+                              └── @adda/types · @adda/api-client · @adda/shared (packages/)
 ```
 
 ### Backend module map
@@ -168,50 +164,45 @@ backend/
 │       └── guards.py        require_admin / require_superadmin
 ├── models/                  Shared SQLAlchemy 2.0 models
 │   ├── user.py              User + SystemRole enum
-│   ├── community.py         Community
+│   ├── community.py         Community (+ stream_title)
 │   ├── membership.py        Membership + CommunityRole enum
 │   ├── channel.py           Channel
 │   ├── channel_member.py    ChannelMember (per-channel access grants)
 │   ├── message.py           Message (persisted chat)
 │   ├── join_request.py      JoinRequest (private community workflow)
+│   ├── follow.py            Follow (user × community)
 │   └── refresh_token.py     RefreshToken (hashed, revocable sessions)
 ├── modules/                 Feature modules (one folder per domain)
 │   ├── auth/                Register, login, JWT, 2FA, OTP, Google OAuth, password reset
-│   ├── communities/         CRUD, stream keys, membership, join requests (+ admin_router)
+│   ├── communities/         CRUD, slugs, follows, stream keys, membership (+ admin_router)
 │   ├── channels/            Channel CRUD, messages, per-channel permissions
-│   ├── streaming/           Live status, viewer counts, force-stop, mediamtx webhook
+│   ├── streaming/           Discover, live status, health, monitor, mediamtx webhook
 │   ├── recordings/          VOD list/serve/delete (+ admin_router)
 │   ├── stats/               Dashboard aggregate counts
 │   ├── users/               Admin user management (+ admin_router)
 │   └── realtime/            WS gateway + Redis pub/sub + presence
-└── alembic/                 9 migrations
+└── alembic/                 11 migrations
 ```
 
-### Frontend structure
+### Web app structure
 
 ```
-apps/web/src/                # viewer web app (pnpm workspace member)
-├── routes/                  TanStack Router (file-based, 28 route files)
-│   ├── __root.tsx           Root layout + SEO head
-│   ├── _public/             12 public pages (landing, about, docs, pricing, …)
-│   ├── _authed/             Authenticated pages (home, community, settings)
-│   ├── admin/               Admin dashboard (overview, users, communities, …)
-│   ├── login.tsx  register.tsx  reset-password.tsx
-├── features/                Feature-sliced domains
-│   ├── auth/                Login forms, Google button, hooks, Zod schemas
-│   ├── admin/               Dashboard tabs + hooks
-│   ├── communities/         Community UI + members panel
-│   ├── channels/            Channel view + chat
-│   ├── realtime/            WebSocket client + chat panel
-│   ├── streaming/           HLS player
-│   ├── recordings/          Recordings panel
-│   └── site/                Navbar, footer, page header (marketing site)
-├── shared/
-│   ├── ui/                  19 shadcn/ui-style components (Radix-based)
-│   ├── api/client.ts        Authenticated fetch client
-│   ├── lib/utils.ts         cn() classname helper
-│   └── config.ts            API/WS/HLS/WebRTC base URLs
-└── app/                     App shell (providers, router, query client, topbar)
+apps/web/src/                # Next.js 15 App Router viewer (workspace member)
+├── app/                     # file-based routes
+│   ├── page.tsx             Browse (SSR: live-first grid, search, Following rail)
+│   ├── channel/[slug]/      Channel page (SSR + OG metadata, player, chat, setup)
+│   ├── community/[id]/      Legacy UUID links → channel view
+│   ├── login/ register/ reset-password/   (password · 2FA · OTP · Google)
+│   ├── settings/            Profile, password, 2FA
+│   └── layout.tsx providers.tsx globals.css
+├── components/              ui kit, LivePlayer (hls.js), ChatRail, ChannelView…
+└── lib/                     session + data hooks (TanStack Query), SSR fetch helper
+
+apps/desktop/src/            # operator console (own design system — no shared UI)
+├── views/                   dashboard · streams · communities · users ·
+│                            recordings · chat · settings (+ boot screens)
+├── ui/                      dense console primitives (button/table/panel/…)
+└── lib/                     session, admin data hooks, notifications, update check
 ```
 
 ---
@@ -247,14 +238,14 @@ Open **http://localhost:5173**.
 ```bash
 make setup                       # one-time setup
 make up postgres redis mediamtx  # start infra in Docker
-make dev                         # backend (uvicorn --reload) + web (vite) concurrently
+make dev                         # backend (uvicorn --reload) + web (next dev) concurrently
 ```
 
 Or run individually:
 
 ```bash
 make backend     # uvicorn --reload on :7001
-make web         # vite dev server on :5173
+make web         # next dev server on :5173
 ```
 
 ### Desktop app (Tauri v2)
@@ -289,7 +280,7 @@ Windows SmartScreen will prompt on first open).
 
 Streams are secured by a **per-community stream key**.
 
-1. Open your community → **Live** tab → **Stream setup**
+1. Open your channel page → **Stream setup (OBS)** card (channel owners)
 2. Copy the **Stream URL** (includes `?key=…`)
 3. In OBS → **Settings → Stream**:
    - **Service:** Custom
@@ -297,8 +288,10 @@ Streams are secured by a **per-community stream key**.
    - **Stream Key:** *(leave empty)*
 4. Click **Start Streaming**
 
-Viewers watch via the **Live** tab (HLS player auto-connects). After the
-stream ends, the recording appears in the **Recordings** tab automatically.
+Set a **stream title** in the same card — it shows on your channel page and
+the browse grid while live. Viewers get the HLS player automatically; admins
+can also force-stop or manage streams from the desktop console. After the
+stream ends, the recording appears under Recordings.
 
 > Rotating the stream key instantly kicks the active OBS connection.
 
@@ -318,7 +311,7 @@ make ps                # list running containers
 # Local dev
 make dev               # backend + web together
 make backend           # uvicorn --reload on :7001
-make web               # vite dev server on :5173
+make web               # next dev server on :5173
 
 # Desktop app
 make desktop-dev       # run desktop app in dev mode (needs Rust)
@@ -336,7 +329,7 @@ make reset-migrate                 # drop all tables, re-apply from scratch
 make reset                         # full factory reset (containers + volumes + recordings)
 
 # Quality gates
-make check             # typecheck (pyright) + lint (ruff + eslint) + build (tsc + vite)
+make check             # everything: pyright + ruff + lint + web/desktop/site builds
 
 # Cleanup
 make clean             # remove containers + Docker volumes (keeps recordings)
@@ -348,7 +341,7 @@ make clean             # remove containers + Docker volumes (keeps recordings)
 
 | Service          | Port |
 |------------------|------|
-| Frontend         | 5173 |
+| Web (Next.js)    | 5173 |
 | Backend API      | 7001 |
 | PostgreSQL       | 5432 |
 | Redis            | 6379 |
@@ -366,7 +359,8 @@ adda/
 ├── Makefile                 all common commands
 ├── compose.yaml             Docker Compose (5 services)
 ├── .env.example             root env template
-├── .github/workflows/ci.yml CI: ruff + pyright + eslint + vite build
+├── .github/workflows/ CI: backend (ruff+pyright), web/desktop/site lint+build,
+│                          console installers via tauri-action
 ├── apps/
 │   ├── web/                 Viewer web app (Next.js 15, SSR browse + channel pages)
 │   │   └── src/app/         App Router pages + components + lib
@@ -393,13 +387,12 @@ adda/
 ## Roadmap
 
 **Shipped:** authentication (JWT + refresh tokens + Google OAuth + 2FA + OTP +
-password reset), communities (CRUD + membership + join requests + private
-communities), channels (Discord-style + permissions + message persistence), live
-streaming (RTMP → HLS via mediamtx with per-community keys), recordings
-(auto-record + VOD playback), real-time infrastructure (WebSocket + Redis
-pub/sub + presence), admin dashboard (users + communities + live + recordings),
-public marketing site (12 pages), desktop console (Tauri v2 operator client with runtime server
-config).
+password reset), communities (CRUD + slugs + follows + join requests + private
+communities), channels (permissions + message persistence), live streaming
+(RTMP → HLS via mediamtx, per-community keys, discover, stream titles & health,
+instant live/offline push), recordings (auto-record + VOD playback), real-time
+infrastructure (WebSocket + Redis pub/sub + presence), Next.js viewer with SSR
+channel pages, desktop operator console (Tauri v2), Astro docs/marketing site.
 
 **Next:** profile pages, posts/announcements, notifications, discovery/search,
 media gallery, file sharing, events, DMs.
