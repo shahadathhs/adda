@@ -24,9 +24,11 @@ import { Button } from "@/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/ui/dialog";
 import { Input } from "@/ui/input";
 import { CommandPalette, type PaletteAction } from "@/ui/command-palette";
+import { TabStrip } from "@/ui/tab-strip";
 import { useAdminLive, useMyChannels, useStreamEvents } from "@/lib/data";
 import { useLogout } from "@/lib/session";
 import { checkForUpdate, isNewer } from "@/lib/update-check";
+import { useTabs, VIEW_LABELS, type Tab, type ViewId } from "@/lib/tabs";
 import { DashboardView } from "./dashboard-view";
 import { StreamsView } from "./streams-view";
 import { CommunitiesView } from "./communities-view";
@@ -38,21 +40,7 @@ import { CreatorOverview } from "./creator/overview";
 import { CreatorStream } from "./creator/stream";
 import { CreatorMembers } from "./creator/members";
 
-export type ViewId =
-  | "overview"
-  | "stream"
-  | "chat"
-  | "recordings"
-  | "members"
-  | "p-dashboard"
-  | "p-streams"
-  | "p-communities"
-  | "p-users"
-  | "p-recordings"
-  | "settings";
-
-const CHANNEL_STORAGE_KEY = "adda_console_channel";
-const VIEW_STORAGE_KEY = "adda_console_view";
+export type { ViewId } from "@/lib/tabs";
 
 const CHANNEL_VIEWS: { id: ViewId; label: string; icon: typeof Radio }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -70,19 +58,27 @@ const PLATFORM_VIEWS: { id: ViewId; label: string; icon: typeof Radio }[] = [
   { id: "p-recordings", label: "Recordings", icon: Film },
 ];
 
+const VIEW_ICONS: Record<ViewId, typeof Radio> = {
+  overview: LayoutDashboard,
+  stream: Radio,
+  chat: MessageSquare,
+  recordings: Film,
+  members: Users,
+  "p-dashboard": LayoutDashboard,
+  "p-streams": Radio,
+  "p-communities": Boxes,
+  "p-users": Users,
+  "p-recordings": Film,
+  settings: Settings,
+};
+
 const SHORTCUTS: [string, string][] = [
   ["⌘K", "Command palette"],
+  ["⌘T / ⌘W", "New tab / close tab"],
+  ["⌘⇧[ · ⌘⇧]", "Previous / next tab"],
   ["⌘1 … ⌘9", "Switch view (as numbered in the sidebar)"],
   ["⌘/", "This shortcut list"],
 ];
-
-function loadStored(key: string): string | null {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
 
 function CreateChannelDialog({ onCreated }: { onCreated: (id: string) => void }) {
   const [form, setForm] = useState({ name: "", slug: "", description: "" });
@@ -146,12 +142,19 @@ function CreateChannelDialog({ onCreated }: { onCreated: (id: string) => void })
 
 export function ConsoleLayout({ user }: { user: User }) {
   const isStaff = user.system_role !== "user";
-  const [selectedId, setSelectedId] = useState<string | null>(() =>
-    loadStored(CHANNEL_STORAGE_KEY),
-  );
-  const [view, setView] = useState<ViewId>(
-    () => (loadStored(VIEW_STORAGE_KEY) as ViewId) ?? "overview",
-  );
+  const {
+    tabs,
+    activeId,
+    active,
+    activate,
+    update,
+    newTab,
+    duplicate,
+    closeTab,
+    closeOthers,
+    cycle,
+    sanitize,
+  } = useTabs();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [updateUrl, setUpdateUrl] = useState<string | null>(null);
@@ -162,27 +165,14 @@ export function ConsoleLayout({ user }: { user: User }) {
   useStreamEvents(true, isStaff);
 
   const selected = useMemo(
-    () => channels.find((c) => c.id === selectedId) ?? null,
-    [channels, selectedId],
+    () => channels.find((c) => c.id === active.channelId) ?? null,
+    [channels, active.channelId],
   );
 
-  // Persist selection + view.
+  // Reconcile restored tabs with the current channel list / role.
   useEffect(() => {
-    if (selectedId) {
-      try {
-        localStorage.setItem(CHANNEL_STORAGE_KEY, selectedId);
-      } catch {
-        /* ignore */
-      }
-    }
-  }, [selectedId]);
-  useEffect(() => {
-    try {
-      localStorage.setItem(VIEW_STORAGE_KEY, view);
-    } catch {
-      /* ignore */
-    }
-  }, [view]);
+    sanitize(new Set(channels.map((c) => c.id)), isStaff);
+  }, [channels, isStaff, sanitize]);
 
   // One-shot update check against GitHub releases (silent on failure).
   useEffect(() => {
@@ -217,17 +207,46 @@ export function ConsoleLayout({ user }: { user: User }) {
         e.preventDefault();
         setHelpOpen((v) => !v);
       }
-      if (mod && /^[1-9]$/.test(e.key)) {
+      if (mod && !e.shiftKey && e.key.toLowerCase() === "t") {
+        e.preventDefault();
+        openNewTab();
+      }
+      if (mod && e.key.toLowerCase() === "w") {
+        e.preventDefault();
+        closeTab(activeId);
+      }
+      if (mod && e.shiftKey && (e.key === "]" || e.key === "[")) {
+        e.preventDefault();
+        cycle(e.key === "]" ? 1 : -1);
+      }
+      if (mod && !e.shiftKey && /^[1-9]$/.test(e.key)) {
         const target = flatNav[Number(e.key) - 1];
         if (target) {
           e.preventDefault();
-          setView(target.id);
+          update(activeId, { view: target.id });
         }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [flatNav]);
+  });
+
+  const openNewTab = () => {
+    newTab(
+      selected
+        ? { view: "overview", channelId: selected.id }
+        : isStaff
+          ? { view: "p-dashboard" }
+          : { view: "overview" },
+    );
+  };
+
+  const tabLabel = (t: Tab) => {
+    const name = channels.find((c) => c.id === t.channelId)?.name;
+    if (t.view === "overview") return name ?? "Start";
+    if (name) return `${VIEW_LABELS[t.view]} · ${name}`;
+    return VIEW_LABELS[t.view];
+  };
 
   const actions = useMemo<PaletteAction[]>(() => {
     const channelSwitch: PaletteAction[] = channels.map((c) => ({
@@ -235,19 +254,35 @@ export function ConsoleLayout({ user }: { user: User }) {
       label: `Switch to ${c.name}`,
       hint: c.my_role ?? "",
       group: "Channels",
-      onSelect: () => {
-        setSelectedId(c.id);
-        setView("overview");
-      },
+      onSelect: () => update(activeId, { channelId: c.id, view: "overview" }),
     }));
+    const tabActions: PaletteAction[] = [
+      { id: "tab-new", label: "New tab", hint: "⌘T", group: "Tabs", onSelect: openNewTab },
+      {
+        id: "tab-close",
+        label: "Close tab",
+        hint: "⌘W",
+        group: "Tabs",
+        onSelect: () => closeTab(activeId),
+      },
+      { id: "tab-next", label: "Next tab", hint: "⌘⇧]", group: "Tabs", onSelect: () => cycle(1) },
+      {
+        id: "tab-prev",
+        label: "Previous tab",
+        hint: "⌘⇧[",
+        group: "Tabs",
+        onSelect: () => cycle(-1),
+      },
+    ];
     const navActions: PaletteAction[] = flatNav.map((v) => ({
       id: `go-${v.id}`,
       label: `Go to ${v.label}`,
       group: "Navigate",
-      onSelect: () => setView(v.id),
+      onSelect: () => update(activeId, { view: v.id }),
     }));
     return [
       ...channelSwitch,
+      ...tabActions,
       ...navActions,
       {
         id: "refresh",
@@ -263,12 +298,32 @@ export function ConsoleLayout({ user }: { user: User }) {
         onSelect: () => logout.mutate(),
       },
     ];
-  }, [channels, flatNav, logout, qc]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channels, flatNav, activeId, logout, qc, closeTab, cycle, update]);
 
   const selectedLive = live.find((s) => s.community_id === selected?.id);
+  const view = active.view;
 
   return (
     <div className="flex h-full flex-col bg-bg">
+      {/* Tab strip */}
+      <TabStrip
+        tabs={tabs.map((t) => {
+          const Icon = VIEW_ICONS[t.view];
+          return {
+            id: t.id,
+            label: tabLabel(t),
+            icon: <Icon className="h-3 w-3" />,
+          };
+        })}
+        activeId={activeId}
+        onSelect={activate}
+        onClose={closeTab}
+        onDuplicate={duplicate}
+        onCloseOthers={closeOthers}
+        onNew={openNewTab}
+      />
+
       <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
         <aside className="flex w-52 shrink-0 flex-col border-r border-line bg-panel">
@@ -286,17 +341,15 @@ export function ConsoleLayout({ user }: { user: User }) {
               <CreateChannelDialog
                 onCreated={(id) => {
                   qc.invalidateQueries();
-                  setSelectedId(id);
-                  setView("overview");
+                  update(activeId, { channelId: id, view: "overview" });
                 }}
               />
             </div>
             <select
-              value={selectedId ?? ""}
-              onChange={(e) => {
-                setSelectedId(e.target.value || null);
-                setView("overview");
-              }}
+              value={active.channelId ?? ""}
+              onChange={(e) =>
+                update(activeId, { channelId: e.target.value || null, view: "overview" })
+              }
               className="h-7 w-full rounded-sm border border-line bg-panel2 px-1.5 text-xs"
             >
               <option value="">
@@ -321,7 +374,7 @@ export function ConsoleLayout({ user }: { user: User }) {
                   return (
                     <button
                       key={v.id}
-                      onClick={() => setView(v.id)}
+                      onClick={() => update(activeId, { view: v.id })}
                       className={cn(
                         "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors",
                         view === v.id
@@ -341,7 +394,7 @@ export function ConsoleLayout({ user }: { user: User }) {
 
           <div className="border-t border-line p-1.5">
             <button
-              onClick={() => setView("settings")}
+              onClick={() => update(activeId, { view: "settings" })}
               className={cn(
                 "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors",
                 view === "settings"
@@ -364,7 +417,37 @@ export function ConsoleLayout({ user }: { user: User }) {
 
         {/* Content */}
         <main className="min-w-0 flex-1 overflow-y-auto">
-          {selected === null && !isStaff ? (
+          {view === "settings" ? (
+            <SettingsView user={user} />
+          ) : selected &&
+            view !== "p-dashboard" &&
+            view !== "p-streams" &&
+            view !== "p-communities" &&
+            view !== "p-users" &&
+            view !== "p-recordings" ? (
+            <>
+              {view === "overview" && (
+                <CreatorOverview
+                  channel={selected}
+                  onGoStream={() => update(activeId, { view: "stream" })}
+                />
+              )}
+              {view === "stream" && <CreatorStream channel={selected} />}
+              {view === "chat" && <ChatView communityId={selected.id} />}
+              {view === "recordings" && <ChannelRecordingsView channel={selected} />}
+              {view === "members" && <CreatorMembers channel={selected} />}
+            </>
+          ) : isStaff ? (
+            <>
+              {view === "p-dashboard" && (
+                <DashboardView onNavigate={(v) => update(activeId, { view: v })} />
+              )}
+              {view === "p-streams" && <StreamsView />}
+              {view === "p-communities" && <CommunitiesView />}
+              {view === "p-users" && <UsersView />}
+              {view === "p-recordings" && <RecordingsView />}
+            </>
+          ) : (
             <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
               <Radio className="h-8 w-8 text-muted/40" />
               <p className="max-w-72 text-xs leading-relaxed text-muted">
@@ -374,35 +457,10 @@ export function ConsoleLayout({ user }: { user: User }) {
               <CreateChannelDialog
                 onCreated={(id) => {
                   qc.invalidateQueries();
-                  setSelectedId(id);
-                  setView("overview");
+                  update(activeId, { channelId: id, view: "overview" });
                 }}
               />
             </div>
-          ) : view === "settings" ? (
-            <SettingsView user={user} />
-          ) : selected && (CHANNEL_VIEWS.some((v) => v.id === view) || view === "overview") ? (
-            <>
-              {view === "overview" && (
-                <CreatorOverview channel={selected} onGoStream={() => setView("stream")} />
-              )}
-              {view === "stream" && <CreatorStream channel={selected} />}
-              {view === "chat" && <ChatView communityId={selected.id} />}
-              {view === "recordings" && <ChannelRecordingsView channel={selected} />}
-              {view === "members" && <CreatorMembers channel={selected} />}
-            </>
-          ) : isStaff && PLATFORM_VIEWS.some((v) => v.id === view) ? (
-            <>
-              {view === "p-dashboard" && <DashboardView onNavigate={(v) => setView(v as ViewId)} />}
-              {view === "p-streams" && <StreamsView />}
-              {view === "p-communities" && <CommunitiesView />}
-              {view === "p-users" && <UsersView />}
-              {view === "p-recordings" && <RecordingsView />}
-            </>
-          ) : isStaff ? (
-            <DashboardView onNavigate={(v) => setView(v as ViewId)} />
-          ) : (
-            <CreatorOverview channel={selected!} onGoStream={() => setView("stream")} />
           )}
         </main>
       </div>
@@ -454,6 +512,12 @@ export function ConsoleLayout({ user }: { user: User }) {
               </div>
             ))}
             <div className="flex items-center justify-between border-t border-line pt-1.5 text-xs">
+              <span className="text-muted">Close a tab</span>
+              <kbd className="rounded-xs border border-line bg-bg px-1.5 py-0.5 font-num">
+                middle-click · ×
+              </kbd>
+            </div>
+            <div className="flex items-center justify-between text-xs">
               <span className="text-muted">View rows for context menus</span>
               <kbd className="rounded-xs border border-line bg-bg px-1.5 py-0.5 font-num">
                 right-click
