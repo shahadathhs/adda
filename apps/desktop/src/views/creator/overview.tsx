@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Eye, Film, Heart, KeyRound, Radio, Users } from "lucide-react";
+import { Eye, Film, Heart, KeyRound, Radio, Square, Users } from "lucide-react";
 import { toast } from "sonner";
-import { updateCommunity } from "@adda/api-client";
+import { stopStream, updateCommunity } from "@adda/api-client";
 import type { Community } from "@adda/types";
+import { hlsBaseUrl } from "@adda/shared";
 import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Panel, PanelHeader } from "@/ui/panel";
+import { LivePlayer } from "@/components/live-player";
 import {
   consoleKeys,
   useChannelHealth,
@@ -52,8 +54,17 @@ export function CreatorOverview({
     },
     onError: () => toast.error("Could not save the title"),
   });
+  const stop = useMutation({
+    mutationFn: () => stopStream(channel.id),
+    onSuccess: () => {
+      toast.success("Stream stopped — publisher disconnected.");
+      qc.invalidateQueries({ queryKey: consoleKeys.status(channel.id) });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Could not stop"),
+  });
 
   const isLive = status?.is_live ?? channel.is_live;
+  const hlsUrl = `${hlsBaseUrl()}/community/${channel.id}/index.m3u8`;
   const uptime =
     health?.uptime_seconds != null
       ? `${Math.floor(health.uptime_seconds / 3600)}h ${Math.floor((health.uptime_seconds % 3600) / 60)}m`
@@ -82,6 +93,27 @@ export function CreatorOverview({
         <Tile icon={Heart} label="Followers" value={String(channel.follower_count)} />
         <Tile icon={Users} label="Members" value={String(members.length)} />
       </div>
+
+      {isLive && (
+        <Panel>
+          <PanelHeader
+            title="Live now"
+            right={
+              <Button
+                variant="danger"
+                size="xs"
+                disabled={stop.isPending}
+                onClick={() => stop.mutate()}
+              >
+                <Square className="h-3 w-3" /> Stop stream
+              </Button>
+            }
+          />
+          <div className="p-3">
+            <LivePlayer hlsUrl={hlsUrl} />
+          </div>
+        </Panel>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel>

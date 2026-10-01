@@ -110,6 +110,23 @@ async def stream_status(community_id: uuid.UUID):
     }
 
 
+async def _require_channel_mod(
+    community_id: uuid.UUID, current_user: User, db: AsyncSession
+) -> None:
+    """Raise unless the user moderates this channel (or is system staff)."""
+    if current_user.system_role in SystemRole.STAFF:
+        return
+    role = await get_member_role(db, community_id, current_user.id)
+    allowed = {
+        CommunityRole.owner,
+        CommunityRole.admin,
+        CommunityRole.moderator,
+        CommunityRole.streamer,
+    }
+    if role not in allowed:
+        raise ForbiddenException("Only channel moderators and streamers can manage this stream")
+
+
 @router.get("/communities/{community_id}/health", response_model=StreamHealthOut)
 async def stream_health(
     community_id: uuid.UUID,
@@ -120,16 +137,7 @@ async def stream_health(
     community = await get_community(db, community_id)
     if community is None:
         raise NotFoundException("Community not found")
-    if current_user.system_role not in SystemRole.STAFF:
-        role = await get_member_role(db, community_id, current_user.id)
-        allowed = {
-            CommunityRole.owner,
-            CommunityRole.admin,
-            CommunityRole.moderator,
-            CommunityRole.streamer,
-        }
-        if role not in allowed:
-            raise ForbiddenException("Only channel moderators and streamers can view stream health")
+    await _require_channel_mod(community_id, current_user, db)
     cid = str(community_id)
     details = await path_details(cid)
     started = await monitor.started_at(cid)
@@ -145,6 +153,24 @@ async def stream_health(
         video_codec=video,
         audio_codec=audio,
     )
+
+
+@router.post("/communities/{community_id}/stop", status_code=status.HTTP_204_NO_CONTENT)
+async def stop_channel_stream(
+    community_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    """Disconnect the active publisher (channel owner/admin/mod/streamer).
+
+    Note: OBS auto-reconnects while the key is valid — rotating the key is the
+    hard lockout; this is the instant 'cut the feed' lever.
+    """
+    community = await get_community(db, community_id)
+    if community is None:
+        raise NotFoundException("Community not found")
+    await _require_channel_mod(community_id, current_user, db)
+    await kick_publisher(str(community_id))
 
 
 @router.get("/playbook")

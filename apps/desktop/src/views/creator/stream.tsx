@@ -1,21 +1,26 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { KeyRound, Radio } from "lucide-react";
+import { KeyRound, Radio, Square } from "lucide-react";
 import { toast } from "sonner";
-import { rotateStreamKey, updateCommunity } from "@adda/api-client";
+import { rotateStreamKey, stopStream, updateCommunity } from "@adda/api-client";
 import type { Community, StreamCredentials } from "@adda/types";
+import { hlsBaseUrl } from "@adda/shared";
 import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Panel, PanelHeader } from "@/ui/panel";
+import { LivePlayer } from "@/components/live-player";
 import { consoleKeys, useChannelStatus, useStreamCreds } from "@/lib/data";
 
-/** OBS setup for one channel: stream URL + key, rotation, live title. */
+/** Go-live cockpit for one channel: preview, stop, OBS setup, title. */
 export function CreatorStream({ channel }: { channel: Community }) {
   const { data: creds } = useStreamCreds(channel.id, true);
   const { data: status } = useChannelStatus(channel.id);
   const qc = useQueryClient();
   const [title, setTitle] = useState(channel.stream_title ?? "");
+
+  const isLive = status?.is_live ?? channel.is_live;
+  const hlsUrl = `${hlsBaseUrl()}/community/${channel.id}/index.m3u8`;
 
   const rotate = useMutation({
     mutationFn: () => rotateStreamKey(channel.id),
@@ -24,6 +29,14 @@ export function CreatorStream({ channel }: { channel: Community }) {
       toast.success("Key rotated — the active publisher was kicked.");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Could not rotate"),
+  });
+  const stop = useMutation({
+    mutationFn: () => stopStream(channel.id),
+    onSuccess: () => {
+      toast.success("Stream stopped — publisher disconnected.");
+      qc.invalidateQueries({ queryKey: consoleKeys.status(channel.id) });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Could not stop"),
   });
   const saveTitle = useMutation({
     mutationFn: () => updateCommunity(channel.id, { stream_title: title.trim() || null }),
@@ -34,18 +47,51 @@ export function CreatorStream({ channel }: { channel: Community }) {
     onError: () => toast.error("Could not save the title"),
   });
 
-  const isLive = status?.is_live ?? channel.is_live;
-
   return (
     <div className="max-w-2xl space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-sm font-semibold">Go live — {channel.name}</h1>
-        {isLive && (
+        <h1 className="text-sm font-semibold">Stream — {channel.name}</h1>
+        {isLive ? (
           <Badge tone="live">
-            <Radio className="h-3 w-3" /> streaming
+            <Radio className="h-3 w-3" /> live · {status?.viewers ?? 0} watching
           </Badge>
+        ) : (
+          <Badge>offline</Badge>
         )}
       </div>
+
+      {/* Live preview / standby */}
+      <Panel>
+        <PanelHeader
+          title={isLive ? "Live preview" : "Preview — waiting for signal"}
+          right={
+            isLive ? (
+              <Button
+                variant="danger"
+                size="xs"
+                disabled={stop.isPending}
+                onClick={() => stop.mutate()}
+              >
+                <Square className="h-3 w-3" /> Stop stream
+              </Button>
+            ) : undefined
+          }
+        />
+        <div className="p-3">
+          {isLive ? (
+            <LivePlayer hlsUrl={hlsUrl} />
+          ) : (
+            <div className="flex aspect-video w-full items-center justify-center rounded-sm border border-dashed border-line bg-bg">
+              <div className="text-center">
+                <Radio className="mx-auto h-6 w-6 text-muted/40" />
+                <p className="mt-2 text-2xs text-muted">
+                  Start broadcasting in OBS — the preview appears here automatically.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </Panel>
 
       <Panel>
         <PanelHeader
@@ -101,6 +147,12 @@ export function CreatorStream({ channel }: { channel: Community }) {
               </p>
             )}
           </div>
+          {isLive && (
+            <p className="border-t border-line pt-2 text-2xs leading-relaxed text-muted">
+              <strong className="text-fg">Stop</strong> disconnects the publisher instantly, but OBS
+              auto-reconnects while the key is valid — rotate the key for a hard lockout.
+            </p>
+          )}
         </div>
       </Panel>
 

@@ -9,3 +9,7 @@ export const discoverChannels = (q?: string) =>
 
 export const streamHealth = (id: string) =>
   request<StreamHealth>(`/api/streaming/communities/${id}/health`);
+
+/** Disconnect the active publisher (channel moderators + system staff). */
+export const stopStream = (id: string) =>
+  request<void>(`/api/streaming/communities/${id}/stop`, { method: "POST" });
