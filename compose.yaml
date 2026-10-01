@@ -82,13 +82,13 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
+        NEXT_PUBLIC_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
     restart: unless-stopped
     environment:
-      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
-      VITE_WS_BASE_URL: ws://localhost:${BACKEND_PORT:-7001}
-      VITE_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
-      VITE_WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
-      VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+      # Server-side (RSC) fetches go over the docker network.
+      API_SSR_URL: http://backend:7001
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     depends_on:

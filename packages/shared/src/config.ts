@@ -6,13 +6,38 @@
 interface EnvLike {
   VITE_API_BASE_URL?: string;
   VITE_HLS_BASE_URL?: string;
+  NEXT_PUBLIC_API_BASE_URL?: string;
+  NEXT_PUBLIC_HLS_BASE_URL?: string;
 }
 
-const env: EnvLike =
-  ((import.meta as unknown as { env?: EnvLike }).env as EnvLike | undefined) ?? {};
+// Bundler globals — Vite exposes import.meta.env, Next inlines process.env.
+// Declared locally (not via @types/node) so browser-only packages typecheck.
+declare const process: { env?: Record<string, string | undefined> } | undefined;
 
-const DEFAULT_API_BASE_URL = env.VITE_API_BASE_URL || "http://localhost:7001";
-const DEFAULT_HLS_BASE_URL = env.VITE_HLS_BASE_URL || "http://localhost:8888";
+/**
+ * Read build-time env defaults bundler-agnostically: Vite exposes
+ * `import.meta.env.VITE_*`, Next inlines `process.env.NEXT_PUBLIC_*`.
+ * These are only DEFAULTS — desktop apps override at runtime via
+ * localStorage (setServerConfig).
+ */
+function readEnvDefaults(): { api?: string; hls?: string } {
+  const viteEnv = (import.meta as unknown as { env?: EnvLike }).env;
+  if (viteEnv?.VITE_API_BASE_URL) {
+    return { api: viteEnv.VITE_API_BASE_URL, hls: viteEnv.VITE_HLS_BASE_URL };
+  }
+  const nextEnv = typeof process !== "undefined" ? (process.env ?? {}) : {};
+  if (nextEnv.NEXT_PUBLIC_API_BASE_URL) {
+    return {
+      api: nextEnv.NEXT_PUBLIC_API_BASE_URL,
+      hls: nextEnv.NEXT_PUBLIC_HLS_BASE_URL,
+    };
+  }
+  return {};
+}
+
+const envDefaults = readEnvDefaults();
+const DEFAULT_API_BASE_URL = envDefaults.api || "http://localhost:7001";
+const DEFAULT_HLS_BASE_URL = envDefaults.hls || "http://localhost:8888";
 
 const SERVER_CONFIG_KEY = "adda_server_config";
 

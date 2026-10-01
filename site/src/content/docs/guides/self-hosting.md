@@ -122,7 +122,7 @@ make migrate     # applies any new database migrations
 
 | Service          | Container port | Purpose                     |
 | ---------------- | -------------- | --------------------------- |
-| Frontend         | 5173           | Vite/NGINX web app          |
+| Web (Next.js)    | 5173           | viewer web app (SSR)       |
 | Backend API      | 7001           | REST + WebSocket            |
 | PostgreSQL       | 5432           | database                    |
 | Redis            | 6379           | pub/sub, presence, OTP      |

@@ -105,6 +105,15 @@ async def create(
     return await _serialize(db, community)
 
 
+@router.get("/by-slug/{slug}", response_model=CommunityOut)
+async def get_by_slug(slug: str, db: AsyncSession = Depends(get_db)):
+    """Public lookup by slug — used for pretty channel URLs (/channel/<slug>)."""
+    community = await get_community_by_slug(db, slug)
+    if community is None:
+        raise NotFoundException("Community not found")
+    return await _serialize(db, community)
+
+
 @router.get("/followed/by-me", response_model=list[CommunityOut])
 async def list_followed(
     db: AsyncSession = Depends(get_db),

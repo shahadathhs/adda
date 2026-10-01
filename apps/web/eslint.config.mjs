@@ -11,6 +11,7 @@ export default defineConfig([
   globalIgnores([
     "node_modules/*",
     "dist/*",
+    ".next/*",
     "src-tauri/target/*",
     "src-tauri/gen/*",
     "**/*.ts",

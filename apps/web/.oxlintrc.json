@@ -14,13 +14,5 @@
     "react-hooks/exhaustive-deps": "warn",
     "react/only-export-components": ["warn", { "allowConstantExport": true }]
   },
-  "ignorePatterns": ["node_modules", "dist", "src/routeTree.gen.ts"],
-  "overrides": [
-    {
-      "files": ["src/main.tsx", "src/routes/**/*.{ts,tsx}", "src/shared/ui/**/*.{ts,tsx}"],
-      "rules": {
-        "react/only-export-components": "off"
-      }
-    }
-  ]
+  "ignorePatterns": ["node_modules", "dist", ".next", "next-env.d.ts"]
 }

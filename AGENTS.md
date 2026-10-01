@@ -46,13 +46,20 @@ uv run ruff format .                  # format
 uv run pyright                        # type checking (must pass, no new warnings)
 ```
 
-### Web app (pnpm workspace member)
+### Web app (Next.js workspace member)
 
 ```bash
 pnpm -C apps/web dev                  # dev server → http://localhost:5173
 pnpm -C apps/web lint                 # oxlint + eslint + prettier
-pnpm -C apps/web build                # tsc + vite build (typechecks packages too)
+pnpm -C apps/web build                # next build (standalone output)
 ```
+
+- Next.js App Router viewer app: SSR browse (`/`) and channel pages
+  (`/channel/[slug]`) with OG metadata; authed pages are client-side.
+- Server components fetch via `API_SSR_URL` (see `src/lib/ssr.ts`); client
+  code uses `@adda/api-client` (localStorage tokens).
+- `@adda/*` packages are transpiled via `transpilePackages` (raw TS source).
+- Legacy UUID links redirect: `/community/[id]` → channel view.
 
 ### Docs/marketing site (Astro + Starlight, workspace member)
 

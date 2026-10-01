@@ -108,8 +108,8 @@ desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
 
 | Layer          | Technology                                                           |
 |----------------|----------------------------------------------------------------------|
-| **Frontend**   | React 19 · TypeScript · TanStack Router · TanStack Query · Tailwind CSS · Radix UI (shadcn/ui) · react-hook-form + Zod · hls.js · next-themes |
-| **Desktop**    | Tauri v2 (system webview, Rust shell)                                |
+| **Viewer web** | Next.js 15 (App Router, SSR channel pages) · React 19 · TanStack Query · Tailwind CSS · hls.js |
+| **Desktop console** | Tauri v2 operator client (own dense UI, ⌘K palette, native notifications) |
 | **Backend**    | FastAPI · async SQLAlchemy 2.0 · asyncpg · Pydantic v2 · PyJWT + cryptography · bcrypt · aiosmtplib · httpx |
 | **Database**   | PostgreSQL 16 (async) · Redis 7 (pub/sub + presence + OTP)          |
 | **Streaming**  | mediamtx (RTMP ingest → HLS/WebRTC playback)                        |
@@ -368,8 +368,8 @@ adda/
 ├── .env.example             root env template
 ├── .github/workflows/ci.yml CI: ruff + pyright + eslint + vite build
 ├── apps/
-│   ├── web/                 Viewer web app (React 19 + Vite + TanStack)
-│   │   └── src/             routes/ + features/ + shared/ (shadcn-style UI kit)
+│   ├── web/                 Viewer web app (Next.js 15, SSR browse + channel pages)
+│   │   └── src/app/         App Router pages + components + lib
 │   └── desktop/             Operator console (React + Tauri v2, own UI)
 │       ├── src/             views/ + ui/ (dense console design system)
 │       └── src-tauri/       Tauri shell + notification plugin

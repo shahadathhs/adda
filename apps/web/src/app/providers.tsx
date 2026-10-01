@@ -1,19 +1,27 @@
-import type { ReactNode } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { ThemeProvider } from "next-themes";
-import { Toaster } from "@/shared/ui/sonner";
-import { queryClient } from "./query-client";
+"use client";
 
-/** Top-level providers: React Query, theme, and the Sonner toaster. */
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
+import { useState, type ReactNode } from "react";
+
 export function Providers({ children }: { children: ReactNode }) {
+  const [client] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 15_000,
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+          mutations: { retry: 0 },
+        },
+      }),
+  );
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        {children}
-        <Toaster richColors position="top-right" />
-        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} position="bottom" />}
-      </ThemeProvider>
+    <QueryClientProvider client={client}>
+      {children}
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }
