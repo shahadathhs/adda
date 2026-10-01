@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Radio } from "lucide-react";
+import { ArrowLeftRight, Radio } from "lucide-react";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { apiBaseUrl } from "@adda/shared";
 import { useLogin, useLogin2fa } from "@/lib/session";
 
-export function LoginView() {
+export function LoginView({ onChangeServer }: { onChangeServer?: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [tempToken, setTempToken] = useState<string | null>(null);
@@ -36,10 +36,15 @@ export function LoginView() {
           <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-accent/15">
             <Radio className="h-4.5 w-4.5 text-accent" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <h1 className="text-sm font-semibold">Sign in</h1>
             <p className="max-w-40 truncate text-2xs text-muted">{apiBaseUrl()}</p>
           </div>
+          {onChangeServer && (
+            <Button variant="ghost" size="xs" title="Change server" onClick={onChangeServer}>
+              <ArrowLeftRight className="h-3 w-3" /> Server
+            </Button>
+          )}
         </div>
 
         {tempToken === null ? (

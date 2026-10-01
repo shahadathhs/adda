@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { Radio } from "lucide-react";
+import { ArrowLeft, Radio } from "lucide-react";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
-import { deriveHlsBase, setServerConfig } from "@adda/shared";
+import { deriveHlsBase, getServerConfig, setServerConfig } from "@adda/shared";
 
-export function ConnectionView({ onConnected }: { onConnected: () => void }) {
-  const [url, setUrl] = useState("");
+export function ConnectionView({
+  onConnected,
+  onCancel,
+}: {
+  onConnected: () => void;
+  /** Present when returning from the login screen — shows a way back. */
+  onCancel?: () => void;
+}) {
+  const [url, setUrl] = useState(getServerConfig().api);
   const [error, setError] = useState<string | null>(null);
 
   const connect = () => {
@@ -55,6 +62,11 @@ export function ConnectionView({ onConnected }: { onConnected: () => void }) {
         <Button variant="primary" className="mt-4 h-8 w-full" onClick={connect}>
           Connect
         </Button>
+        {onCancel && (
+          <Button variant="ghost" className="mt-1.5 h-7 w-full" onClick={onCancel}>
+            <ArrowLeft className="h-3 w-3" /> Back to sign in
+          </Button>
+        )}
       </div>
     </div>
   );

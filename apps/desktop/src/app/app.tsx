@@ -23,16 +23,21 @@ export function App() {
   const { data: user, isPending, isError } = session;
 
   if (!configured) {
-    return <ConnectionView onConnected={() => setConfigured(true)} />;
+    return (
+      <ConnectionView
+        onConnected={() => setConfigured(true)}
+        onCancel={hasToken || session.data ? undefined : () => setConfigured(true)}
+      />
+    );
   }
   if (!hasToken) {
-    return <LoginView />;
+    return <LoginView onChangeServer={() => setConfigured(false)} />;
   }
   if (isPending) {
     return <Splash label="Signing in…" />;
   }
   if (isError || !user) {
-    return <LoginView />;
+    return <LoginView onChangeServer={() => setConfigured(false)} />;
   }
   return <ConsoleLayout user={user} />;
 }
