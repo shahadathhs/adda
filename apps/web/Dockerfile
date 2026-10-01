@@ -11,8 +11,10 @@ COPY site/package.json site/
 # Build-time public env (baked into the client bundle as defaults).
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:7001
 ARG NEXT_PUBLIC_HLS_BASE_URL=http://localhost:8888
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
     NEXT_PUBLIC_HLS_BASE_URL=$NEXT_PUBLIC_HLS_BASE_URL \
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
     NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm install --filter @adda/web... --no-frozen-lockfile

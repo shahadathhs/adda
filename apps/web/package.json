@@ -25,9 +25,12 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "sonner": "^2.0.8",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "@react-oauth/google": "^0.13.5"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.2.0",

@@ -3,5 +3,5 @@
   "identifier": "default",
   "description": "Capabilities for the console's main window.",
   "windows": ["main"],
-  "permissions": ["core:default", "notification:default"]
+  "permissions": ["core:default", "notification:default", "window-state:default"]
 }

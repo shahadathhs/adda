@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Boxes,
   Film,
+  Keyboard,
   LayoutDashboard,
   LogOut,
   MessageSquare,
@@ -16,9 +17,11 @@ import { apiBaseUrl } from "@adda/shared";
 import { socket } from "@adda/api-client";
 import { cn } from "@/ui/cn";
 import { Badge } from "@/ui/badge";
+import { Dialog, DialogContent } from "@/ui/dialog";
 import { CommandPalette, type PaletteAction } from "@/ui/command-palette";
 import { useAdminLive, useStreamEvents } from "@/lib/data";
 import { useLogout } from "@/lib/session";
+import { checkForUpdate, isNewer } from "@/lib/update-check";
 import { DashboardView } from "./dashboard-view";
 import { StreamsView } from "./streams-view";
 import { CommunitiesView } from "./communities-view";
@@ -40,13 +43,51 @@ const VIEWS: { id: ViewId; label: string; icon: typeof Radio }[] = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
+const VIEW_STORAGE_KEY = "adda_console_view";
+
+function loadView(): ViewId {
+  try {
+    const saved = localStorage.getItem(VIEW_STORAGE_KEY) as ViewId | null;
+    if (saved && VIEWS.some((v) => v.id === saved)) return saved;
+  } catch {
+    /* first run */
+  }
+  return "dashboard";
+}
+
+const SHORTCUTS: [string, string][] = [
+  ["⌘K", "Command palette"],
+  ["⌘1 – ⌘7", "Switch view"],
+  ["⌘/", "This shortcut list"],
+];
+
 export function ConsoleLayout({ user }: { user: User }) {
-  const [view, setView] = useState<ViewId>("dashboard");
+  const [view, setView] = useState<ViewId>(loadView);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [updateUrl, setUpdateUrl] = useState<string | null>(null);
   const qc = useQueryClient();
   const logout = useLogout();
   const { data: live = [] } = useAdminLive();
   useStreamEvents(true);
+
+  // Remember the last view across launches.
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, view);
+    } catch {
+      /* ignore */
+    }
+  }, [view]);
+
+  // One-shot update check against GitHub releases (silent on failure).
+  useEffect(() => {
+    void checkForUpdate(__APP_VERSION__).then((info) => {
+      if (info?.latest && info.url && isNewer(info.latest, info.current)) {
+        setUpdateUrl(info.url);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -54,6 +95,10 @@ export function ConsoleLayout({ user }: { user: User }) {
       if (mod && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen((v) => !v);
+      }
+      if (mod && e.key === "/") {
+        e.preventDefault();
+        setHelpOpen((v) => !v);
       }
       if (mod && /^[1-7]$/.test(e.key)) {
         e.preventDefault();
@@ -172,9 +217,42 @@ export function ConsoleLayout({ user }: { user: User }) {
               {live.length} live · {live.reduce((n, s) => n + s.viewers, 0)} viewers
             </Badge>
           )}
+          {updateUrl && (
+            <a href={updateUrl} target="_blank" rel="noreferrer" title="New version available">
+              <Badge tone="accent">update available ↑</Badge>
+            </a>
+          )}
+          <button
+            className="flex items-center gap-1 hover:text-fg"
+            onClick={() => setHelpOpen(true)}
+            title="Keyboard shortcuts (⌘/)"
+          >
+            <Keyboard className="h-3 w-3" /> shortcuts
+          </button>
           <span>{user.email}</span>
         </div>
       </footer>
+
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent title="Keyboard shortcuts">
+          <div className="space-y-1.5">
+            {SHORTCUTS.map(([keys, label]) => (
+              <div key={keys} className="flex items-center justify-between text-xs">
+                <span className="text-muted">{label}</span>
+                <kbd className="rounded-xs border border-line bg-bg px-1.5 py-0.5 font-num">
+                  {keys}
+                </kbd>
+              </div>
+            ))}
+            <div className="flex items-center justify-between border-t border-line pt-1.5 text-xs">
+              <span className="text-muted">View rows in Streams/Recordings for context menus</span>
+              <kbd className="rounded-xs border border-line bg-bg px-1.5 py-0.5 font-num">
+                right-click
+              </kbd>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} actions={actions} />
     </div>

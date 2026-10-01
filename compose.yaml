@@ -85,6 +85,7 @@ services:
       args:
         NEXT_PUBLIC_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
         NEXT_PUBLIC_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
     restart: unless-stopped
     environment:
       # Server-side (RSC) fetches go over the docker network.
