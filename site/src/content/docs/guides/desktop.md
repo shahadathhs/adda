@@ -1,42 +1,71 @@
 ---
-title: Desktop app
-description: Install the adda desktop app and connect it to your server.
+title: Desktop console
+description: The adda operator console — stream and community management on your desktop.
 ---
 
-adda ships as a native desktop app (built with Tauri v2) that wraps the same
-UI as the web app in a small, fast native window — and it's
-**runtime-configurable**, so one installer works with any adda server.
+The **adda Console** is the operator client: a native desktop app (Tauri v2)
+for streamers and server admins. Viewers use the web app; the console is for
+*running the show* — dense, dark, keyboard-first, with its own UI built for
+desktop conventions (no wrapped website).
+
+```
+┌──────────────┬─────────────────────────────────────────────┐
+│ adda Console │  Dashboard                        ● Realtime│
+│──────────────│                                              │
+│ ⌘1 Dashboard │  Users 42   Communities 7   Live 2           │
+│ ⌘2 Streams   │                                              │
+│ ⌘3 Communities│  Active streams                             │
+│ ⌘4 Users     │  ┌────────────────────────────────────────┐ │
+│ ⌘5 Recordings│  │ My Stream   LIVE   1,284 viewers  Stop │ │
+│ ⌘6 Chat      │  └────────────────────────────────────────┘ │
+│ ⌘7 Settings  │                                              │
+└──────────────┴─────────────────────────────────────────────┘
+```
 
 ## Install
 
-Grab the latest installer for your platform from the
+Grab the latest installer from the
 [GitHub releases](https://github.com/shahadathhs/adda/releases) page:
 
-| Platform | File                    |
-| -------- | ----------------------- |
+| Platform | File                           |
+| -------- | ------------------------------ |
 | macOS    | `.dmg` (Apple Silicon / Intel) |
-| Windows  | `.exe` / `.msi`         |
-| Linux    | `.deb` / `.AppImage`    |
+| Windows  | `.exe` / `.msi`                |
+| Linux    | `.deb` / `.AppImage`           |
 
 :::caution[Unsigned binaries]
-Installers are not code-signed yet. macOS Gatekeeper and Windows SmartScreen
-will show a one-time "unknown developer" prompt — see the
-[FAQ](/faq/#macos-says-the-app-is-from-an-unknown-developer) for the
-workaround.
+Installers are not code-signed yet — see the
+[FAQ](/faq/#macos-says-the-app-is-from-an-unknown-developer) for the one-time
+Gatekeeper/SmartScreen workaround.
 :::
 
-## First run: connect to a server
+## First run
 
-The desktop app doesn't hardcode a server. On first launch you get a
-**Connect to a server** screen:
+1. Enter your server address (e.g. `https://your-adda-server.com`)
+2. Sign in with an **operator account** (`admin` or `superadmin`)
+3. Done — the console remembers both. Change them any time in
+   **Settings → Connection**.
 
-1. Enter your server's URL, e.g. `https://app.example.com`
-2. The HLS/streaming URL is derived automatically (same host, port 8888) —
-   override it only if your deployment splits hosts
-3. Sign in with your normal account
+## What's inside
 
-The choice persists locally. Change it any time in
-**Settings → Connection**.
+| View           | What you do there                                                     |
+| -------------- | --------------------------------------------------------------------- |
+| **Dashboard**  | Platform stats + active streams at a glance                            |
+| **Streams**    | Live monitor (5s refresh), viewer counts, force-stop (button or right-click) |
+| **Communities**| Manage every channel: members, kick, stream-key reveal/rotate, suspend, delete |
+| **Users**      | Search, promote/demote roles, suspend, reset passwords, delete          |
+| **Recordings** | Browse/filter, play in-app, download, delete                            |
+| **Chat**       | Inspect persisted channel messages and moderate (delete) them          |
+| **Settings**   | Server connection, account, version                                    |
+
+## Desktop behaviors
+
+- **⌘K command palette** — navigate, refresh data, sign out
+- **⌘1–⌘7** — jump between views
+- **Native notifications** — the console subscribes to every community's
+  realtime channel and notifies you the moment a stream goes live
+  (`stream_status` WebSocket events)
+- **Status bar** — realtime connection state, server URL, live viewer totals
 
 ## Building from source
 
@@ -48,12 +77,12 @@ make desktop-build
 make desktop
 ```
 
-Installers land in `frontend/src-tauri/target/` (native) or `./dist-desktop/`
-(Docker).
+Installers land in `apps/desktop/src-tauri/target/` (native) or
+`./dist-desktop/` (Docker).
 
-## How auth works on desktop
+## How auth works
 
-The app stores rotating tokens locally: a short-lived access token and a
-30-day refresh token (hashed server-side with reuse detection). When the
-access token expires, the client refreshes transparently — you stay signed
-in until the refresh token is revoked or expires.
+Same rotating tokens as the web app: a short-lived access token plus a 30-day
+refresh token (hashed server-side, reuse detection revokes the session). The
+console refreshes transparently; you stay signed in until the refresh token
+expires or is revoked.

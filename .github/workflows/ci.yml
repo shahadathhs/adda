@@ -64,6 +64,29 @@ jobs:
       - name: Build
         run: pnpm -C apps/web build
 
+  desktop:
+    name: Desktop console (lint + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm -C apps/desktop lint
+
+      - name: Build
+        run: pnpm -C apps/desktop build
+
   site:
     name: Docs site (build)
     runs-on: ubuntu-latest

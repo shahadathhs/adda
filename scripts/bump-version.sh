@@ -16,8 +16,8 @@ fi
 
 ROOT=$(pwd)
 
-# apps/web/package.json
-cd "$ROOT/apps/web"
+# apps/desktop/package.json
+cd "$ROOT/apps/desktop"
 npm version "$VERSION" --no-git-tag-version
 
 # src-tauri/tauri.conf.json (uses node for a safe JSON edit)

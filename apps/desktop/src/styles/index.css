@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/*
+ * adda Console design tokens — dense, dark-first, desktop.
+ * Deliberately separate from the web app's design system: this is a
+ * different surface with different conventions (information density,
+ * keyboard-first, compact controls). Never share UI between apps.
+ */
+@theme {
+  /* Surfaces */
+  --color-bg: #0b0d10;
+  --color-panel: #12151a;
+  --color-panel2: #171b22;
+  --color-line: #232833;
+
+  /* Text */
+  --color-fg: #e7ebf2;
+  --color-muted: #8b94a3;
+
+  /* Brand + state */
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+  --color-accent-fg: #ffffff;
+  --color-danger: #ef4444;
+  --color-ok: #22c55e;
+  --color-live: #ef4444;
+
+  /* Compact radii + type scale */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --text-2xs: 0.6875rem;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-bg text-fg antialiased;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+/* Thin, desktop-style scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Focus ring: keyboard-first, must read like a native app */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+/* Mono for numerics / keys / paths */
+.font-num {
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}

@@ -7,6 +7,7 @@
 
 BACKEND_DIR  := backend
 FRONTEND_DIR := apps/web
+DESKTOP_DIR  := apps/desktop
 SITE_DIR     := site
 COMPOSE      := docker compose
 UV           := uv run
@@ -100,16 +101,16 @@ web: ## Run web dev server on :5173 (vite)
 # first (make up, or make dev in another terminal).
 
 desktop-dev: ## Run the desktop app in dev mode (needs local Rust + running stack)
-	@cd $(FRONTEND_DIR) && \
-	  if lsof -i :5173 -sTCP:LISTEN >/dev/null 2>&1; then \
-	    echo "vite already running on :5173 — attaching to it"; \
+	@cd $(DESKTOP_DIR) && \
+	  if lsof -i :5174 -sTCP:LISTEN >/dev/null 2>&1; then \
+	    echo "vite already running on :5174 — attaching to it"; \
 	    $(PNPM) tauri dev --config '{"build":{"beforeDevCommand":""}}'; \
 	  else \
 	    $(PNPM) desktop:dev; \
 	  fi
 
 desktop-build: ## Build desktop installers natively (needs local Rust; macOS/Windows only)
-	@cd $(FRONTEND_DIR) && $(PNPM) desktop:build
+	@cd $(DESKTOP_DIR) && $(PNPM) desktop:build
 
 desktop: ## Build Linux desktop installers via Docker (no Rust needed) → ./dist-desktop/
 	$(COMPOSE) --profile desktop build desktop

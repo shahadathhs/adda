@@ -76,12 +76,15 @@ desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
 - **Live** — monitor active streams, viewer counts, force-stop
 - **Recordings** — browse and delete recordings across all communities
 
-### Desktop App (Tauri v2)
-- The same React app wrapped in a native window — small binary, system webview
-- **Runtime-configurable server** — first-run "Connect to a server" screen;
-  each user points their app at their own self-hosted instance (changeable in
-  Settings → Connection)
-- One codebase, three clients: browser, desktop dev, desktop installers
+### Desktop Console (Tauri v2)
+- **Operator client** — its own app (own UI, dense + dark + keyboard-first),
+  not a wrapped website: dashboard, live monitor with force-stop, community
+  management (members, stream keys), users, recordings, chat moderation
+- **⌘K command palette**, ⌘1–⌘7 view switching, native notifications when a
+  stream goes live (`stream_status` WebSocket events)
+- **Runtime-configurable server** — first-run connect screen, changeable in
+  Settings; signs in with an operator account (admin/superadmin)
+- Shares only logic (`@adda/*` packages) with the web app — never UI
 - Linux `.deb`/`.AppImage` buildable via Docker (no local Rust needed);
   macOS/Windows installers build natively
 
@@ -365,9 +368,11 @@ adda/
 ├── .env.example             root env template
 ├── .github/workflows/ci.yml CI: ruff + pyright + eslint + vite build
 ├── apps/
-│   └── web/                 Viewer web app (React 19 + Vite + TanStack)
-│       ├── src/             routes/ + features/ + shared/ (shadcn-style UI kit)
-│       └── src-tauri/       Tauri v2 desktop shell (Rust + icons + Dockerfile)
+│   ├── web/                 Viewer web app (React 19 + Vite + TanStack)
+│   │   └── src/             routes/ + features/ + shared/ (shadcn-style UI kit)
+│   └── desktop/             Operator console (React + Tauri v2, own UI)
+│       ├── src/             views/ + ui/ (dense console design system)
+│       └── src-tauri/       Tauri shell + notification plugin
 ├── packages/                Shared TS logic (never UI)
 │   ├── types/               DTOs mirroring Pydantic schemas (@adda/types)
 │   ├── api-client/          request + auth + WS client + endpoints (@adda/api-client)
@@ -393,7 +398,7 @@ communities), channels (Discord-style + permissions + message persistence), live
 streaming (RTMP → HLS via mediamtx with per-community keys), recordings
 (auto-record + VOD playback), real-time infrastructure (WebSocket + Redis
 pub/sub + presence), admin dashboard (users + communities + live + recordings),
-public marketing site (12 pages), desktop app (Tauri v2 with runtime server
+public marketing site (12 pages), desktop console (Tauri v2 operator client with runtime server
 config).
 
 **Next:** profile pages, posts/announcements, notifications, discovery/search,

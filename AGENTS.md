@@ -2,10 +2,9 @@
 
 A self-hosted multi-tenant live-streaming platform (Twitch-like) with
 community chat. pnpm monorepo: FastAPI backend (`backend/`) + React/TS viewer
-web app (`apps/web/`, Vite + TanStack) + mediamtx streaming server +
-Astro/Starlight docs site (`site/`). A dedicated Tauri operator console
-(`apps/desktop/`) is planned; until it lands, the Tauri shell in
-`apps/web/src-tauri/` wraps the web app.
+web app (`apps/web/`, Vite + TanStack) + Tauri operator console
+(`apps/desktop/`) + mediamtx streaming server + Astro/Starlight docs site
+(`site/`).
 
 ## Target architecture (in progress)
 
@@ -62,21 +61,24 @@ make site-dev                         # dev server → http://localhost:4321
 make site-build                       # static build → site/dist/
 ```
 
-### Desktop app (Tauri v2, requires Rust toolchain)
+### Desktop console (Tauri v2, requires Rust toolchain)
 
 ```bash
-pnpm -C apps/web desktop:dev          # tauri dev — needs backend+mediamtx running
-pnpm -C apps/web desktop:build        # bundles installers into src-tauri/target
+pnpm -C apps/desktop desktop:dev        # tauri dev — needs backend running on :7001
+pnpm -C apps/desktop desktop:build      # bundles installers into src-tauri/target
+pnpm -C apps/desktop dev                # console UI in a browser on :5174 (no Rust)
 ```
 
-- Desktop shell lives in `apps/web/src-tauri/`; it wraps the same Vite app.
-- Server URLs are runtime-configurable (`@adda/shared` config, persisted in
-  localStorage) — the desktop app shows a setup screen on first run.
-- Auth uses rotating refresh tokens (`/api/auth/refresh`); clients refresh
-  transparently on 401 (`@adda/api-client`).
-- Linux installers can also be built without local Rust, via Docker:
-  `docker compose --profile desktop run --rm desktop` → output in
-  `./dist-desktop/` (macOS/Windows installers must be built natively).
+- The console (`apps/desktop/`) is the **operator client** — stream/community
+  management for streamers and admins. It shares logic via `@adda/*` packages
+  but has its own UI (dense, dark, keyboard-first; never shares UI with web).
+- Server URL is runtime-configured (`@adda/shared`): first-run connect screen,
+  changeable in Settings. Auth = operator account (admin/superadmin) with the
+  same rotating refresh tokens as web.
+- Native notifications on `stream_status` WS events via the Tauri
+  notification plugin; ⌘K command palette; ⌘1–⌘7 view switching.
+- Linux installers build without local Rust via Docker:
+  `docker compose --profile desktop run --rm desktop` → `./dist-desktop/`.
 
 ### Infra (Docker)
 

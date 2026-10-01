@@ -28,7 +28,7 @@ jobs:
       - name: Compare version against existing tags
         id: ver
         run: |
-          VERSION=$(node -p "require('./apps/web/src-tauri/tauri.conf.json').version")
+          VERSION=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             echo "v$VERSION already released — skipping." >> "$GITHUB_STEP_SUMMARY"
@@ -78,7 +78,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: apps/web/src-tauri -> target
+          workspaces: apps/desktop/src-tauri -> target
 
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
@@ -94,13 +94,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          projectPath: apps/web
+          projectPath: apps/desktop
           tagName: v${{ needs.check.outputs.version }}
-          releaseName: "adda Desktop ${{ needs.check.outputs.version }}"
+          releaseName: "adda Console ${{ needs.check.outputs.version }}"
           releaseBody: |
-            ## adda Desktop v${{ needs.check.outputs.version }}
+            ## adda Console v${{ needs.check.outputs.version }}
 
-            Self-hosted community platform — desktop client for
+            adda operator console (stream & community management) for
             **macOS**, **Windows**, and **Linux**.
 
             ### Downloads
