@@ -46,6 +46,19 @@ Used by Docker Compose and shared by services.
 | `BACKEND_PORT` | `7001`  |                                 |
 | `IS_DEBUG`     | `true`  | enables `/docs` (OpenAPI)       |
 
+### CORS
+
+| Variable        | Default                                                                                   |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `CORS_ORIGINS`  | `http://localhost:5173,http://localhost:5174,tauri://localhost,http://tauri.localhost`    |
+
+Comma-separated browser origins allowed to call the API. The defaults cover
+the web app (5173), the desktop console in dev/preview (5174), and the
+packaged Tauri console (`tauri://localhost` on macOS/Linux,
+`http://tauri.localhost` on Windows). In production, set it to your web
+app's origin(s) — keep the `tauri://` entries so operators can use the
+console.
+
 ### Streaming (mediamtx)
 
 | Variable          | Default                  | Notes                                    |
