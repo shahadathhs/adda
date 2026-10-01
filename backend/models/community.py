@@ -29,6 +29,8 @@ class Community(Base):
     is_private: Mapped[bool] = mapped_column(default=False)
     # Suspended communities are hidden from public listings (admin lever).
     is_suspended: Mapped[bool] = mapped_column(default=False)
+    # What the owner is streaming right now (shown on the channel + browse grid).
+    stream_title: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
     # Secret required to publish an RTMP stream to this community.
     stream_key: Mapped[str] = mapped_column(
@@ -46,7 +48,9 @@ class Community(Base):
         cascade="all, delete-orphan",
     )
 
-    def to_public_dict(self, member_count: int = 0, is_live: bool = False) -> dict:
+    def to_public_dict(
+        self, member_count: int = 0, is_live: bool = False, follower_count: int = 0
+    ) -> dict:
         return {
             "id": str(self.id),
             "name": self.name,
@@ -55,7 +59,9 @@ class Community(Base):
             "banner_url": self.banner_url,
             "avatar_url": self.avatar_url,
             "is_private": self.is_private,
+            "stream_title": self.stream_title,
             "owner_id": str(self.owner_id),
             "member_count": member_count,
+            "follower_count": follower_count,
             "is_live": is_live,
         }

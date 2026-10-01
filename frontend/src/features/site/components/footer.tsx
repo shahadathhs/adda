@@ -5,6 +5,8 @@ import { Container } from "@/shared/ui/container";
 type To = ComponentProps<typeof Link>["to"];
 type Item = { label: string; to: To };
 
+const YEAR = new Date().getFullYear();
+
 const COLUMNS: { title: string; items: Item[] }[] = [
   {
     title: "Product",
@@ -76,9 +78,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-center sm:flex-row sm:text-left">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} adda. All rights reserved.
-          </p>
+          <p className="text-xs text-muted-foreground">© {YEAR} adda. All rights reserved.</p>
           <p className="text-xs text-muted-foreground">Made for communities.</p>
         </div>
       </Container>

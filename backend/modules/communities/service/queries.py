@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.community import Community
@@ -35,11 +35,45 @@ async def list_all_communities(db: AsyncSession) -> list[Community]:
     return list(result.scalars().all())
 
 
+async def search_communities(
+    db: AsyncSession, q: str | None = None, limit: int = 50, offset: int = 0
+) -> list[Community]:
+    """Public listing with optional name/slug/stream-title search."""
+    stmt = select(Community).where(Community.is_suspended.is_(False))
+    if q:
+        like = f"%{q}%"
+        stmt = stmt.where(
+            or_(
+                Community.name.ilike(like),
+                Community.slug.ilike(like),
+                Community.stream_title.ilike(like),
+            )
+        )
+    result = await db.execute(
+        stmt.order_by(Community.created_at.desc()).limit(limit).offset(offset)
+    )
+    return list(result.scalars().all())
+
+
 async def count_members(db: AsyncSession, community_id: uuid.UUID) -> int:
     result = await db.execute(
         select(func.count()).select_from(Membership).where(Membership.community_id == community_id)
     )
     return int(result.scalar() or 0)
+
+
+async def count_members_map(
+    db: AsyncSession, community_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, int]:
+    """Member counts for many communities in one query (for grids)."""
+    if not community_ids:
+        return {}
+    result = await db.execute(
+        select(Membership.community_id, func.count())
+        .where(Membership.community_id.in_(community_ids))
+        .group_by(Membership.community_id)
+    )
+    return {cid: int(n) for cid, n in result.all()}
 
 
 async def get_member_role(

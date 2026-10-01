@@ -7,6 +7,7 @@
 
 BACKEND_DIR  := backend
 FRONTEND_DIR := frontend
+SITE_DIR     := site
 COMPOSE      := docker compose
 UV           := uv run
 PNPM         := pnpm
@@ -20,6 +21,7 @@ ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
         dev backend frontend desktop desktop-dev desktop-build desktop-clean release \
         migrate migration reset reset-migrate db-up typecheck \
         lint lint-backend lint-web format build-web \
+        site-setup site-dev site-build site-preview \
         check clean clean-recordings
 
 help: ## Show this help
@@ -182,6 +184,20 @@ lint: lint-backend lint-web ## Lint backend (ruff) + frontend (eslint)
 
 build-web: ## Build frontend (tsc + vite)
 	@cd $(FRONTEND_DIR) && $(PNPM) build
+
+# ── Marketing / docs site (Astro + Starlight) ─────────────────────────
+
+site-setup: ## Install docs-site deps (pnpm)
+	@cd $(SITE_DIR) && $(PNPM) install
+
+site-dev: ## Run docs-site dev server on :4321
+	@cd $(SITE_DIR) && $(PNPM) dev
+
+site-build: site-setup ## Build static docs site → site/dist/
+	@cd $(SITE_DIR) && $(PNPM) build
+
+site-preview: ## Preview the built docs site
+	@cd $(SITE_DIR) && $(PNPM) preview
 
 # ── Quality & cleanup ─────────────────────────────────────────────────
 

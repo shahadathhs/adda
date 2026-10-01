@@ -2,6 +2,7 @@ from models.base import Base
 from models.channel import Channel
 from models.channel_member import ChannelMember
 from models.community import Community
+from models.follow import Follow
 from models.join_request import JoinRequest
 from models.membership import CommunityRole, Membership
 from models.message import Message
@@ -14,6 +15,7 @@ __all__ = [
     "ChannelMember",
     "Community",
     "CommunityRole",
+    "Follow",
     "JoinRequest",
     "Membership",
     "Message",

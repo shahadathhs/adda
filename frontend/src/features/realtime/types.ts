@@ -27,3 +27,11 @@ export interface ServerMessage {
   channel?: string;
   data?: Record<string, unknown>;
 }
+
+// Shape of `data` for a `stream_status` message (mirrors StreamStatusPayload).
+export interface StreamStatusPayload {
+  community_id: string;
+  is_live: boolean;
+  viewers: number;
+  started_at: string | null;
+}

@@ -19,6 +19,7 @@ class CommunityUpdate(BaseModel):
     description: str | None = Field(default=None, max_length=1000)
     banner_url: str | None = None
     avatar_url: str | None = None
+    stream_title: str | None = Field(default=None, max_length=200)
     is_private: bool | None = None
 
 
@@ -32,8 +33,10 @@ class CommunityOut(BaseModel):
     banner_url: str | None = None
     avatar_url: str | None = None
     is_private: bool
+    stream_title: str | None = None
     owner_id: str
     member_count: int = 0
+    follower_count: int = 0
     is_live: bool = False
 
 

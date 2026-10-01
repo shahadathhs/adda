@@ -6,8 +6,10 @@ export interface Community {
   banner_url: string | null;
   avatar_url: string | null;
   is_private: boolean;
+  stream_title: string | null;
   owner_id: string;
   member_count: number;
+  follower_count: number;
   is_live: boolean;
 }
 

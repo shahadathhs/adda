@@ -45,6 +45,11 @@ async def startup() -> None:
     from modules.realtime.manager import manager
 
     await manager.start()
+
+    from modules.streaming.service import monitor
+
+    monitor.start()
+
     logging.getLogger("adda").info("Backend startup complete. Debug=%s", settings.debug)
 
 

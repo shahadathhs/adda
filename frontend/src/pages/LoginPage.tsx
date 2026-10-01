@@ -4,6 +4,8 @@ import { MessageCircle, Radio, Users } from "lucide-react";
 import { LoginForm } from "@/features/auth/components/login-form";
 import { RegisterForm } from "@/features/auth/components/register-form";
 
+const YEAR = new Date().getFullYear();
+
 export default function LoginPage({
   initialMode = "login",
 }: {
@@ -40,9 +42,7 @@ export default function LoginPage({
             ))}
           </ul>
         </div>
-        <p className="relative text-xs text-primary-foreground/70">
-          © {new Date().getFullYear()} adda
-        </p>
+        <p className="relative text-xs text-primary-foreground/70">© {YEAR} adda</p>
       </aside>
 
       {/* Form side */}

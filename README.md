@@ -1,9 +1,10 @@
 # adda
 
-A self-hosted community platform that combines **text channels**, **live streaming**,
-and **community management** in a single deployable bundle. Built as a full-stack
-monorepo with a FastAPI backend, React/TypeScript frontend, and mediamtx streaming
-server.
+A self-hosted, **multi-tenant live-streaming platform** (think self-hosted
+Twitch) with **real-time community chat**. One instance hosts many channels —
+each with its own stream key, live page, chat, and recordings. Built as a
+full-stack monorepo with a FastAPI backend, React/TypeScript web app + Tauri
+desktop app, mediamtx streaming server, and an Astro/Starlight docs site.
 
 > **adda** (আড্ডা /ˈ_add_ːa/) — Bengali for an informal, wide-ranging conversation
 > among friends.
@@ -45,8 +46,12 @@ server.
 - **RTMP ingest → HLS playback** via [mediamtx](https://github.com/bluenviron/mediamtx)
 - **Per-community stream keys** with instant rotation (kicks active publisher)
 - **Publish-auth webhook** — mediamtx calls back to backend to validate stream key
+- **Discover/browse page** — live-first grid with viewer counts and search
+- **Stream titles & health** — what's live now, viewers, uptime, codecs
+- **Follows** — follow channels, personal Following rail with live indicators
+- **Instant live/offline push** — background monitor publishes `stream_status`
+  over WebSocket to subscribed clients
 - **Auto-start HLS player** when a stream goes live
-- **Viewer counts** via mediamtx REST API
 - **Admin force-stop** — kick a publisher from the dashboard
 - OBS/Streamlabs ready — just paste the stream URL
 
@@ -79,6 +84,12 @@ server.
 - One codebase, three clients: browser, desktop dev, desktop installers
 - Linux `.deb`/`.AppImage` buildable via Docker (no local Rust needed);
   macOS/Windows installers build natively
+
+### Docs & Marketing Site (Astro + Starlight)
+- Static site with landing page, full guides (quickstart, self-hosting,
+  streaming with OBS, desktop app, administration), configuration + API
+  reference, and FAQ
+- Zero-JS static output, SEO-ready, served from `site/dist/`
 
 ### Public Site
 - Marketing landing page with feature showcase
@@ -311,6 +322,10 @@ make desktop-dev       # run desktop app in dev mode (needs Rust)
 make desktop-build     # native installers (macOS/Windows)
 make desktop           # Linux installers via Docker → ./dist-desktop/
 
+# Docs / marketing site
+make site-dev          # docs site dev server → http://localhost:4321
+make site-build        # static build → site/dist/
+
 # Database
 make migrate                       # apply Alembic migrations
 make migration m="add posts table" # generate a new migration
@@ -352,15 +367,16 @@ adda/
 ├── backend/                 FastAPI app (uv, Python 3.12)
 │   ├── main.py              app entry, router registration, startup seed
 │   ├── core/                shared infra (config, database, redis, security/, seed)
-│   ├── models/              8 SQLAlchemy models
+│   ├── models/              9 SQLAlchemy models
 │   ├── modules/             8 feature modules
-│   └── alembic/             9 migrations
+│   └── alembic/             11 migrations
 ├── frontend/                React app (pnpm + Vite)
 │   ├── src/                 # the app (browser + desktop share it)
 │   │   ├── routes/          28 file-based routes (TanStack Router)
-│   │   ├── features/        8 feature-sliced domains
+│   │   ├── features/        9 feature-sliced domains
 │   │   └── shared/          UI kit (19 components) + API client + config
 │   └── src-tauri/           Tauri v2 desktop shell (Rust + icons + Dockerfile)
+├── site/                    Astro + Starlight marketing/docs site
 ├── mediamtx/                mediamtx config (Dockerfile-baked) + recording retention
 └── recordings/              stream recordings (gitignored, bind-mounted)
 ```

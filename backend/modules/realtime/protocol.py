@@ -75,3 +75,12 @@ class PresencePayload(BaseModel):
     channel: str
     online_count: int
     user_ids: list[str]
+
+
+class StreamStatusPayload(BaseModel):
+    """Shape of the `data` field for a `stream_status`."""
+
+    community_id: str
+    is_live: bool
+    viewers: int = 0
+    started_at: str | None = None  # ISO 8601

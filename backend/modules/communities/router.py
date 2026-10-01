@@ -25,6 +25,13 @@ from modules.communities.service.commands import (
     delete_community,
     update_community,
 )
+from modules.communities.service.follows import (
+    count_followers,
+    follow_community,
+    is_following,
+    list_followed_communities,
+    unfollow_community,
+)
 from modules.communities.service.memberships import (
     approve_join_request,
     create_join_request,
@@ -59,8 +66,11 @@ router = APIRouter(prefix="/communities", tags=["communities"])
 
 async def _serialize(db: AsyncSession, community: Community) -> CommunityOut:
     member_count = await count_members(db, community.id)
+    follower_count = await count_followers(db, community.id)
     live = await is_community_live(str(community.id))
-    data = community.to_public_dict(member_count=member_count, is_live=live)
+    data = community.to_public_dict(
+        member_count=member_count, is_live=live, follower_count=follower_count
+    )
     return CommunityOut.model_validate(data, from_attributes=True)
 
 
@@ -93,6 +103,16 @@ async def create(
         raise ConflictException("Slug already taken")
     community = await create_community(db, data, current_user.id)
     return await _serialize(db, community)
+
+
+@router.get("/followed/by-me", response_model=list[CommunityOut])
+async def list_followed(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Channels the current user follows (for their following rail/homepage)."""
+    communities = await list_followed_communities(db, current_user.id)
+    return [await _serialize(db, c) for c in communities]
 
 
 @router.get("/{community_id}", response_model=CommunityOut)
@@ -156,6 +176,42 @@ async def rotate_stream_key(
     # reconnecting requires the rotated key (the old one is dead in the DB).
     await kick_publisher(str(community.id))
     return build_stream_credentials(community)
+
+
+# ── Follows ───────────────────────────────────────────────────────────
+@router.get("/{community_id}/follow")
+async def follow_state(
+    community_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return {"following": await is_following(db, community_id, current_user.id)}
+
+
+@router.post("/{community_id}/follow", status_code=status.HTTP_201_CREATED)
+async def follow(
+    community_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    community = await get_community(db, community_id)
+    if community is None:
+        raise NotFoundException("Community not found")
+    if await is_following(db, community_id, current_user.id):
+        raise ConflictException("Already following")
+    await follow_community(db, community_id, current_user.id)
+    return {"following": True, "follower_count": await count_followers(db, community_id)}
+
+
+@router.delete("/{community_id}/follow", status_code=status.HTTP_204_NO_CONTENT)
+async def unfollow(
+    community_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not await is_following(db, community_id, current_user.id):
+        raise NotFoundException("Not following")
+    await unfollow_community(db, community_id, current_user.id)
 
 
 # ── Members ───────────────────────────────────────────────────────────

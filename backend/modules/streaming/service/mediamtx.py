@@ -29,6 +29,22 @@ async def list_paths() -> list[dict]:
         return []
 
 
+async def path_details(community_id: str) -> dict | None:
+    """Full mediamtx path object (readers, tracks) or None when not live."""
+    path = community_path(community_id)
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            resp = await client.get(
+                f"{settings.mtx_api_url}/v3/paths/get/{path}",
+                auth=(settings.mtx_api_user, settings.mtx_api_pass),
+            )
+            if resp.status_code != 200:
+                return None
+            return resp.json()
+    except Exception:
+        return None
+
+
 async def viewer_count(community_id: str) -> int:
     """Approximate viewer count (mediamtx readers) for a community stream."""
     path = community_path(community_id)

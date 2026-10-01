@@ -11,6 +11,25 @@ export const createCommunity = (data: Partial<Community> & { name: string; slug:
     body: JSON.stringify(data),
   });
 
+export const updateCommunity = (id: string, data: Partial<Community>) =>
+  request<Community>(`/api/communities/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const getFollowState = (id: string) =>
+  request<{ following: boolean }>(`/api/communities/${id}/follow`);
+
+export const followCommunity = (id: string) =>
+  request<{ following: boolean; follower_count: number }>(`/api/communities/${id}/follow`, {
+    method: "POST",
+  });
+
+export const unfollowCommunity = (id: string) =>
+  request<void>(`/api/communities/${id}/follow`, { method: "DELETE" });
+
+export const listFollowed = () => request<Community[]>("/api/communities/followed/by-me");
+
 export const getStreamKey = (id: string) =>
   request<StreamCredentials>(`/api/communities/${id}/stream-key`);
 

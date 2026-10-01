@@ -1,8 +1,9 @@
 # adda — Project Agent Instructions
 
-A self-hosted community platform (Telegram-flavored) with live streaming.
-Monorepo: FastAPI backend (`backend/`) + React/TS frontend (`frontend/`) +
-mediamtx streaming server.
+A self-hosted multi-tenant live-streaming platform (Twitch-like) with
+community chat. Monorepo: FastAPI backend (`backend/`) + React/TS frontend
+(`frontend/`) + mediamtx streaming server + Astro/Starlight docs site
+(`site/`).
 
 ## Commands
 
@@ -24,8 +25,15 @@ uv run pyright                        # type checking (must pass, no new warning
 cd frontend
 pnpm install
 pnpm dev                                  # dev server → http://localhost:5173
-pnpm lint                                 # eslint
+pnpm lint                                 # oxlint + eslint + prettier
 pnpm build                                # tsc + vite build
+```
+
+### Docs/marketing site (Astro + Starlight, pnpm)
+
+```bash
+make site-dev                             # dev server → http://localhost:4321
+make site-build                           # static build → site/dist/
 ```
 
 ### Desktop app (Tauri v2, requires Rust toolchain)
