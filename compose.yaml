@@ -33,6 +33,11 @@ services:
   mediamtx:
     build: ./mediamtx
     restart: unless-stopped
+    environment:
+      # Publish-auth webhook target. Defaults to the compose backend service;
+      # when the backend runs natively (`make backend`), the root .env should
+      # set MTX_AUTH_ADDRESS=http://host.docker.internal:7001/api/streams/auth
+      MTX_AUTHHTTPADDRESS: ${MTX_AUTH_ADDRESS:-http://backend:7001/api/streams/auth}
     ports:
       - "${RTMP_PORT:-1935}:1935"   # RTMP ingest (OBS streams here)
       - "${HLS_PORT:-8888}:8888"    # HLS playback

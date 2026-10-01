@@ -16,6 +16,9 @@ apiAddress: :9997
 # Reads (HLS/playback) and the control API are excluded below, so viewing a
 # stream never needs a key and the key never appears in the HLS path.
 authMethod: http
+# Overridable at runtime via the MTX_AUTHHTTPADDRESS env var (see compose):
+# when the backend runs natively (`make backend`), the root .env should set
+# MTX_AUTH_ADDRESS=http://host.docker.internal:7001/api/streams/auth
 authHTTPAddress: http://backend:7001/api/streams/auth
 authHTTPExclude:
   - action: read

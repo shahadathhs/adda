@@ -69,6 +69,7 @@ console.
 | `MTX_API_PORT`    | `9997`                   | mediamtx control API                     |
 | `MTX_API_URL`     | `http://localhost:9997`  | used by the backend                      |
 | `MTX_API_USER`    | `admin`                  | set in `mediamtx/mediamtx.yml`           |
+| `MTX_AUTH_ADDRESS` | `http://backend:7001/api/streams/auth` | publish-auth webhook target; set to `http://host.docker.internal:7001/api/streams/auth` when the backend runs natively (`make backend`) |
 | `MTX_API_PASS`    | `admin`                  | **change in prod**                       |
 | `HLS_BASE_URL`    | `http://localhost:8888`  | browser-facing                           |
 | `WEBRTC_BASE_URL` | `http://localhost:8889`  | browser-facing                           |
