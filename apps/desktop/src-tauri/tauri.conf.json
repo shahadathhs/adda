@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "adda Console",
+  "productName": "adda-console",
   "version": "0.2.0",
   "identifier": "app.adda.console",
   "build": {

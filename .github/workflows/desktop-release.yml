@@ -107,10 +107,10 @@ jobs:
 
             | Platform | File |
             |----------|------|
-            | macOS (Apple Silicon) | `adda_${{ needs.check.outputs.version }}_aarch64.dmg` |
-            | Windows | `adda_${{ needs.check.outputs.version }}_x64-setup.exe` |
-            | Linux (Debian/Ubuntu) | `adda_${{ needs.check.outputs.version }}_amd64.deb` |
-            | Linux (any distro) | `adda_${{ needs.check.outputs.version }}_amd64.AppImage` |
+            | macOS (Apple Silicon) | `adda-console_${{ needs.check.outputs.version }}_aarch64.dmg` |
+            | Windows | `adda-console_${{ needs.check.outputs.version }}_x64-setup.exe` |
+            | Linux (Debian/Ubuntu) | `adda-console_${{ needs.check.outputs.version }}_amd64.deb` |
+            | Linux (any distro) | `adda-console_${{ needs.check.outputs.version }}_amd64.AppImage` |
 
             On first launch, enter your server address (e.g.
             `https://your-adda-server.com`) — the app remembers it.
