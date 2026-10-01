@@ -76,9 +76,10 @@ pnpm -C apps/desktop desktop:build      # bundles installers into src-tauri/targ
 pnpm -C apps/desktop dev                # console UI in a browser on :5174 (no Rust)
 ```
 
-- The console (`apps/desktop/`) is the **operator client** — stream/community
-  management for streamers and admins. It shares logic via `@adda/*` packages
-  but has its own UI (dense, dark, keyboard-first; never shares UI with web).
+- The console (`apps/desktop/`) is the **creator client** — channel
+  management for streamers/moderators (their channels only) plus a Platform
+  section for system admins. It shares logic via `@adda/*` packages but has
+  its own UI (dense, dark, keyboard-first; never shares UI with web).
 - Server URL is runtime-configured (`@adda/shared`): first-run connect screen,
   changeable in Settings. Auth = operator account (admin/superadmin) with the
   same rotating refresh tokens as web.

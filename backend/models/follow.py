@@ -10,9 +10,7 @@ class Follow(Base):
     """A user following a community (its channel) for live notifications."""
 
     __tablename__ = "follows"
-    __table_args__ = (
-        UniqueConstraint("user_id", "community_id", name="uq_follow_user_community"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "community_id", name="uq_follow_user_community"),)
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),

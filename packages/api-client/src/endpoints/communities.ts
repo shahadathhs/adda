@@ -3,6 +3,9 @@ import { request } from "../client";
 
 export const listCommunities = () => request<Community[]>("/api/communities");
 
+/** Channels where the current user holds a creator/moderator role. */
+export const listMine = () => request<Community[]>("/api/communities/mine");
+
 export const getCommunity = (id: string) => request<Community>(`/api/communities/${id}`);
 
 export const createCommunity = (data: Partial<Community> & { name: string; slug: string }) =>

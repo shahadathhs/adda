@@ -12,11 +12,13 @@ from core.database import get_db
 from core.exceptions import ForbiddenException, NotFoundException
 from core.security.deps import get_current_user
 from core.security.guards import require_admin
+from models.membership import CommunityRole
 from models.user import SystemRole, User
 from modules.communities.service.follows import count_followers_map
 from modules.communities.service.queries import (
     count_members_map,
     get_community,
+    get_member_role,
     search_communities,
 )
 from modules.streaming.schemas import DiscoverItem, LiveStreamOut, StreamHealthOut
@@ -114,12 +116,20 @@ async def stream_health(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> StreamHealthOut:
-    """Streamer dashboard health snapshot (owner or staff only)."""
+    """Streamer dashboard health snapshot (channel owner/admin/mod/streamer)."""
     community = await get_community(db, community_id)
     if community is None:
         raise NotFoundException("Community not found")
-    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
-        raise ForbiddenException("Only the owner can view stream health")
+    if current_user.system_role not in SystemRole.STAFF:
+        role = await get_member_role(db, community_id, current_user.id)
+        allowed = {
+            CommunityRole.owner,
+            CommunityRole.admin,
+            CommunityRole.moderator,
+            CommunityRole.streamer,
+        }
+        if role not in allowed:
+            raise ForbiddenException("Only channel moderators and streamers can view stream health")
     cid = str(community_id)
     details = await path_details(cid)
     started = await monitor.started_at(cid)

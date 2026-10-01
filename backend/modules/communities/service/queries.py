@@ -6,6 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.community import Community
 from models.membership import CommunityRole, Membership
 
+# Roles with creator/moderator powers inside a channel — the audience of the
+# desktop creator console.
+ELEVATED_ROLES = {
+    CommunityRole.owner,
+    CommunityRole.admin,
+    CommunityRole.moderator,
+    CommunityRole.streamer,
+}
+
 
 async def get_community(db: AsyncSession, community_id: uuid.UUID) -> Community | None:
     result = await db.execute(select(Community).where(Community.id == community_id))
@@ -85,3 +94,20 @@ async def get_member_role(
         )
     )
     return result.scalar_one_or_none()
+
+
+async def list_my_communities(
+    db: AsyncSession, user_id: uuid.UUID
+) -> list[tuple[Community, CommunityRole]]:
+    """Communities where the user holds an elevated (creator/moderator) role."""
+    result = await db.execute(
+        select(Community, Membership.role)
+        .join(Membership, Membership.community_id == Community.id)
+        .where(
+            Membership.user_id == user_id,
+            Membership.role.in_(ELEVATED_ROLES),
+            Community.is_suspended.is_(False),
+        )
+        .order_by(Community.created_at.desc())
+    )
+    return [(community, role) for community, role in result.all()]

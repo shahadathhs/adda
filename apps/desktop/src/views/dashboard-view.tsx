@@ -65,7 +65,7 @@ export function DashboardView({ onNavigate }: { onNavigate: (v: ViewId) => void 
         <PanelHeader
           title="Active streams"
           right={
-            <Button variant="ghost" size="xs" onClick={() => onNavigate("streams")}>
+            <Button variant="ghost" size="xs" onClick={() => onNavigate("p-streams")}>
               All streams →
             </Button>
           }

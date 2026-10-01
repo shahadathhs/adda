@@ -54,7 +54,9 @@ class Settings(BaseSettings):
 
     # CORS origins (comma-separated). The tauri:// entries cover the desktop
     # app (macOS/Linux uses tauri://localhost, Windows http://tauri.localhost).
-    cors_origins: str = "http://localhost:5173,http://localhost:5174,tauri://localhost,http://tauri.localhost"
+    cors_origins: str = (
+        "http://localhost:5173,http://localhost:5174,tauri://localhost,http://tauri.localhost"
+    )
 
     # Bootstrap accounts — seeded idempotently on startup (only created if they
     # don't already exist). Override all of these in prod with strong values.

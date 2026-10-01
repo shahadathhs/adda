@@ -3,10 +3,11 @@ title: Desktop console
 description: The adda operator console — stream and community management on your desktop.
 ---
 
-The **adda Console** is the operator client: a native desktop app (Tauri v2)
-for streamers and server admins. Viewers use the web app; the console is for
-*running the show* — dense, dark, keyboard-first, with its own UI built for
-desktop conventions (no wrapped website).
+The **adda Console** is the creator client: a native desktop app (Tauri v2)
+for anyone who runs a channel — streamers, channel moderators, and system
+admins. Viewers use the web app; the console is for *running the show* —
+dense, dark, keyboard-first, with its own UI built for desktop conventions
+(no wrapped website).
 
 ```
 ┌──────────────┬─────────────────────────────────────────────┐
@@ -42,13 +43,29 @@ Gatekeeper/SmartScreen workaround.
 ## First run
 
 1. Enter your server address (e.g. `https://your-adda-server.com`)
-2. Sign in with an **operator account** (`admin` or `superadmin`)
+2. Sign in with your account
 3. Done — the console remembers both. Change them any time in
    **Settings → Connection**.
 
+The sidebar adapts to who you are: your channels appear in the **Channel**
+section (with your role next to each), and system `admin`/`superadmin`
+accounts additionally get the **Platform** section (users, all communities,
+live monitor, all recordings). No channels yet? Create one right from the
+picker.
+
 ## What's inside
 
+**Channel views** (per selected channel):
+
 | View           | What you do there                                                     |
+| -------------- | --------------------------------------------------------------------- |
+| **Overview**   | Live status, viewers, followers, members, title, health, recent VODs  |
+| **Stream**     | Go-live setup: OBS URL + key, rotation, live title                    |
+| **Chat**       | Inspect persisted channel messages and moderate (delete) them         |
+| **Recordings** | Browse, play, download your channel's recordings                      |
+| **Members**    | Roles (moderator/streamer/member/guest), kick, join requests          |
+
+**Platform views** (system admins only):
 | -------------- | --------------------------------------------------------------------- |
 | **Dashboard**  | Platform stats + active streams at a glance                            |
 | **Streams**    | Live monitor (5s refresh), viewer counts, force-stop (button or right-click) |

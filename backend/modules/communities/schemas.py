@@ -38,6 +38,8 @@ class CommunityOut(BaseModel):
     member_count: int = 0
     follower_count: int = 0
     is_live: bool = False
+    # The requesting user's role in this community (filled by /mine).
+    my_role: str | None = None
 
 
 class StreamCredentialsOut(BaseModel):

@@ -11,6 +11,8 @@ export interface Community {
   member_count: number;
   follower_count: number;
   is_live: boolean;
+  /** The requesting user's role on this channel (filled by /mine). */
+  my_role?: string | null;
 }
 
 export interface StreamCredentials {

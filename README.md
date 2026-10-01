@@ -76,7 +76,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - Channel-namespace routing: `community:<id>`, `community:<id>:chat`,
   `community:<id>:presence`, `channel:<uuid>`, `user:<id>`
 
-### Operator Tools (Desktop Console)
+### Creator Console (Desktop)
 - **Dedicated operator client** — dense, dark, keyboard-first desktop app
   (not a wrapped website): Dashboard (stats + active streams), Streams
   (live monitor, viewer counts, force-stop), Communities (members, kick,
@@ -87,8 +87,10 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - **Native notifications** the moment any channel goes live
 - Window state + last view remembered across launches; update-available
   check against GitHub releases
-- Signs in with an operator account (admin/superadmin); stream owners
-  manage their own stream from the web channel page
+- **For every kind of user**: sign in and see *your* channels (owner/
+  moderator/streamer roles) with per-channel tools; system admins
+  additionally get the Platform section (users, all communities, live
+  monitor, all recordings)
 
 ### Desktop Console (Tauri v2)
 - **Operator client** — its own app (own UI, dense + dark + keyboard-first),

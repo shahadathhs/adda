@@ -53,6 +53,7 @@ from modules.communities.service.queries import (
     get_community_by_slug,
     get_member_role,
     list_communities,
+    list_my_communities,
 )
 from modules.communities.service.stream_keys import (
     build_stream_credentials,
@@ -77,12 +78,32 @@ async def _serialize(db: AsyncSession, community: Community) -> CommunityOut:
 async def _get_owned_community(
     community_id: uuid.UUID, current_user: User, db: AsyncSession
 ) -> Community:
+    """Community the user may broadcast to/manage streams for: channel
+    owner/admin/streamer, or system staff."""
     community = await get_community(db, community_id)
     if community is None:
         raise NotFoundException("Community not found")
-    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
-        raise ForbiddenException("Only the owner can view or rotate the stream key")
+    if current_user.system_role in SystemRole.STAFF:
+        return community
+    role = await get_member_role(db, community_id, current_user.id)
+    if role not in {CommunityRole.owner, CommunityRole.admin, CommunityRole.streamer}:
+        raise ForbiddenException("Only channel owners and streamers can manage the stream key")
     return community
+
+
+@router.get("/mine", response_model=list[CommunityOut])
+async def list_mine(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Channels where the current user holds a creator/moderator role —
+    the channel picker of the desktop creator console."""
+    out: list[CommunityOut] = []
+    for community, role in await list_my_communities(db, current_user.id):
+        item = await _serialize(db, community)
+        item.my_role = role.value
+        out.append(item)
+    return out
 
 
 # ── Communities ───────────────────────────────────────────────────────

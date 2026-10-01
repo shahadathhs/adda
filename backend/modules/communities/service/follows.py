@@ -26,9 +26,7 @@ async def unfollow_community(db: AsyncSession, community_id: uuid.UUID, user_id:
 
 async def is_following(db: AsyncSession, community_id: uuid.UUID, user_id: uuid.UUID) -> bool:
     result = await db.execute(
-        select(Follow.id).where(
-            Follow.community_id == community_id, Follow.user_id == user_id
-        )
+        select(Follow.id).where(Follow.community_id == community_id, Follow.user_id == user_id)
     )
     return result.scalar_one_or_none() is not None
 
