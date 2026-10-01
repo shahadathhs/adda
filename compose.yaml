@@ -78,10 +78,10 @@ services:
       sh -c "alembic upgrade head &&
              uvicorn main:app --host 0.0.0.0 --port 7001"
 
-  frontend:
+  web:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
     restart: unless-stopped
     environment:
       VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
@@ -99,31 +99,34 @@ services:
   # Output lands in ./dist-desktop/ on the host.
   desktop:
     build:
-      context: ./frontend
-      dockerfile: src-tauri/Dockerfile
+      context: .
+      dockerfile: apps/web/src-tauri/Dockerfile
     profiles: ["desktop"]
+    working_dir: /repo
     environment:
       # AppImage tooling can't use FUSE inside containers.
       APPIMAGE_EXTRACT_AND_RUN: "1"
     volumes:
-      - ./frontend:/app
-      - desktop_node_modules:/app/node_modules
+      - .:/repo
+      - desktop_node_modules:/repo/node_modules
+      - desktop_web_node_modules:/repo/apps/web/node_modules
       - desktop_pnpm_store:/root/.local/share/pnpm/store
       - desktop_cargo_registry:/usr/local/cargo/registry
       - desktop_cargo_git:/usr/local/cargo/git
-      - desktop_tauri_target:/app/src-tauri/target
+      - desktop_tauri_target:/repo/apps/web/src-tauri/target
       - ./dist-desktop:/out
     command: >
-      sh -c "pnpm install &&
-             pnpm tauri build --bundles deb,appimage &&
+      sh -c "pnpm install --filter @adda/web... --no-frozen-lockfile &&
+             pnpm --filter @adda/web exec tauri build --bundles deb,appimage &&
              rm -rf /out/* &&
-             cp -r src-tauri/target/release/bundle/deb /out/ &&
-             cp -r src-tauri/target/release/bundle/appimage /out/"
+             cp -r apps/web/src-tauri/target/release/bundle/deb /out/ &&
+             cp -r apps/web/src-tauri/target/release/bundle/appimage /out/"
 
 volumes:
   postgres_data:
   redis_data:
   desktop_node_modules:
+  desktop_web_node_modules:
   desktop_pnpm_store:
   desktop_cargo_registry:
   desktop_cargo_git:

@@ -16,8 +16,8 @@ fi
 
 ROOT=$(pwd)
 
-# frontend/package.json
-cd "$ROOT/frontend"
+# apps/web/package.json
+cd "$ROOT/apps/web"
 npm version "$VERSION" --no-git-tag-version
 
 # src-tauri/tauri.conf.json (uses node for a safe JSON edit)
@@ -30,7 +30,7 @@ node -e '
 ' "$VERSION"
 
 # src-tauri/Cargo.toml (top-level [package] only)
-cd "$ROOT/frontend/src-tauri"
+cd "$ROOT/apps/web/src-tauri"
 sed -i.bak -E '0,/^version = ".*$/s//version = "'"$VERSION"'"/' Cargo.toml
 rm -f Cargo.toml.bak
 

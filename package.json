@@ -1,0 +1,14 @@
+{
+  "name": "adda",
+  "version": "0.2.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "install:all": "pnpm install"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.0"
+  }
+}

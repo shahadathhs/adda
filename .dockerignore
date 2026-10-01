@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+**/dist
+**/.astro
+.git
+.github
+backend
+.venv
+recordings
+dist-desktop
+*.md
+apps/web/src-tauri/target

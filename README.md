@@ -187,7 +187,7 @@ backend/
 ### Frontend structure
 
 ```
-frontend/src/
+apps/web/src/                # viewer web app (pnpm workspace member)
 ├── routes/                  TanStack Router (file-based, 28 route files)
 │   ├── __root.tsx           Root layout + SEO head
 │   ├── _public/             12 public pages (landing, about, docs, pricing, …)
@@ -220,7 +220,7 @@ frontend/src/
 - **Docker** + **Docker Compose**
 - **[uv](https://docs.astral.sh/uv/)** — Python package manager
   (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
-- **Node.js 20+** + **pnpm** (`corepack enable`) — only for local frontend dev
+- **Node.js 20+** + **pnpm** (`corepack enable`) — only for local web dev
 
 ### Quick start (Docker)
 
@@ -244,14 +244,14 @@ Open **http://localhost:5173**.
 ```bash
 make setup                       # one-time setup
 make up postgres redis mediamtx  # start infra in Docker
-make dev                         # backend (uvicorn --reload) + frontend (vite) concurrently
+make dev                         # backend (uvicorn --reload) + web (vite) concurrently
 ```
 
 Or run individually:
 
 ```bash
 make backend     # uvicorn --reload on :7001
-make frontend    # vite dev server on :5173
+make web         # vite dev server on :5173
 ```
 
 ### Desktop app (Tauri v2)
@@ -313,9 +313,9 @@ make logs              # tail all logs
 make ps                # list running containers
 
 # Local dev
-make dev               # backend + frontend together
+make dev               # backend + web together
 make backend           # uvicorn --reload on :7001
-make frontend          # vite dev server on :5173
+make web               # vite dev server on :5173
 
 # Desktop app
 make desktop-dev       # run desktop app in dev mode (needs Rust)
@@ -364,19 +364,21 @@ adda/
 ├── compose.yaml             Docker Compose (5 services)
 ├── .env.example             root env template
 ├── .github/workflows/ci.yml CI: ruff + pyright + eslint + vite build
+├── apps/
+│   └── web/                 Viewer web app (React 19 + Vite + TanStack)
+│       ├── src/             routes/ + features/ + shared/ (shadcn-style UI kit)
+│       └── src-tauri/       Tauri v2 desktop shell (Rust + icons + Dockerfile)
+├── packages/                Shared TS logic (never UI)
+│   ├── types/               DTOs mirroring Pydantic schemas (@adda/types)
+│   ├── api-client/          request + auth + WS client + endpoints (@adda/api-client)
+│   └── shared/              runtime server config + zod schemas (@adda/shared)
 ├── backend/                 FastAPI app (uv, Python 3.12)
 │   ├── main.py              app entry, router registration, startup seed
 │   ├── core/                shared infra (config, database, redis, security/, seed)
 │   ├── models/              9 SQLAlchemy models
 │   ├── modules/             8 feature modules
 │   └── alembic/             11 migrations
-├── frontend/                React app (pnpm + Vite)
-│   ├── src/                 # the app (browser + desktop share it)
-│   │   ├── routes/          28 file-based routes (TanStack Router)
-│   │   ├── features/        9 feature-sliced domains
-│   │   └── shared/          UI kit (19 components) + API client + config
-│   └── src-tauri/           Tauri v2 desktop shell (Rust + icons + Dockerfile)
-├── site/                    Astro + Starlight marketing/docs site
+├── site/                    Astro + Starlight marketing/docs site (→ Vercel)
 ├── mediamtx/                mediamtx config (Dockerfile-baked) + recording retention
 └── recordings/              stream recordings (gitignored, bind-mounted)
 ```

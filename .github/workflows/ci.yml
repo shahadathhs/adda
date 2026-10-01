@@ -38,12 +38,9 @@ jobs:
       - name: Pyright
         run: uv run pyright
 
-  frontend:
-    name: Frontend (lint + build)
+  web:
+    name: Web (lint + build)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - uses: actions/checkout@v7
 
@@ -56,12 +53,33 @@ jobs:
           node-version: "20"
 
       # pnpm-lock.yaml is intentionally gitignored, so resolve fresh (no
-      # --frozen-lockfile, no lockfile-keyed cache).
+      # --frozen-lockfile, no lockfile-keyed cache). Root install covers the
+      # whole workspace (apps/web + packages + site).
       - name: Install dependencies
         run: pnpm install
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm -C apps/web lint
 
       - name: Build
-        run: pnpm build
+        run: pnpm -C apps/web build
+
+  site:
+    name: Docs site (build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm -C site build

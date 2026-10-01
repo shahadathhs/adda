@@ -6,7 +6,7 @@
 .DEFAULT_GOAL := help
 
 BACKEND_DIR  := backend
-FRONTEND_DIR := frontend
+FRONTEND_DIR := apps/web
 SITE_DIR     := site
 COMPOSE      := docker compose
 UV           := uv run
@@ -17,11 +17,11 @@ PNPM         := pnpm
 ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 
 .PHONY: help setup env dirs toolchain install \
-        up down restart build logs logs-backend logs-frontend logs-desktop ps \
-        dev backend frontend desktop desktop-dev desktop-build desktop-clean release \
+        up down restart build logs logs-backend logs-web logs-desktop ps \
+        dev backend web desktop desktop-dev desktop-build desktop-clean release \
         migrate migration reset reset-migrate db-up typecheck \
         lint lint-backend lint-web format build-web \
-        site-setup site-dev site-build site-preview \
+        site-dev site-build site-preview \
         check clean clean-recordings
 
 help: ## Show this help
@@ -30,8 +30,8 @@ help: ## Show this help
 
 # ── Setup ─────────────────────────────────────────────────────────────
 
-env: ## Create .env files (root, backend, frontend) from their examples
-	@for f in .env backend/.env frontend/.env; do \
+env: ## Create .env files (root, backend, apps/web) from their examples
+	@for f in .env backend/.env apps/web/.env; do \
 	  if [ ! -f "$$f" ] && [ -f "$$f.example" ]; then cp "$$f.example" "$$f" && echo "Created $$f"; \
 	  else echo "$$f exists (skipped)"; fi; \
 	done
@@ -45,9 +45,9 @@ toolchain: ## Ensure uv is installed
 	  exit 1; \
 	}
 
-install: toolchain ## Install backend (uv) + frontend (pnpm) deps
+install: toolchain ## Install backend (uv) + workspace (pnpm) deps
 	@cd $(BACKEND_DIR) && uv sync
-	@cd $(FRONTEND_DIR) && pnpm install
+	pnpm install
 
 setup: env dirs install db-up migrate ## First-time setup: .env + dirs + deps + Postgres + migrations
 	@echo "Setup complete — DB synced to head. Run 'make dev'."
@@ -72,8 +72,8 @@ logs: ## Tail logs for all services
 logs-backend: ## Tail backend logs
 	$(COMPOSE) logs -f --tail=100 backend
 
-logs-frontend: ## Tail frontend logs
-	$(COMPOSE) logs -f --tail=100 frontend
+logs-web: ## Tail web logs
+	$(COMPOSE) logs -f --tail=100 web
 
 logs-desktop: ## Tail desktop-builder logs
 	$(COMPOSE) --profile desktop logs -f --tail=100 desktop
@@ -84,7 +84,7 @@ ps: ## List running containers
 # ── Local dev ─────────────────────────────────────────────────────────
 # Requires postgres + redis running, e.g.:  make up postgres redis
 
-dev: ## Run backend + frontend together (local)
+dev: ## Run backend + web together (local)
 	@trap 'kill 0' EXIT; \
 	(cd $(BACKEND_DIR) && $(UV) uvicorn main:app --reload --port 7001) & \
 	(cd $(FRONTEND_DIR) && $(PNPM) dev)
@@ -92,7 +92,7 @@ dev: ## Run backend + frontend together (local)
 backend: ## Run backend dev server on :7001 (uvicorn --reload)
 	@cd $(BACKEND_DIR) && $(UV) uvicorn main:app --reload --port 7001
 
-frontend: ## Run frontend dev server on :5173 (vite)
+web: ## Run web dev server on :5173 (vite)
 	@cd $(FRONTEND_DIR) && $(PNPM) dev
 
 # ── Desktop app (Tauri) ───────────────────────────────────────────────
@@ -127,7 +127,7 @@ desktop-clean: ## Remove desktop build caches (Docker volumes + dist-desktop/)
 release: ## Prepare a release: make release v=0.2.0 (bump + commit + push; merge to main to build)
 	@test -n "$(v)" || { echo 'Usage: make release v=0.2.0'; exit 1; }
 	./scripts/bump-version.sh $(v)
-	git add frontend/package.json frontend/src-tauri/tauri.conf.json frontend/src-tauri/Cargo.toml
+	git add apps/web/package.json apps/web/src-tauri/tauri.conf.json apps/web/src-tauri/Cargo.toml
 	git commit -m "chore: release v$(v)"
 	git push origin $$(git rev-parse --abbrev-ref HEAD)
 	@echo ""
@@ -177,23 +177,21 @@ format: ## Format backend (ruff)
 
 # ── Frontend ──────────────────────────────────────────────────────────
 
-lint-web: ## Lint frontend (ESLint)
+lint-web: ## Lint web app (oxlint + eslint + prettier)
 	@cd $(FRONTEND_DIR) && $(PNPM) lint
 
-lint: lint-backend lint-web ## Lint backend (ruff) + frontend (eslint)
+lint: lint-backend lint-web ## Lint backend (ruff) + web (oxlint/eslint/prettier)
 
-build-web: ## Build frontend (tsc + vite)
+build-web: ## Build web app (tsc + vite)
 	@cd $(FRONTEND_DIR) && $(PNPM) build
 
 # ── Marketing / docs site (Astro + Starlight) ─────────────────────────
-
-site-setup: ## Install docs-site deps (pnpm)
-	@cd $(SITE_DIR) && $(PNPM) install
+# Deps come from the root workspace: `pnpm install` (see: make install).
 
 site-dev: ## Run docs-site dev server on :4321
 	@cd $(SITE_DIR) && $(PNPM) dev
 
-site-build: site-setup ## Build static docs site → site/dist/
+site-build: ## Build static docs site → site/dist/
 	@cd $(SITE_DIR) && $(PNPM) build
 
 site-preview: ## Preview the built docs site

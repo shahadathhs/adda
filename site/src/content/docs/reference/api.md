@@ -98,7 +98,8 @@ user:<id>                 — personal notifications
 ```
 
 The contract is defined in `backend/modules/realtime/protocol.py` and mirrored
-in `frontend/src/features/realtime/ws.ts` — keep both in sync when extending.
+in `packages/types/src/realtime.ts` (transport in
+`packages/api-client/src/ws.ts`) — keep both in sync when extending.
 
 ## mediamtx auth webhook
 

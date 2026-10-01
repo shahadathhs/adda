@@ -1,0 +1,13 @@
+{
+  "name": "@adda/api-client",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@adda/shared": "workspace:*",
+    "@adda/types": "workspace:*"
+  }
+}

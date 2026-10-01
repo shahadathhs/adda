@@ -15,7 +15,7 @@ htmlcov/
 
 # ── Node ──
 node_modules/
-frontend/dist/
+apps/web/dist/
 .vite/
 pnpm-lock.yaml
 *.tsbuildinfo
@@ -25,7 +25,7 @@ pnpm-lock.yaml
 .env
 .env.local
 backend/.env
-frontend/.env.local
+apps/web/.env.local
 
 # ── Editor ──
 .vscode/
