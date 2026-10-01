@@ -7,6 +7,7 @@ import {
   me,
   register,
   setSession,
+  socket,
   verify2faLogin,
 } from "@adda/api-client";
 import type { Token, User } from "@adda/types";
@@ -82,7 +83,12 @@ export function useLogout() {
         }
       }
       clearSession();
-      qc.clear();
+    },
+    // Teardown AFTER the mutation settles: qc.clear() would also wipe the
+    // running mutation from the cache — removeQueries() touches data only.
+    onSettled: () => {
+      socket.disconnect();
+      qc.removeQueries();
     },
   });
 }

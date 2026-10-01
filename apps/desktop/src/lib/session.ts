@@ -1,5 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { clearSession, login, logout, me, setSession, verify2faLogin } from "@adda/api-client";
+import {
+  clearSession,
+  getToken,
+  login,
+  logout,
+  me,
+  setSession,
+  socket,
+  verify2faLogin,
+} from "@adda/api-client";
 import type { Token, User } from "@adda/types";
 import { toast } from "sonner";
 
@@ -7,11 +16,13 @@ export const sessionKeys = {
   me: ["session", "me"] as const,
 };
 
-/** Boot-time session check: resolves the operator or errors when expired. */
+/** Boot-time session check: resolves the user or errors when expired. */
 export function useSession() {
   return useQuery({
     queryKey: sessionKeys.me,
     queryFn: me,
+    // Tokens live in localStorage (browser only) — never fetch without one.
+    enabled: typeof window !== "undefined" && !!getToken(),
     staleTime: Infinity,
     retry: false,
   });
@@ -67,7 +78,12 @@ export function useLogout() {
         }
       }
       clearSession();
-      qc.clear();
+    },
+    // Teardown AFTER the mutation settles: qc.clear() would also wipe the
+    // (running) mutation from the cache — removeQueries() touches data only.
+    onSettled: () => {
+      socket.disconnect();
+      qc.removeQueries();
     },
   });
 }
