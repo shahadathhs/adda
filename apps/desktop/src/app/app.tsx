@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Radio } from "lucide-react";
 import { getToken } from "@adda/api-client";
 import { hasServerConfig } from "@adda/shared";
 import { cn } from "@/ui/cn";
+import { TitleBarHeader } from "@/ui/titlebar";
 import { WindowControls } from "@/ui/window-controls";
 import { useSession } from "@/lib/session";
 import { ConnectionView } from "@/views/connection-view";
@@ -14,19 +15,18 @@ const isMac = /Mac/.test(navigator.userAgent);
 /** Minimal drag-region titlebar shown on every pre-auth screen. */
 function PreAuthHeader() {
   return (
-    <header
-      data-tauri-drag-region
+    <TitleBarHeader
       className={cn(
-        "flex items-center border-b border-line bg-bg",
-        isMac ? "h-11 pl-20" : "h-9 pl-3",
+        // Same line as the macOS traffic lights (see console-layout).
+        isMac ? "h-8 pl-20" : "h-9 pl-3",
       )}
     >
-      <span data-tauri-drag-region className="flex items-center gap-2 text-2xs text-muted">
+      <span className="flex items-center gap-2 self-stretch px-2 text-2xs leading-none text-muted">
         <Radio className="h-3.5 w-3.5 text-accent" />
         adda Console
       </span>
       {!isMac && <WindowControls />}
-    </header>
+    </TitleBarHeader>
   );
 }
 
@@ -50,9 +50,21 @@ function Splash({ label }: { label: string }) {
 
 export function App() {
   const [configured, setConfigured] = useState(hasServerConfig());
+  // Set by the signed-out event from useLogout — a guaranteed screen flip
+  // that doesn't depend on query-cache notification semantics.
+  const [signedOut, setSignedOut] = useState(false);
   const hasToken = !!getToken();
   const session = useSession();
   const { data: user, isPending, isError } = session;
+
+  useEffect(() => {
+    const onSignedOut = () => setSignedOut(true);
+    window.addEventListener("adda:signed-out", onSignedOut);
+    return () => window.removeEventListener("adda:signed-out", onSignedOut);
+  }, []);
+
+  // Signing in again (session data arrives) deactivates the logout gate.
+  const loggedOut = (signedOut || !hasToken) && !user;
 
   if (!configured) {
     return (
@@ -64,7 +76,7 @@ export function App() {
       </PreAuthScreen>
     );
   }
-  if (!hasToken) {
+  if (loggedOut) {
     return (
       <PreAuthScreen>
         <LoginView onChangeServer={() => setConfigured(false)} />

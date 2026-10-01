@@ -84,11 +84,14 @@ export function useLogout() {
       }
       clearSession();
     },
-    // Teardown AFTER the mutation settles: qc.clear() would also wipe the
-    // running mutation from the cache — removeQueries() touches data only.
+    // Teardown AFTER the mutation settles. removeQueries alone is not enough:
+    // it doesn't guarantee a re-render of the app shell (an active observer
+    // just silently recreates its query). Explicitly nulling the session
+    // query forces the notification that flips the app to the login screen.
     onSettled: () => {
       socket.disconnect();
       qc.removeQueries();
+      qc.setQueryData(sessionKeys.me, null);
     },
   });
 }

@@ -39,7 +39,11 @@ export function TabStrip({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-1 items-center gap-1 px-1.5", className)}>
+    <div
+      // Empty strip area drags the window; child buttons stay interactive.
+      data-tauri-drag-region
+      className={cn("flex flex-1 items-center gap-1 px-1.5", className)}
+    >
       {tabs.map((t) => {
         const isActive = t.id === activeId;
         return (
