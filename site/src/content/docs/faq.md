@@ -19,7 +19,7 @@ and `REDIS_URL` to match, then `make up` again.
 
 Desktop installers are currently unsigned. Right-click the app → **Open** →
 **Open** in the dialog (macOS), or
-`xattr -d com.apple.quarantine /Applications/adda.app` in a terminal.
+`xattr -d com.apple.quarantine /Applications/Adda.app` in a terminal.
 Windows SmartScreen: **More info → Run anyway**.
 
 ## Is there transcoding / multi-bitrate?

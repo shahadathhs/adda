@@ -1,7 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#7c3aed" />
-  <path d="M18 24h28v14H32l-8 8v-8h-6z" fill="#fff" />
-  <circle cx="26" cy="31" r="2.5" fill="#7c3aed" />
-  <circle cx="32" cy="31" r="2.5" fill="#7c3aed" />
-  <circle cx="38" cy="31" r="2.5" fill="#7c3aed" />
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333EA"/>
+      <stop offset="55%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="22%" cy="12%" r="80%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="paper" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#EDE9FE"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="230" fill="url(#sheen)"/>
+  <rect x="212" y="252" width="600" height="400" rx="104" fill="url(#paper)"/>
+  <path d="M356 636 L356 788 L512 636 Z" fill="url(#paper)"/>
+  <path d="M436 352 L676 452 L436 552 Z" fill="#7C3AED" stroke="#7C3AED" stroke-width="56" stroke-linejoin="round"/>
 </svg>

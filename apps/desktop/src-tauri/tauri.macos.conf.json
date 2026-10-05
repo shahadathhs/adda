@@ -2,7 +2,7 @@
   "app": {
     "windows": [
       {
-        "title": "adda Console",
+        "title": "Adda",
         "width": 1240,
         "height": 780,
         "minWidth": 940,

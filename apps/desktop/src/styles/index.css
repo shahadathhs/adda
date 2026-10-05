@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * adda Console design tokens — dense, dark-first, desktop.
+ * Adda Console design tokens — dense, dark-first, desktop.
  * Deliberately separate from the web app's design system: this is a
  * different surface with different conventions (information density,
  * keyboard-first, compact controls). Never share UI between apps.

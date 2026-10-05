@@ -3,7 +3,7 @@ title: Desktop console
 description: The adda operator console — stream and community management on your desktop.
 ---
 
-The **adda Console** is the creator client: a native desktop app (Tauri v2)
+The **Adda Console** is the creator client: a native desktop app (Tauri v2)
 for anyone who runs a channel — streamers, channel moderators, and system
 admins. Viewers use the web app; the console is for *running the show* —
 dense, dark, keyboard-first, with its own UI built for desktop conventions
@@ -11,7 +11,7 @@ dense, dark, keyboard-first, with its own UI built for desktop conventions
 
 ```
 ┌──────────────┬─────────────────────────────────────────────┐
-│ adda Console │  Dashboard                        ● Realtime│
+│ Adda Console │  Dashboard                        ● Realtime│
 │──────────────│                                              │
 │ ⌘1 Dashboard │  Users 42   Communities 7   Live 2           │
 │ ⌘2 Streams   │                                              │

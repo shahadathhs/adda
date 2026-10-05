@@ -96,9 +96,9 @@ jobs:
         with:
           projectPath: apps/desktop
           tagName: v${{ needs.check.outputs.version }}
-          releaseName: "adda Console ${{ needs.check.outputs.version }}"
+          releaseName: "Adda Console ${{ needs.check.outputs.version }}"
           releaseBody: |
-            ## adda Console v${{ needs.check.outputs.version }}
+            ## Adda Console v${{ needs.check.outputs.version }}
 
             adda operator console (stream & community management) for
             **macOS**, **Windows**, and **Linux**.
@@ -107,10 +107,10 @@ jobs:
 
             | Platform | File |
             |----------|------|
-            | macOS (Apple Silicon) | `adda-console_${{ needs.check.outputs.version }}_aarch64.dmg` |
-            | Windows | `adda-console_${{ needs.check.outputs.version }}_x64-setup.exe` |
-            | Linux (Debian/Ubuntu) | `adda-console_${{ needs.check.outputs.version }}_amd64.deb` |
-            | Linux (any distro) | `adda-console_${{ needs.check.outputs.version }}_amd64.AppImage` |
+            | macOS (Apple Silicon) | `Adda_${{ needs.check.outputs.version }}_aarch64.dmg` |
+            | Windows | `Adda_${{ needs.check.outputs.version }}_x64-setup.exe` |
+            | Linux (Debian/Ubuntu) | `Adda_${{ needs.check.outputs.version }}_amd64.deb` |
+            | Linux (any distro) | `Adda_${{ needs.check.outputs.version }}_amd64.AppImage` |
 
             On first launch, enter your server address (e.g.
             `https://your-adda-server.com`) — the app remembers it.

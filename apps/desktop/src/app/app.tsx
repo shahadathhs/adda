@@ -23,7 +23,7 @@ function PreAuthHeader() {
     >
       <span className="flex items-center gap-2 self-stretch px-2 text-2xs leading-none text-muted">
         <Radio className="h-3.5 w-3.5 text-accent" />
-        adda Console
+        Adda Console
       </span>
       {!isMac && <WindowControls />}
     </TitleBarHeader>

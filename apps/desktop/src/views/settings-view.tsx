@@ -75,7 +75,7 @@ export function SettingsView({ user }: { user: User }) {
         <div className="flex items-center gap-2.5 p-3">
           <Radio className="h-4 w-4 text-accent" />
           <p className="text-2xs text-muted">
-            adda Console v{__APP_VERSION__} — operator client for a self-hosted adda instance.
+            Adda Console v{__APP_VERSION__} — creator client for a self-hosted adda instance.
             Viewers use the web app; this console is for stream and community management.
           </p>
         </div>

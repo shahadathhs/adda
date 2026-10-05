@@ -33,7 +33,7 @@ export function ConnectionView({
             <Radio className="h-4.5 w-4.5 text-accent" />
           </div>
           <div>
-            <h1 className=" text-sm font-semibold">adda Console</h1>
+            <h1 className=" text-sm font-semibold">Adda Console</h1>
             <p className="text-2xs text-muted">Operator control for your adda server</p>
           </div>
         </div>

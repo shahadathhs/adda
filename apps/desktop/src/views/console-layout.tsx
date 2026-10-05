@@ -344,7 +344,7 @@ export function ConsoleLayout({ user }: { user: User }) {
         <aside className="flex w-52 shrink-0 flex-col border-r border-line bg-panel">
           <div className="flex h-10 items-center gap-2 border-b border-line px-3">
             <Radio className="h-3.5 w-3.5 text-accent" />
-            <span className="text-xs font-semibold tracking-wide">adda Console</span>
+            <span className="text-xs font-semibold tracking-wide">Adda Console</span>
           </div>
 
           {/* Channel picker */}
