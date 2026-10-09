@@ -23,16 +23,17 @@ one sitting, it is not in MVP1.
 |---|---|
 | Register (email, password, display name) → signed in | ✅ built |
 | Login; 2FA challenge when enabled (TOTP) | ✅ built |
+| OTP email login (6-digit code via SMTP) | ✅ built |
 | Forgot password → SMTP email → reset form → login | ✅ built |
-| Change password (settings), invalid-current error path | ✅ built |
+| Change password (settings), set-password for accounts without one | ✅ built |
 | Session: transparent refresh on 401, logout everywhere-clean | ✅ built |
 | Profile: display name, bio, avatar URL | ✅ built |
 
-**Included minimum:** SMTP-backed password reset + TOTP 2FA. Registration
-is instant — no email verification (self-hosted; admin owns the mail
-domain).
+**Included minimum:** SMTP-backed password reset + OTP login + TOTP 2FA.
+Registration is instant — no email verification (self-hosted; admin owns
+the mail domain).
 
-**Cut from the product:** OTP-by-email login, email verification.
+**Cut from MVP1:** email verification.
 All backend work exists; they re-enter in MVP2 after UI polish.
 
 ### F2 — Discover & watch
@@ -185,7 +186,7 @@ MVP1 marketing runs on screenshots. Every surface ships re-skinned to
 
 ## Explicitly deferred (MVP2+)
 
-email-OTP login · email verification · private channels +
+email verification · private channels +
 join-request approvals · restricted channels / permission grants · chat
 reactions/replies/edits UI · emotes · group DMs · typing indicators ·
 read receipts · DM attachments/media · DM search & export ·
