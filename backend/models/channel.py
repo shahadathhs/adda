@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class Channel(Base):
-    """A text/announcement channel within a community (Discord-style)."""
+    """A text/announcement channel within a community."""
 
     __tablename__ = "channels"
     __table_args__ = (UniqueConstraint("community_id", "slug", name="uq_channel_community_slug"),)

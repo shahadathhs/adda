@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class ChannelMember(Base):
-    """Per-channel access grant (Discord-style: owner assigns who can access)."""
+    """Per-channel access grant (owner explicitly assigns who can access)."""
 
     __tablename__ = "channel_members"
     __table_args__ = (UniqueConstraint("channel_id", "user_id", name="uq_channel_member"),)

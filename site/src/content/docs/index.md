@@ -20,8 +20,8 @@ hero:
 
 **adda** (আড্ডা) bundles everything a streaming community needs into a single
 deployable stack: text channels, real-time chat, **live video**, recordings,
-and a full admin dashboard. One instance, many streamers — like a self-hosted
-Twitch you fully own.
+and a full admin dashboard. One instance, many streamers — a live community
+platform you fully own.
 
 ## Why adda?
 

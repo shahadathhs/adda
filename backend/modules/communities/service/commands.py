@@ -38,7 +38,7 @@ async def create_community(
         )
     )
 
-    # Default channels (Discord-style).
+    # Default channels created with every community.
     for slug, name, ctype, position in DEFAULT_CHANNELS:
         db.add(
             Channel(

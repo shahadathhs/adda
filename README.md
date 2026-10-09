@@ -1,7 +1,7 @@
 # adda
 
-A self-hosted, **multi-tenant live-streaming platform** (think self-hosted
-Twitch) with **real-time community chat**. One instance hosts many channels —
+A self-hosted, **multi-tenant live-streaming platform** with **real-time
+community chat**. One instance hosts many channels —
 each with its own stream key, live page, chat, and recordings.
 
 Three UIs, three deployment targets, one backend:
@@ -43,7 +43,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
   `announcements`, `live`)
 
 ### Channels & Messaging
-- **Discord-style channels** within each community (`text`, `announcement`, `live`)
+- **Community channels** within each community (`text`, `announcement`, `live`)
 - **Permission-controlled** — restricted channels require explicit read/write grants
 - **Real-time chat** via WebSocket (reactions, replies, edits)
 - **Message persistence** — channel messages are stored in PostgreSQL with cursor
