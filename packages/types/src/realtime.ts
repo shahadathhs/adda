@@ -18,6 +18,8 @@ export type ServerMessageType =
   | "chat_message"
   | "presence"
   | "stream_status"
+  | "dm_message"
+  | "dm_read"
   | "notification"
   | "error"
   | "pong";
@@ -34,4 +36,22 @@ export interface StreamStatusPayload {
   is_live: boolean;
   viewers: number;
   started_at: string | null;
+}
+
+// Shape of `data` for a `dm_message` (delivered on user:<id>; mirrors DmMessagePayload).
+export interface DmMessagePayload {
+  id: string;
+  thread_id: string;
+  sender_id: string;
+  username: string;
+  display_name: string;
+  content: string;
+  created_at: string;
+}
+
+// Shape of `data` for a `dm_read` (mirrors DmReadPayload).
+export interface DmReadPayload {
+  thread_id: string;
+  reader_id: string;
+  last_read_message_id: string;
 }

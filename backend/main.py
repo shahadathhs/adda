@@ -8,6 +8,7 @@ from modules.auth.router import router as auth_router
 from modules.channels.router import router as channels_router
 from modules.communities.admin_router import router as communities_admin_router
 from modules.communities.router import router as communities_router
+from modules.dms.router import router as dms_router
 from modules.realtime.gateway import router as ws_router
 from modules.recordings.router import admin_router as recordings_admin_router
 from modules.recordings.router import router as recordings_router
@@ -65,6 +66,7 @@ app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
 app.include_router(channels_router, prefix=settings.api_prefix)
 app.include_router(communities_admin_router, prefix=settings.api_prefix)
+app.include_router(dms_router, prefix=settings.api_prefix)
 app.include_router(users_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)
 app.include_router(streaming_admin_router, prefix=settings.api_prefix)

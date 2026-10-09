@@ -4,4 +4,5 @@ export * from "./channel";
 export * from "./streaming";
 export * from "./recording";
 export * from "./admin";
+export * from "./dm";
 export * from "./realtime";
