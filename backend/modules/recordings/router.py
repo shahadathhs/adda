@@ -11,7 +11,7 @@ from core.database import get_db
 from core.exceptions import BadRequestException, NotFoundException
 from core.security.guards import require_admin
 from models.community import Community
-from modules.recordings.schemas import RecordingOut
+from modules.recordings.schemas import RecordingFeedItem, RecordingOut
 from modules.recordings.service.files import delete_recording, resolve_recording, scan_recordings
 
 # ── Public ────────────────────────────────────────────────────────────
@@ -29,6 +29,45 @@ async def list_recordings(
     if exists is None:
         raise NotFoundException("Community not found")
     return [RecordingOut(**r) for r in scan_recordings(str(community_id))]
+
+
+@router.get("/recent", response_model=list[RecordingFeedItem])
+async def recent_recordings(
+    limit: int = 12,
+    db: AsyncSession = Depends(get_db),
+) -> list[RecordingFeedItem]:
+    """Public home-page feed: newest recordings across PUBLIC channels.
+
+    Private-channel recordings never appear here. Playback goes through
+    the (already public) /recordings/file endpoint.
+    """
+    communities = (
+        (
+            await db.execute(
+                select(Community).where(Community.is_private == False)  # noqa: E712
+            )
+        )
+        .scalars()
+        .all()
+    )
+    by_id = {str(c.id): c for c in communities}
+
+    items: list[RecordingFeedItem] = []
+    for cid, community in by_id.items():
+        for r in scan_recordings(cid):
+            items.append(
+                RecordingFeedItem(
+                    community_id=cid,
+                    name=r["name"],
+                    path=r["path"],
+                    size_bytes=r["size_bytes"],
+                    created_at=r["created_at"],
+                    community_name=community.name,
+                    community_slug=community.slug,
+                )
+            )
+    items.sort(key=lambda i: i.created_at, reverse=True)
+    return items[:max(1, min(limit, 48))]
 
 
 @router.get("/file")

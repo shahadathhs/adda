@@ -29,7 +29,10 @@ services:
       CORS_ORIGINS: "http://localhost:5173,http://localhost:7001"
       HLS_BASE_URL: "http://localhost:8888"
       WEBRTC_BASE_URL: "http://localhost:8889"
+      MTX_HLS_URL: "http://mediamtx:8888"
       PASSWORD_RESET_URL: "http://localhost:5173/reset-password"
+      RECORDINGS_DIR: /recordings
+      THUMBS_DIR: /thumbs
       SEED_TEST_USERS: "true"
 
   web:

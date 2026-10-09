@@ -5,6 +5,7 @@ import time
 import uuid
 
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
@@ -30,6 +31,7 @@ from modules.streaming.service.playback import (
     list_live_community_ids,
     webrtc_url,
 )
+from modules.streaming.service.thumbs import thumb_path
 
 # ── Public ────────────────────────────────────────────────────────────
 router = APIRouter(prefix="/streaming", tags=["streaming"])
@@ -108,6 +110,23 @@ async def stream_status(community_id: uuid.UUID):
         "hls_url": hls_url(cid),
         "webrtc_url": webrtc_url(cid),
     }
+
+
+@router.get("/communities/{community_id}/thumb", include_in_schema=False)
+async def stream_thumbnail(community_id: uuid.UUID):
+    """Latest live frame (or the offline poster) as a JPEG.
+
+    Public — browse cards are public. Short cache: thumbnails refresh
+    while live. 404 until the first frame of the first stream exists.
+    """
+    path = thumb_path(str(community_id))
+    if not path.exists():
+        raise NotFoundException("No thumbnail for this channel yet")
+    return FileResponse(
+        path,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "public, max-age=30"},
+    )
 
 
 async def _require_channel_mod(

@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from core.redis_client import redis_client
 from modules.realtime.manager import manager
 from modules.realtime.protocol import outgoing
+from modules.streaming.service import thumbs
 from modules.streaming.service.mediamtx import viewer_count
 from modules.streaming.service.playback import list_live_community_ids
 
@@ -61,6 +62,10 @@ async def _announce(community_id: str, is_live: bool, started: float | None) -> 
 async def _tick() -> None:
     current = set(await list_live_community_ids())
     previous = {str(key) for key in await redis_client.hkeys(STARTED_KEY)}
+
+    # Thumbnails follow live state (also re-syncs after a backend restart,
+    # where current == previous and no transition fires).
+    thumbs.sync(current)
 
     for community_id in current - previous:
         started = time.time()

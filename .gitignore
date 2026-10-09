@@ -37,5 +37,6 @@ apps/web/.env.local
 #    folders like backend/recordings/) ──
 /media/
 /recordings/
+/thumbs/
 /uploads/
 /dist-desktop/

@@ -58,11 +58,13 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-adda}:${POSTGRES_PASSWORD:?}@postgres:5432/${POSTGRES_DB:-adda}
       REDIS_URL: redis://redis:6379/0
       MTX_API_URL: http://mediamtx:9997
+      MTX_HLS_URL: http://mediamtx:8888
       IS_DEBUG: ${IS_DEBUG:-false}
       CORS_ORIGINS: ${CORS_ORIGINS:-https://${ADDA_DOMAIN:-localhost}}
       HLS_BASE_URL: ${HLS_BASE_URL:-https://${ADDA_DOMAIN:-localhost}/hls}
       PASSWORD_RESET_URL: ${PASSWORD_RESET_URL:-https://${ADDA_DOMAIN:-localhost}/reset-password}
       RECORDINGS_DIR: /recordings
+      THUMBS_DIR: /thumbs
       SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:-admin}
       SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL:-admin@example.com}
       SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:?set SUPERADMIN_PASSWORD in .env (install.sh generates it)}
@@ -75,6 +77,7 @@ services:
       SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
     volumes:
       - ./recordings:/recordings
+      - ./thumbs:/thumbs
     depends_on:
       postgres:
         condition: service_healthy
@@ -117,7 +120,9 @@ services:
     profiles: ["prod"]
     restart: unless-stopped
     environment:
-      ADDA_DOMAIN: ${ADDA_DOMAIN:?set ADDA_DOMAIN in .env}
+      # Prod installs always set ADDA_DOMAIN (install.sh); the localhost
+      # default only exists so dev commands don't trip interpolation.
+      ADDA_DOMAIN: ${ADDA_DOMAIN:-localhost}
     ports:
       - "80:80"
       - "443:443"

@@ -89,9 +89,11 @@ ps: ## List running containers
 	$(COMPOSE) ps
 
 # ── Local dev ─────────────────────────────────────────────────────────
-# Requires postgres + redis running, e.g.:  make up postgres redis
 
-dev: ## Run backend + web together (local)
+infra: ## Start just the infra (postgres + redis + mediamtx) for native dev
+	$(COMPOSE) -f compose.yaml -f compose.dev.yaml up -d postgres redis mediamtx
+
+dev: ## Run backend (:7001) + web (:5173) with hot reload — needs `make infra` running
 	@trap 'kill 0' EXIT; \
 	(cd $(BACKEND_DIR) && $(UV) uvicorn main:app --reload --port 7001) & \
 	(cd $(FRONTEND_DIR) && $(PNPM) dev)

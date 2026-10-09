@@ -43,12 +43,18 @@ class Settings(BaseSettings):
     mtx_api_url: str = "http://localhost:9997"
     mtx_api_user: str = "admin"
     mtx_api_pass: str = "admin"
+    # Internal (server-side) HLS base — the thumbnail worker pulls frames
+    # from here, so it must reach mediamtx directly, not through the proxy.
+    mtx_hls_url: str = "http://localhost:8888"
     hls_base_url: str = "http://localhost:8888"
     webrtc_base_url: str = "http://localhost:8889"
     rtmp_base_url: str = "rtmp://localhost:1935"
     # Where mediamtx writes recordings (bind-mounted). Local: repo root; in
     # docker the container path (/recordings) is set via RECORDINGS_DIR.
     recordings_dir: str = "../recordings"
+    # Where live-stream thumbnails are written (one JPEG per community,
+    # overwritten in place while live; kept as the offline poster).
+    thumbs_dir: str = "../thumbs"
 
     # CORS origins (comma-separated). The tauri:// entries cover the desktop
     # app (macOS/Linux uses tauri://localhost, Windows http://tauri.localhost).

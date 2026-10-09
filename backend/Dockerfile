@@ -10,6 +10,11 @@ ENV PYTHONUNBUFFERED=1 \
 # uv as a single binary, copied from the official image.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+# ffmpeg powers the live thumbnail worker (frame grabs from HLS).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies first for better layer caching (no project, no dev).
