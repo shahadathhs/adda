@@ -143,10 +143,14 @@ and unread state are correct.
 
 | Step | Status |
 |---|---|
-| `docker compose up -d --build` → postgres/redis/mediamtx/backend/web | ✅ built |
-| Seeded admin login documented | ✅ built |
-| Site guides: quickstart, OBS, self-hosting (TLS/proxy), console | ✅ built |
+| `./scripts/install.sh` → asks domain + admin email, generates every secret (Postgres, JWT, admin password), writes `.env` | ✅ built |
+| One command → stack up behind Caddy with automatic HTTPS; only 80/443/1935 public | ✅ built |
+| Admin password shown once; changeable in Settings | ✅ built |
+| Seeded admin login documented; no default passwords in prod | ✅ built |
+| Dev mode preserved: `make up` (dev overlay, test users, localhost ports) | ✅ built |
+| Site guides: quickstart + self-hosting match the installer reality | ✅ built |
 | `.env.example` complete — no undocumented vars | ⚠️ verify |
+| Fresh VPS: DNS → install → go live in ≤10 min | ⚠️ verify end-to-end |
 
 ---
 
@@ -170,7 +174,7 @@ MVP1 marketing runs on screenshots. Every surface ships re-skinned to
 - [ ] Error paths demonstrated: wrong password, 2FA wrong code, expired
       reset link, dead slug, duplicate slug, key rotate while live,
       WS kill mid-chat, DM to blocked user, DM reconnect mid-thread
-- [ ] Fresh `docker compose up` from clone → go live in ≤10 min
+- [ ] Fresh VPS: `install.sh` → DNS → go live in ≤10 min (full walkthrough)
 - [ ] `ruff` + `pyright` clean · web lint/build clean · desktop lint
       clean · site build clean
 - [ ] Anti-slop checklist (DESIGN.md §8) on all three surfaces

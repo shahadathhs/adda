@@ -1,13 +1,22 @@
+# ── adda — production-safe base stack ────────────────────────────────
+# Only two things touch the internet: Caddy (80/443, automatic HTTPS)
+# and RTMP ingest (1935). Postgres, Redis, the mediamtx API, HLS, the
+# backend, and the web app are internal-only.
+#
+#   Production:  ./install.sh   (or: docker compose --profile prod up -d --build)
+#   Local dev:   docker compose -f compose.yaml -f compose.dev.yaml up
+#
+# Use install.sh for a real domain — it generates every secret and
+# writes .env for you. See .env.example for the full variable list.
+
 services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-adda}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-adda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (install.sh generates it)}
       POSTGRES_DB: ${POSTGRES_DB:-adda}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,8 +29,6 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -34,16 +41,9 @@ services:
     build: ./mediamtx
     restart: unless-stopped
     environment:
-      # Publish-auth webhook target. Defaults to the compose backend service;
-      # when the backend runs natively (`make backend`), the root .env should
-      # set MTX_AUTH_ADDRESS=http://host.docker.internal:7001/api/streams/auth
       MTX_AUTHHTTPADDRESS: ${MTX_AUTH_ADDRESS:-http://backend:7001/api/streams/auth}
     ports:
-      - "${RTMP_PORT:-1935}:1935"   # RTMP ingest (OBS streams here)
-      - "${HLS_PORT:-8888}:8888"    # HLS playback
-      - "${WEBRTC_PORT:-8889}:8889" # WebRTC playback (HTTP/HTTPS handshake)
-      - "8189:8189/udp"             # WebRTC UDP/ICE (the actual media stream)
-      - "${MTX_API_PORT:-9997}:9997" # mediamtx REST API
+      - "${RTMP_PORT:-1935}:1935" # RTMP ingest — OBS streams here
     volumes:
       - ./recordings:/media
 
@@ -55,23 +55,24 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-adda}:${POSTGRES_PASSWORD:-adda}@postgres:5432/${POSTGRES_DB:-adda}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-adda}:${POSTGRES_PASSWORD:?}@postgres:5432/${POSTGRES_DB:-adda}
       REDIS_URL: redis://redis:6379/0
       MTX_API_URL: http://mediamtx:9997
-      HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
-      WEBRTC_BASE_URL: http://localhost:${WEBRTC_PORT:-8889}
+      IS_DEBUG: ${IS_DEBUG:-false}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://${ADDA_DOMAIN:-localhost}}
+      HLS_BASE_URL: ${HLS_BASE_URL:-https://${ADDA_DOMAIN:-localhost}/hls}
+      PASSWORD_RESET_URL: ${PASSWORD_RESET_URL:-https://${ADDA_DOMAIN:-localhost}/reset-password}
       RECORDINGS_DIR: /recordings
+      SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:-admin}
+      SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL:-admin@example.com}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:?set SUPERADMIN_PASSWORD in .env (install.sh generates it)}
+      SEED_TEST_USERS: ${SEED_TEST_USERS:-false}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_FROM: ${SMTP_FROM:-adda <noreply@localhost>}
+      SMTP_FROM: ${SMTP_FROM:-adda <noreply@${ADDA_DOMAIN:-localhost}>}
       SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      PASSWORD_RESET_URL: ${PASSWORD_RESET_URL:-http://localhost:5173/reset-password}
-      RESET_TOKEN_EXPIRE_MINUTES: ${RESET_TOKEN_EXPIRE_MINUTES:-30}
-    ports:
-      - "${BACKEND_PORT:-7001}:7001"
     volumes:
       - ./recordings:/recordings
     depends_on:
@@ -79,6 +80,18 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:7001/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     command: >
       sh -c "alembic upgrade head &&
              uvicorn main:app --host 0.0.0.0 --port 7001"
@@ -88,17 +101,36 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:${BACKEND_PORT:-7001}
-        NEXT_PUBLIC_HLS_BASE_URL: http://localhost:${HLS_PORT:-8888}
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://${ADDA_DOMAIN:-localhost}}
+        NEXT_PUBLIC_HLS_BASE_URL: ${NEXT_PUBLIC_HLS_BASE_URL:-https://${ADDA_DOMAIN:-localhost}/hls}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
     restart: unless-stopped
     environment:
       # Server-side (RSC) fetches go over the docker network.
       API_SSR_URL: http://backend:7001
-    ports:
-      - "${FRONTEND_PORT:-5173}:5173"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+
+  # Automatic HTTPS for your domain (Let's Encrypt / ZeroSSL).
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["prod"]
+    restart: unless-stopped
+    environment:
+      ADDA_DOMAIN: ${ADDA_DOMAIN:?set ADDA_DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+      web:
+        condition: service_started
 
   # Builds desktop installers (Linux .deb/.AppImage) — not a long-running
   # service. Run: make desktop
@@ -130,6 +162,8 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
+  caddy_config:
   desktop_node_modules:
   desktop_pnpm_store:
   desktop_cargo_registry:

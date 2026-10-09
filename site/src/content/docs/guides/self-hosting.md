@@ -25,6 +25,14 @@ down without affecting streams, chat, or viewers.
 - Ports open: **80/443** (web), **1935** (RTMP ingest)
 - A domain name pointing at the server
 
+:::note
+**The easy path:** `./scripts/install.sh` does steps 1–3 automatically —
+generates every secret, starts the stack, and configures automatic HTTPS
+for your domain via the bundled Caddy service. Only follow the manual
+steps below if you need a custom setup (existing reverse proxy, separate
+hostnames, external Postgres, …).
+:::
+
 ## 1. Configure
 
 ```bash
@@ -38,20 +46,25 @@ At minimum, change these in `.env` — see the
 
 ```bash
 # Strong, unique values
-JWT_SECRET=<python -c "import secrets; print(secrets.token_urlsafe(48))">
-POSTGRES_PASSWORD=<strong password>
+JWT_SECRET=$(openssl rand -hex 48)
+POSTGRES_PASSWORD=$(openssl rand -hex 16)
+
+# The domain (drives HTTPS + all public URLs)
+ADDA_DOMAIN=example.com
+CORS_ORIGINS=https://example.com
 
 # Bootstrap admin — override with strong values
 SUPERADMIN_EMAIL=you@example.com
-SUPERADMIN_PASSWORD=<strong password>
+SUPERADMIN_PASSWORD=$(openssl rand -base64 18)
 SEED_TEST_USERS=false
 
-# Public URLs your viewers/broadcasters will use
-HLS_BASE_URL=https://stream.example.com
-WEBRTC_BASE_URL=https://stream.example.com/webrtc
-RTMP_BASE_URL=rtmp://stream.example.com
+# Public URLs (single domain — playback is proxied under /hls)
+HLS_BASE_URL=https://example.com/hls
+NEXT_PUBLIC_API_BASE_URL=https://example.com
+NEXT_PUBLIC_HLS_BASE_URL=https://example.com/hls
+PASSWORD_RESET_URL=https://example.com/reset-password
 
-# Email (needed for password reset, 2FA, OTP login)
+# Email (optional — needed for password-reset mail)
 SMTP_HOST=smtp.example.com
 SMTP_USERNAME=adda@example.com
 SMTP_PASSWORD=<app password>
@@ -61,13 +74,17 @@ SMTP_FROM=adda <noreply@example.com>
 ## 2. Start
 
 ```bash
-make setup
-make up
+docker compose --profile prod up -d --build
 ```
 
-Migrations run via `make setup`; they're idempotent.
+Migrations run automatically on backend startup; they're idempotent.
+The stack waits for its own health checks before Caddy serves traffic.
 
-## 3. Reverse proxy (TLS)
+## 3. Reverse proxy (custom setups)
+
+The bundled Caddy handles HTTPS and routes `/api`, `/ws`, `/hls` and the
+web app on one domain (see `deploy/caddy/Caddyfile`). Skip this section
+unless you're replacing it. If you proxy yourself:
 
 Route two hostnames: the **app** (`app.example.com` — frontend + API +
 WebSocket) and the **stream** (`stream.example.com` — HLS/WebRTC/RTMP from

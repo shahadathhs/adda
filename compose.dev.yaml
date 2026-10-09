@@ -1,0 +1,41 @@
+# ── adda — local development overlay ────────────────────────────────
+# Publishes every service port on localhost and points browser URLs at
+# raw ports. Never use this overlay on a public server.
+#
+#   docker compose -f compose.yaml -f compose.dev.yaml up -d --build
+#   (or `make stack-dev`)
+
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  redis:
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  mediamtx:
+    ports:
+      - "${HLS_PORT:-8888}:8888"
+      - "${WEBRTC_PORT:-8889}:8889"
+      - "8189:8189/udp"
+      - "${MTX_API_PORT:-9997}:9997"
+
+  backend:
+    ports:
+      - "${BACKEND_PORT:-7001}:7001"
+    environment:
+      IS_DEBUG: "true"
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:7001"
+      HLS_BASE_URL: "http://localhost:8888"
+      WEBRTC_BASE_URL: "http://localhost:8889"
+      PASSWORD_RESET_URL: "http://localhost:5173/reset-password"
+      SEED_TEST_USERS: "true"
+
+  web:
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    build:
+      args:
+        NEXT_PUBLIC_API_BASE_URL: "http://localhost:7001"
+        NEXT_PUBLIC_HLS_BASE_URL: "http://localhost:8888"

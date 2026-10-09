@@ -1,76 +1,82 @@
 ---
 title: Quickstart
-description: A full adda stack running locally in about five minutes.
+description: Your own live platform, on your domain, in one command.
 ---
 
-The fastest path is Docker — one command builds and starts Postgres, Redis,
-mediamtx, the FastAPI backend, and the React frontend.
+One command asks for your domain and admin email, generates every secret,
+and hands you a running platform with HTTPS. That's the whole install.
 
 ## Prerequisites
 
-- **Docker** + Docker Compose
-- **Git**
-- **make** (optional but convenient — plain `docker compose` works too)
+- A server (any VPS, 2 GB RAM is plenty to start) with **Docker** +
+  **Docker Compose v2**
+- A **domain** whose DNS A record points at that server
+- Ports **80**, **443** (HTTPS) and **1935** (RTMP ingest for OBS) open
 
-## 1. Clone and configure
+## 1. Get adda onto the server
 
 ```bash
 git clone https://github.com/shahadathhs/adda.git
 cd adda
-make setup
 ```
 
-`make setup` copies `.env.example` files, installs toolchain dependencies,
-starts Postgres, and applies database migrations.
-
-:::note
-Everything defaults to sensible local values. For production deployments,
-review the [configuration reference](/reference/configuration/) first.
-:::
-
-## 2. Start the stack
+## 2. Run the installer
 
 ```bash
-make up
+./scripts/install.sh
 ```
 
-First build takes a few minutes. When it finishes, open
-**http://localhost:5173**.
+You will be asked exactly two questions:
 
-## 3. Sign in
+1. **Your domain** — e.g. `adda.example.com` (already pointed at this server)
+2. **Admin email** — your login, and how the platform mails you
 
-Seeded accounts are created on first startup:
+Everything else is generated for you: the database password, the token
+signing secret, and your admin password. Email (SMTP) is optional — skip
+it now, add it later in `.env` and restart.
 
-| User  | Email               | Password      | Role      |
-| ----- | ------------------- | ------------- | --------- |
-| admin | `admin@example.com` | `admin12345`  | superadmin |
-| alice | `alice@example.com` | `password123` | member    |
-| bob   | `bob@example.com`   | `password123` | member    |
+The installer builds the images, starts everything behind automatic
+HTTPS, waits for health checks, and prints your credentials:
 
-Sign in as **alice**, click **New** on the Browse page, and create your first
-channel.
+```text
+adda is live:  https://adda.example.com
+  admin login:  you@example.com
+  password:     <generated — shown only this once>
+```
 
-## 4. Go live
+:::caution
+Save the admin password immediately. It lives only in `.env` on your
+server and is never displayed again. Change it in **Settings** after
+first sign-in.
+:::
 
-1. Open your channel → **Live** tab → copy the **Stream URL** from
-   *Stream setup (OBS)*.
-2. In OBS: **Settings → Stream → Service: Custom**, paste the URL as the
-   server, leave the stream key empty.
-3. Click **Start Streaming** — the channel flips to **LIVE** within seconds
-   and appears on the Browse grid.
+## 3. Create your channel and go live
 
-See the [full streaming guide](/guides/streaming/) for stream titles, health
-metrics, viewer counts, and recordings.
+1. Sign in at `https://your-domain`, create a channel from the **Browse**
+   page.
+2. Open the channel → **Live** tab → copy the **Stream URL** and **stream
+   key** from *Stream setup (OBS)*.
+3. In OBS: **Settings → Stream → Custom**, paste the server URL and key,
+   click **Start Streaming**.
 
-## 5. Watch
+The channel flips to **LIVE** within seconds — on the homepage grid, in
+every follower's sidebar, with viewer counts and chat.
 
-Open the channel from any browser (or the
-[desktop app](/guides/desktop/)) — the HLS player auto-connects and the chat
-rail on the right is live for everyone.
+## Trying it locally instead?
+
+The full stack runs on localhost with dev ports and no HTTPS:
+
+```bash
+make up        # → http://localhost:5173
+```
+
+Dev stacks seed test accounts (`admin@example.com` / `admin12345`, plus
+alice and bob) for poking around. Production installs never do.
 
 ## Where to go next
 
-- [Self-hosting guide](/guides/self-hosting/) — production setup, TLS, proxies
-- [Administration](/guides/admin/) — the admin dashboard explained
+- [Self-hosting guide](/guides/self-hosting/) — backups, tuning, scaling
+- [Going live with OBS](/guides/streaming/) — stream titles, health, recordings
+- [Desktop console](/guides/desktop/) — manage your platform as a native app
 - [Configuration](/reference/configuration/) — every environment variable
 - [FAQ](/faq/) — common issues (including port conflicts)

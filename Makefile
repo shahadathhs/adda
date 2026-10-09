@@ -55,8 +55,14 @@ setup: env dirs install db-up migrate ## First-time setup: .env + dirs + deps + 
 
 # ── Docker (full stack) ───────────────────────────────────────────────
 
-up: ## Build & start all services (detached)
-	$(COMPOSE) up -d --build
+stack: ## Start the production stack with HTTPS (needs .env from install.sh)
+	$(COMPOSE) --profile prod up -d --build
+
+stack-dev: ## Start the dev stack (all ports on localhost, no HTTPS)
+	$(COMPOSE) -f compose.yaml -f compose.dev.yaml up -d --build
+
+up: ## Build & start all services (detached, dev ports)
+	$(COMPOSE) -f compose.yaml -f compose.dev.yaml up -d --build
 
 down: ## Stop & remove containers (keeps volumes)
 	$(COMPOSE) down

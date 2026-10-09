@@ -211,29 +211,56 @@ apps/desktop/src/            # operator console (own design system — no shared
 
 ## Getting Started
 
-### Prerequisites
+### Install on a server (one command)
 
-- **Docker** + **Docker Compose**
-- **[uv](https://docs.astral.sh/uv/)** — Python package manager
-  (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
-- **Node.js 20+** + **pnpm** (`corepack enable`) — only for local web dev
-
-### Quick start (Docker)
+Point a domain's DNS A record at a fresh server with Docker, open ports
+80, 443 and 1935, then:
 
 ```bash
-make setup    # creates .env files, installs deps, starts Postgres, runs migrations
-make up       # builds and starts all services
+./scripts/install.sh        # or: curl -fsSL <release-url>/install.sh | sh
+```
+
+It asks for two things — **your domain** and an **admin email** — and
+does the rest: generates the Postgres password, JWT secret, and admin
+password, writes `.env`, builds every image, starts the stack behind
+Caddy with automatic HTTPS, and prints your login exactly once.
+
+```text
+adda is live:  https://adda.example.com
+  admin login:  you@example.com
+  password:     <generated — shown once, change after first sign-in>
+  OBS stream URL:  rtmp://adda.example.com/live
+```
+
+Postgres, Redis, and the streaming internals are never exposed to the
+internet — only HTTPS (80/443) and RTMP (1935).
+
+### Prerequisites
+
+- **Docker** + **Docker Compose v2**
+- **[uv](https://docs.astral.sh/uv/)** — Python package manager
+  (`curl -LsSf https://astral.sh/uv/install.sh | sh`) — dev only
+- **Node.js 20+** + **pnpm** (`corepack enable`) — only for local web dev
+
+### Quick start (local Docker)
+
+```bash
+make setup       # creates .env files, installs deps, starts Postgres, runs migrations
+make up          # builds and starts the full stack with dev ports (no HTTPS)
 ```
 
 Open **http://localhost:5173**.
 
-**Seeded accounts** (auto-created on first startup):
+**Seeded accounts** (dev only — `SEED_TEST_USERS=true` via the dev overlay):
 
 | User   | Email                | Password      | Role       |
 |--------|----------------------|---------------|------------|
 | admin  | `admin@example.com`  | `admin12345`  | superadmin |
 | alice  | `alice@example.com`  | `password123` | member     |
 | bob    | `bob@example.com`    | `password123` | member     |
+
+> Production stacks made by `install.sh` seed **only** the admin, with a
+> generated password. `SEED_TEST_USERS` defaults to false.
 
 ### Local development (hot reload)
 

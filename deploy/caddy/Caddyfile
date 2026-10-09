@@ -1,0 +1,32 @@
+# adda — automatic HTTPS entrypoint (production profile).
+# {$ENV} placeholders are read from the container environment, which
+# compose fills from .env — no templating step needed.
+
+{$ADDA_DOMAIN} {
+	encode gzip
+
+	# Liveness probe target (backend serves /health at the root).
+	handle /health {
+		reverse_proxy backend:7001
+	}
+
+	# REST API (backend mounts everything under /api).
+	handle /api/* {
+		reverse_proxy backend:7001
+	}
+
+	# WebSocket gateway.
+	handle /ws {
+		reverse_proxy backend:7001
+	}
+
+	# HLS playback — strip the /hls prefix; mediamtx serves at root.
+	handle_path /hls/* {
+		reverse_proxy mediamtx:8888
+	}
+
+	# Everything else is the viewer web app.
+	handle {
+		reverse_proxy web:5173
+	}
+}
