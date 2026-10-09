@@ -1,0 +1,110 @@
+---
+/*
+ * DM inbox demo — minimal direct messages: peer row, last message,
+ * relative time in mono, unread accent dot + count badge.
+ */
+const threads = [
+	{ name: 'mehdi', initials: 'm', last: 'sure, see you at 9', time: '2m', unread: 2 },
+	{ name: 'shirin', initials: 's', last: 'sent the recording link', time: '1h', unread: 0 },
+];
+---
+
+<div class="inbox" role="img" aria-label="Example direct message inbox">
+	{threads.map((t) => (
+		<div class:list={['row', { unread: t.unread > 0 }]}>
+			<span class="avatar" aria-hidden="true">{t.initials}</span>
+			<span class="text">
+				<span class="name">{t.name}</span>
+				<span class="last">{t.last}</span>
+			</span>
+			<span class="end">
+				<time>{t.time}</time>
+				{t.unread > 0 && <span class="dot" aria-label={`${t.unread} unread`} />}
+			</span>
+		</div>
+	))}
+</div>
+
+<style>
+	.inbox {
+		display: grid;
+		padding: 0.375rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 8px;
+		background: #14161b;
+	}
+
+	.row {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		padding: 0.5rem;
+		border-radius: 6px;
+	}
+
+	.row.unread {
+		background: var(--adda-accent-subtle);
+	}
+
+	.avatar {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		background: var(--sl-color-gray-4);
+		color: var(--sl-color-gray-1);
+		font-size: 0.875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		flex-shrink: 0;
+	}
+
+	.unread .avatar {
+		background: var(--adda-accent);
+		color: var(--adda-ink);
+	}
+
+	.text {
+		display: grid;
+		min-width: 0;
+		flex: 1;
+	}
+
+	.name {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--sl-color-gray-1);
+	}
+
+	.unread .name {
+		font-weight: 700;
+	}
+
+	.last {
+		font-size: 0.8125rem;
+		color: var(--sl-color-gray-3);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.end {
+		display: grid;
+		justify-items: end;
+		gap: 0.375rem;
+	}
+
+	time {
+		font-size: 0.6875rem;
+		color: var(--sl-color-gray-4);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--adda-accent);
+	}
+</style>

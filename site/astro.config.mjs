@@ -9,6 +9,10 @@ export default defineConfig({
       description:
         "Self-hosted, multi-tenant live streaming for your community — web, desktop, and mobile browser in one bundle.",
       favicon: "/favicon.svg",
+      logo: {
+        src: "./src/assets/logo.svg",
+      },
+      customCss: ["./src/styles/theme.css"],
       social: [
         {
           icon: "github",

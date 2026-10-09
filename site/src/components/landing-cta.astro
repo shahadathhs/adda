@@ -1,0 +1,68 @@
+---
+/*
+ * CTA band — the self-hoster's moment: the command that starts it all.
+ */
+---
+
+<section class="cta">
+	<div class="inner">
+		<h2 class="heading">Own the whole stack</h2>
+		<p class="sub">
+			Postgres, Redis, the streaming server, the API, and the web app —
+			one compose file, your machine.
+		</p>
+		<div class="cmd">
+			<span class="prompt">$</span>
+			<code>docker compose up -d</code>
+		</div>
+		<a class="sl-link-button primary" href="/quickstart/">Read the quickstart</a>
+	</div>
+</section>
+
+<style>
+	.cta {
+		border-block: 1px solid var(--sl-color-hairline);
+		background: #14161b;
+	}
+
+	.inner {
+		max-width: 60rem;
+		margin-inline: auto;
+		padding: 3rem 1rem;
+		display: grid;
+		justify-items: start;
+		gap: 1rem;
+	}
+
+	.heading {
+		font-size: 1.375rem;
+		letter-spacing: -0.01em;
+		margin: 0;
+	}
+
+	.sub {
+		color: var(--sl-color-gray-3);
+		margin: 0;
+		max-width: 52ch;
+	}
+
+	.cmd {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.625rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 6px;
+		background: #0c0d10;
+		padding: 0.75rem 1rem;
+		font-size: 0.9375rem;
+	}
+
+	.prompt {
+		color: var(--sl-color-gray-5);
+		user-select: none;
+	}
+
+	.cmd code {
+		color: var(--adda-accent);
+	}
+</style>

@@ -1,0 +1,75 @@
+---
+/*
+ * Demo band — the product equation, shown not told: community channels,
+ * live, direct messages, each rendered in the real component anatomy.
+ */
+import StreamCard from './demo/stream-card.astro';
+import ChatThread from './demo/chat-thread.astro';
+import DmThread from './demo/dm-thread.astro';
+---
+
+<section class="demos">
+	<p class="eyebrow">one deploy, one identity</p>
+	<h2 class="heading">Everything a community needs, in the box</h2>
+	<div class="grid">
+		<div class="cell">
+			<StreamCard />
+			<p class="caption"><strong>Live</strong> — paste a key in OBS, your stream is on every member's home page in seconds.</p>
+		</div>
+		<div class="cell">
+			<ChatThread />
+			<p class="caption"><strong>Channels</strong> — realtime chat that belongs to your community, persisted on your disk.</p>
+		</div>
+		<div class="cell">
+			<DmThread />
+			<p class="caption"><strong>Direct messages</strong> — private by design: not even the server admin can read them.</p>
+		</div>
+	</div>
+</section>
+
+<style>
+	.demos {
+		max-width: 60rem;
+		margin-inline: auto;
+		padding-inline: 1rem;
+	}
+
+	.eyebrow {
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--sl-color-gray-4);
+		margin: 0 0 0.5rem;
+	}
+
+	.heading {
+		font-size: 1.375rem;
+		letter-spacing: -0.01em;
+		margin: 0 0 1.5rem;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.5rem;
+	}
+
+	.caption {
+		font-size: 0.8125rem;
+		line-height: 1.55;
+		color: var(--sl-color-gray-3);
+		margin: 0.75rem 0 0;
+	}
+
+	.caption strong {
+		color: var(--sl-color-gray-1);
+		font-weight: 600;
+	}
+
+	@media (max-width: 50rem) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

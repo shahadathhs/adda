@@ -1,0 +1,135 @@
+---
+/*
+ * Stream card demo — the exact anatomy from DESIGN.md §7: 16:9 thumb,
+ * LIVE badge top-left, viewer count bottom-left in mono tabular,
+ * avatar + title + meta row.
+ */
+---
+
+<figure class="demo-card">
+	<div class="thumb">
+		<svg class="play" viewBox="0 0 24 24" aria-hidden="true">
+			<path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor"></path>
+		</svg>
+		<span class="badge">LIVE</span>
+		<span class="viewers">
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path
+					d="M12 5c5 0 9 4.5 10 7-1 2.5-5 7-10 7S3 14.5 2 12c1-2.5 5-7 10-7zm0 3.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5z"
+					fill="currentColor"></path>
+			</svg>
+			128
+		</span>
+	</div>
+	<figcaption class="meta">
+		<span class="avatar" aria-hidden="true">ab</span>
+		<span class="text">
+			<span class="title">saturday night adda</span>
+			<span class="sub">onair · music</span>
+		</span>
+	</figcaption>
+</figure>
+
+<style>
+	.demo-card {
+		margin: 0;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 8px;
+		background: var(--sl-color-bg-accent);
+		overflow: hidden;
+		transition:
+			translate 120ms var(--adda-ease-micro),
+			box-shadow 120ms var(--adda-ease-micro);
+	}
+
+	.demo-card:hover {
+		translate: 0 -2px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+	}
+
+	.thumb {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		background: #14161b;
+		display: grid;
+		place-items: center;
+	}
+
+	.play {
+		width: 3rem;
+		height: 3rem;
+		color: var(--sl-color-gray-5);
+	}
+
+	.badge {
+		position: absolute;
+		top: 0.625rem;
+		left: 0.625rem;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: #fff;
+		background: var(--adda-live);
+		border-radius: 3px;
+		padding: 0.125rem 0.375rem;
+	}
+
+	.viewers {
+		position: absolute;
+		bottom: 0.625rem;
+		left: 0.625rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: 0.8125rem;
+		font-variant-numeric: tabular-nums;
+		color: #fff;
+		background: rgba(0, 0, 0, 0.6);
+		border-radius: 4px;
+		padding: 0.125rem 0.375rem;
+	}
+
+	.viewers svg {
+		width: 0.875rem;
+		height: 0.875rem;
+	}
+
+	.meta {
+		display: flex;
+		gap: 0.625rem;
+		padding: 0.625rem;
+	}
+
+	.avatar {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		background: var(--adda-accent);
+		color: var(--adda-ink);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		flex-shrink: 0;
+	}
+
+	.text {
+		display: grid;
+		min-width: 0;
+	}
+
+	.title {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--sl-color-gray-1);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.sub {
+		font-size: 0.8125rem;
+		color: var(--sl-color-gray-3);
+	}
+</style>

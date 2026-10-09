@@ -1,0 +1,139 @@
+---
+/*
+ * Why adda — real content, doc typography via the .sl-markdown-content
+ * class so lists and tables inherit the themed styles.
+ */
+---
+
+<div class="why">
+	<h2 id="why-adda">Why adda?</h2>
+	<ul>
+		<li>
+			<strong>Multi-tenant by design.</strong> One server hosts many channels.
+			Every community gets its own stream key, live page, chat, and recordings —
+			no need to run a copy per streamer.
+		</li>
+		<li>
+			<strong>Own your stack.</strong> Postgres for data, Redis for realtime
+			fan-out, mediamtx for video. No third-party trackers, no forced logins, no
+			cloud dependency.
+		</li>
+		<li>
+			<strong>Real-time everywhere.</strong> WebSocket chat with presence,
+			instant live/offline notifications, Redis pub/sub so you can scale to
+			multiple backend instances.
+		</li>
+		<li>
+			<strong>Three clients, one codebase.</strong> Web app, and a native
+			desktop app (Tauri) that connects to <em>your</em> server URL on first
+			run.
+		</li>
+		<li>
+			<strong>Secure out of the box.</strong> Rotating refresh tokens, 2FA,
+			email OTP, per-community stream keys with instant rotation.
+		</li>
+	</ul>
+
+	<h2 id="feature-tour">Feature tour</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Area</th>
+				<th>What you get</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><td>Streaming</td><td>RTMP ingest → HLS + WebRTC playback, viewer counts, stream health, titles</td></tr>
+			<tr><td>Chat</td><td>Realtime WebSocket chat, presence, persisted channel history</td></tr>
+			<tr><td>Direct messages</td><td>Private 1:1 threads with unread tracking and blocking</td></tr>
+			<tr><td>Communities</td><td>Public/private channels, roles, join requests, followers</td></tr>
+			<tr><td>Recordings</td><td>Automatic recording of every stream, in-app playback, admin management</td></tr>
+			<tr><td>Admin</td><td>Users, communities, live monitor with force-stop, recordings, stats</td></tr>
+			<tr><td>Auth</td><td>Password + JWT, refresh rotation, 2FA, OTP, password reset</td></tr>
+		</tbody>
+	</table>
+</div>
+
+<style>
+	.why {
+		max-width: 72ch;
+		margin-inline: auto;
+		padding-inline: 1.25rem;
+	}
+
+	.why h2 {
+		font-family: var(--adda-font-display);
+		font-size: 1.375rem;
+		letter-spacing: -0.01em;
+		margin: 0 0 1rem;
+		scroll-margin-top: 4rem;
+	}
+
+	.why ul {
+		margin: 0 0 2.5rem;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.why li {
+		position: relative;
+		padding-left: 1.25rem;
+		color: #9aa1af;
+		font-size: 0.9375rem;
+		line-height: 1.65;
+	}
+
+	.why li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0.55em;
+		width: 0.375rem;
+		height: 0.375rem;
+		border-radius: 50%;
+		background: var(--adda-accent);
+	}
+
+	.why strong {
+		color: #edeef2;
+		font-weight: 600;
+	}
+
+	.why table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.875rem;
+	}
+
+	.why th {
+		text-align: left;
+		font-size: 0.6875rem;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #676e7c;
+		padding: 0.625rem 0.75rem;
+		border-bottom: 1px solid #262a33;
+	}
+
+	.why td {
+		padding: 0.625rem 0.75rem;
+		border-bottom: 1px solid #20242c;
+		color: #9aa1af;
+		line-height: 1.55;
+	}
+
+	.why td:first-child {
+		color: #edeef2;
+		font-weight: 500;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 48rem) {
+		.why td:first-child {
+			white-space: normal;
+		}
+	}
+</style>

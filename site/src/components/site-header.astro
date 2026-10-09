@@ -1,0 +1,111 @@
+---
+/*
+ * Bespoke landing header — product chrome, not docs chrome.
+ * Wordmark · three links · one marigold CTA.
+ */
+import logo from '../assets/logo.svg';
+
+const links = [
+	{ href: '/quickstart/', label: 'Quickstart' },
+	{ href: '/guides/self-hosting/', label: 'Self-hosting' },
+	{ href: '/faq/', label: 'FAQ' },
+	{ href: 'https://github.com/shahadathhs/adda', label: 'GitHub' },
+];
+---
+
+<header class="header">
+	<div class="inner">
+		<a class="brand" href="/">
+			<img src={logo.src} alt="" width="22" height="22" />
+			<span>adda</span>
+		</a>
+		<nav class="links">
+			{links.map((l) => (
+				<a href={l.href}>{l.label}</a>
+			))}
+		</nav>
+		<a class="cta" href="/quickstart/">Get started</a>
+	</div>
+</header>
+
+<style>
+	.header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		border-bottom: 1px solid #20242c;
+		background: rgba(12, 13, 16, 0.85);
+		backdrop-filter: blur(12px);
+	}
+
+	.inner {
+		max-width: 68rem;
+		margin-inline: auto;
+		padding: 0 1.25rem;
+		height: 3.5rem;
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: #edeef2;
+		text-decoration: none;
+		font-family: var(--adda-font-display);
+		font-weight: 700;
+		font-size: 1.0625rem;
+		letter-spacing: -0.01em;
+	}
+
+	.links {
+		display: flex;
+		gap: 1.5rem;
+		margin-inline: auto;
+	}
+
+	.links a {
+		color: #9aa1af;
+		text-decoration: none;
+		font-size: 0.875rem;
+		font-weight: 500;
+		transition: color 120ms var(--adda-ease-micro);
+	}
+
+	.links a:hover {
+		color: #edeef2;
+	}
+
+	.cta {
+		color: var(--adda-ink);
+		background: var(--adda-accent);
+		text-decoration: none;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		padding: 0.4375rem 0.875rem;
+		border-radius: 4px;
+		transition:
+			background-color 120ms var(--adda-ease-micro),
+			scale 120ms var(--adda-ease-micro);
+	}
+
+	.cta:hover {
+		background: var(--adda-accent-hover);
+	}
+
+	.cta:active {
+		scale: 0.97;
+	}
+
+	@media (max-width: 48rem) {
+		.links {
+			display: none;
+		}
+
+		.cta {
+			margin-inline: auto 0;
+		}
+	}
+</style>

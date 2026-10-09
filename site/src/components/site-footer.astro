@@ -1,0 +1,145 @@
+---
+/*
+ * Bespoke landing footer — wordmark, link columns, fine print.
+ */
+import logo from '../assets/logo.svg';
+
+const year = new Date().getFullYear();
+
+const columns = [
+	{
+		title: 'Product',
+		links: [
+			{ href: '/quickstart/', label: 'Quickstart' },
+			{ href: '/guides/streaming/', label: 'Going live' },
+			{ href: '/guides/desktop/', label: 'Desktop console' },
+		],
+	},
+	{
+		title: 'Operate',
+		links: [
+			{ href: '/guides/self-hosting/', label: 'Self-hosting' },
+			{ href: '/guides/admin/', label: 'Administration' },
+			{ href: '/reference/configuration/', label: 'Configuration' },
+		],
+	},
+	{
+		title: 'Project',
+		links: [
+			{ href: '/faq/', label: 'FAQ' },
+			{ href: '/reference/api/', label: 'API overview' },
+			{ href: 'https://github.com/shahadathhs/adda', label: 'GitHub' },
+		],
+	},
+];
+---
+
+<footer class="footer">
+	<div class="inner">
+		<div class="brand-col">
+			<a class="brand" href="/">
+				<img src={logo.src} alt="" width="20" height="20" />
+				<span>adda</span>
+			</a>
+			<p class="note">
+				Self-hosted, multi-tenant live streaming with community chat and
+				direct messages. <span class="bangla" lang="bn">আড্ডা</span> — Bengali
+				for an informal conversation among friends.
+			</p>
+		</div>
+		{
+			columns.map((col) => (
+				<div class="col">
+					<p class="col-title">{col.title}</p>
+					{col.links.map((l) => (
+						<a href={l.href}>{l.label}</a>
+					))}
+				</div>
+			))
+		}
+	</div>
+	<div class="fine">© {year} adda · run it on your own hardware</div>
+</footer>
+
+<style>
+	.footer {
+		border-top: 1px solid #20242c;
+		margin-top: 4rem;
+	}
+
+	.inner {
+		max-width: 68rem;
+		margin-inline: auto;
+		padding: 3rem 1.25rem 2rem;
+		display: grid;
+		grid-template-columns: 2fr 1fr 1fr 1fr;
+		gap: 2rem;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: #edeef2;
+		text-decoration: none;
+		font-family: var(--adda-font-display);
+		font-weight: 700;
+		font-size: 1rem;
+	}
+
+	.note {
+		color: #676e7c;
+		font-size: 0.8125rem;
+		line-height: 1.6;
+		max-width: 34ch;
+		margin: 0.75rem 0 0;
+	}
+
+	.bangla {
+		color: #9aa1af;
+	}
+
+	.col {
+		display: grid;
+		align-content: start;
+		gap: 0.5rem;
+	}
+
+	.col-title {
+		font-size: 0.6875rem;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #676e7c;
+		margin: 0 0 0.25rem;
+	}
+
+	.col a {
+		color: #9aa1af;
+		text-decoration: none;
+		font-size: 0.8125rem;
+		transition: color 120ms var(--adda-ease-micro);
+	}
+
+	.col a:hover {
+		color: #edeef2;
+	}
+
+	.fine {
+		border-top: 1px solid #20242c;
+		padding: 1rem 1.25rem;
+		text-align: center;
+		color: #676e7c;
+		font-size: 0.75rem;
+	}
+
+	@media (max-width: 48rem) {
+		.inner {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.brand-col {
+			grid-column: 1 / -1;
+		}
+	}
+</style>

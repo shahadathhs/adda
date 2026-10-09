@@ -1,0 +1,54 @@
+---
+/*
+ * The landing page — fully bespoke (no Starlight shell): own header,
+ * hero + product mock, demos, install CTA, why, designed footer.
+ * Docs pages keep the Starlight chrome; this page sells.
+ */
+import '../styles/theme.css';
+import SiteHeader from '../components/site-header.astro';
+import SiteFooter from '../components/site-footer.astro';
+import LandingHero from '../components/landing-hero.astro';
+import HeroMock from '../components/hero-mock.astro';
+import LandingDemos from '../components/landing-demos.astro';
+import LandingCta from '../components/landing-cta.astro';
+import LandingWhy from '../components/landing-why.astro';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>adda — self-hosted live streaming for your community</title>
+		<meta
+			name="description"
+			content="Channels, chat, live streams, recordings, and direct messages — one command on your own server, with automatic HTTPS."
+		/>
+		<meta property="og:title" content="adda — self-hosted live streaming" />
+		<meta
+			property="og:description"
+			content="One command on your own server: community channels, live streams, chat, and DMs with automatic HTTPS."
+		/>
+		<meta property="og:type" content="website" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	</head>
+	<body>
+		<SiteHeader />
+		<main>
+			<LandingHero />
+			<HeroMock />
+			<LandingDemos />
+			<LandingCta />
+			<LandingWhy />
+		</main>
+		<SiteFooter />
+	</body>
+</html>
+
+<style>
+	main {
+		display: grid;
+		gap: 5.5rem;
+		padding-bottom: 3rem;
+	}
+</style>

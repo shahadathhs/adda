@@ -1,0 +1,313 @@
+---
+/*
+ * Hero mock — a browser frame showing the adda browse page: top bar,
+ * live stream-card grid (two live, one offline), and a chat rail.
+ * Every piece uses the real product anatomy (DESIGN.md §7) at mock
+ * scale — this is the product demonstration, not decoration.
+ */
+const cards = [
+	{ live: true, title: 'friday night adda — requests open', channel: 'onair', cat: 'music', viewers: '428' },
+	{ live: true, title: 'chess blitz & banter', channel: 'gambit', cat: 'games', viewers: '97' },
+	{ live: false, title: 'cooking, badly (recording)', channel: 'shirin', cat: 'irl', viewers: null },
+];
+
+const messages = [
+	{ name: 'rifat', color: '#5aa9e6', text: 'this outro song though' },
+	{ name: 'nabila', color: '#d67ab1', text: 'mod picks were great tonight', mod: true },
+	{ name: 'tanvir', color: '#4cc38a', text: 'raiding gambit next, join us' },
+	{ name: 'mehdi', color: '#f5a623', text: 'first time here, instant follow' },
+];
+---
+
+<figure class="stage" role="img" aria-label="The adda browse page: live channels and chat">
+	<div class="frame">
+		<div class="chrome">
+			<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+			<span class="url">adda.example.com</span>
+		</div>
+		<div class="app">
+			<div class="topbar">
+				<span class="mark">adda</span>
+				<span class="search">search channels…</span>
+				<span class="me"></span>
+			</div>
+			<div class="body">
+				<div class="grid">
+					<p class="rail-title">Live now</p>
+					{
+						cards.map((c) => (
+							<div class="card">
+								<div class="thumb">
+									{c.live ? <span class="badge">LIVE</span> : <span class="badge off">OFFLINE</span>}
+									{c.live && <span class="viewers">{c.viewers}</span>}
+								</div>
+								<div class="meta">
+									<span class="avatar">{c.channel.slice(0, 1)}</span>
+									<span class="lines">
+										<span class="title">{c.title}</span>
+										<span class="sub">{c.channel} · {c.cat}</span>
+									</span>
+								</div>
+							</div>
+						))
+					}
+				</div>
+				<aside class="chat">
+					<p class="chat-head">chat · 214 here</p>
+					{
+						messages.map((m) => (
+							<p class="msg">
+								{m.mod && <span class="mod">mod</span>}
+								<span class="name" style={`color:${m.color}`}>{m.name}</span>
+								<span class="text">{m.text}</span>
+							</p>
+						))
+					}
+					<div class="input">say something…</div>
+				</aside>
+			</div>
+		</div>
+	</div>
+</figure>
+
+<style>
+	.stage {
+		margin: 3.5rem auto 0;
+		max-width: 64rem;
+		padding-inline: 1.25rem;
+	}
+
+	.frame {
+		border: 1px solid #262a33;
+		border-radius: 10px;
+		overflow: hidden;
+		background: #0e1014;
+		box-shadow:
+			0 8px 32px rgba(0, 0, 0, 0.6),
+			0 1px 2px rgba(0, 0, 0, 0.4);
+	}
+
+	.chrome {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.625rem 0.875rem;
+		border-bottom: 1px solid #20242c;
+		background: #12141a;
+	}
+
+	.dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: #2a2e37;
+	}
+
+	.url {
+		margin-inline: auto;
+		font-size: 0.6875rem;
+		color: #676e7c;
+		background: #0c0d10;
+		border: 1px solid #20242c;
+		border-radius: 4px;
+		padding: 0.125rem 3rem;
+	}
+
+	.app {
+		font-size: 0.6875rem;
+	}
+
+	.topbar {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.5rem 0.875rem;
+		border-bottom: 1px solid #20242c;
+	}
+
+	.mark {
+		font-family: var(--adda-font-display);
+		font-weight: 700;
+		font-size: 0.8125rem;
+		color: #edeef2;
+	}
+
+	.search {
+		flex: 1;
+		max-width: 16rem;
+		margin-inline: auto;
+		color: #4a505c;
+		background: #14161b;
+		border: 1px solid #20242c;
+		border-radius: 4px;
+		padding: 0.25rem 0.625rem;
+	}
+
+	.me {
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 50%;
+		background: var(--adda-accent);
+	}
+
+	.body {
+		display: grid;
+		grid-template-columns: 1fr 11rem;
+		gap: 0.875rem;
+		padding: 0.875rem;
+	}
+
+	.rail-title,
+	.chat-head {
+		grid-column: 1 / -1;
+		margin: 0;
+		font-size: 0.625rem;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #676e7c;
+	}
+
+	.chat-head {
+		grid-column: auto;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.75rem;
+		align-content: start;
+	}
+
+	.card {
+		min-width: 0;
+	}
+
+	.thumb {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		border-radius: 6px;
+		background: #171b22;
+		border: 1px solid #20242c;
+	}
+
+	.badge {
+		position: absolute;
+		top: 0.375rem;
+		left: 0.375rem;
+		font-size: 0.5rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: #fff;
+		background: var(--adda-live);
+		border-radius: 2px;
+		padding: 0.0625rem 0.25rem;
+	}
+
+	.badge.off {
+		background: #2a2e37;
+		color: #9aa1af;
+	}
+
+	.viewers {
+		position: absolute;
+		bottom: 0.375rem;
+		left: 0.375rem;
+		font-size: 0.5625rem;
+		font-variant-numeric: tabular-nums;
+		color: #fff;
+		background: rgba(0, 0, 0, 0.6);
+		border-radius: 2px;
+		padding: 0.0625rem 0.25rem;
+	}
+
+	.meta {
+		display: flex;
+		gap: 0.375rem;
+		padding: 0.375rem 0.125rem 0;
+	}
+
+	.avatar {
+		display: grid;
+		place-items: center;
+		width: 1.375rem;
+		height: 1.375rem;
+		border-radius: 50%;
+		background: var(--adda-accent);
+		color: var(--adda-ink);
+		font-size: 0.5625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		flex-shrink: 0;
+	}
+
+	.lines {
+		display: grid;
+		min-width: 0;
+	}
+
+	.title {
+		color: #edeef2;
+		font-weight: 600;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.sub {
+		color: #676e7c;
+	}
+
+	.chat {
+		border: 1px solid #20242c;
+		border-radius: 6px;
+		background: #12151a;
+		padding: 0.625rem;
+		display: grid;
+		gap: 0.375rem;
+		align-content: start;
+	}
+
+	.msg {
+		margin: 0;
+		line-height: 1.45;
+		color: #c9cdd6;
+		display: flex;
+		gap: 0.25rem;
+		flex-wrap: wrap;
+	}
+
+	.mod {
+		font-size: 0.5rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: #edeef2;
+		background: #3a3f4a;
+		border-radius: 2px;
+		padding: 0 0.1875rem;
+		align-self: center;
+	}
+
+	.name {
+		font-weight: 600;
+	}
+
+	.input {
+		margin-top: 0.25rem;
+		border: 1px solid #20242c;
+		border-radius: 4px;
+		background: #0c0d10;
+		color: #4a505c;
+		padding: 0.3125rem 0.5rem;
+	}
+
+	@media (max-width: 48rem) {
+		.body {
+			grid-template-columns: 1fr;
+		}
+
+		.chat {
+			display: none;
+		}
+	}
+</style>
