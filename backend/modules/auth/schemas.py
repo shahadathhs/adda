@@ -29,10 +29,6 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(min_length=8, max_length=128)
 
 
-class GoogleAuthRequest(BaseModel):
-    id_token: str
-
-
 class Token(BaseModel):
     access_token: str
     refresh_token: str
@@ -84,7 +80,3 @@ class TwoFactorDisable(BaseModel):
 class Login2faVerify(BaseModel):
     temp_token: str
     code: str = Field(min_length=6, max_length=6)
-
-
-class GoogleLinkRequest(BaseModel):
-    id_token: str

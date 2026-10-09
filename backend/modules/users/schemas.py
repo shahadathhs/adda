@@ -16,7 +16,6 @@ class UserOut(BaseModel):
     avatar_url: str | None = None
     bio: str | None = None
     system_role: str = "user"
-    google_id: str | None = None
     two_factor_enabled: bool = False
     has_password: bool = True
 

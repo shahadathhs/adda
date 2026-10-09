@@ -30,8 +30,6 @@ class Settings(BaseSettings):
     reset_token_expire_minutes: int = 30
     # Frontend URL the reset email links to (token appended as ?token=…).
     password_reset_url: str = "http://localhost:5173/reset-password"
-    # Google OAuth 2.0 (ID-token flow). Set to your Google client id to enable.
-    google_client_id: str = ""
 
     # Email (SMTP). Leave smtp_host empty to skip sending (e.g. in dev).
     smtp_host: str = ""

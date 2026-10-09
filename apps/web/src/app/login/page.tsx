@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Radio } from "lucide-react";
 import { toast } from "sonner";
-import { googleLogin, requestOtp, verifyOtp } from "@adda/api-client";
+import { requestOtp, verifyOtp } from "@adda/api-client";
 import type { Token } from "@adda/types";
 import { setSession } from "@adda/api-client";
 import { me } from "@adda/api-client";
@@ -13,11 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useLogin, useLogin2fa } from "@/lib/session";
-import { GoogleSignIn } from "@/components/google-sign-in";
 
 type Mode = "password" | "otp";
-
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
 async function adopt(token: Token) {
   setSession({ access_token: token.access_token, refresh_token: token.refresh_token });
@@ -68,15 +65,6 @@ export default function LoginPage() {
       toast.error(err instanceof Error ? err.message : "Verification failed");
     } finally {
       setOtpPending(false);
-    }
-  };
-
-  const onGoogle = async (idToken: string) => {
-    try {
-      await adopt(await googleLogin(idToken));
-      done();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
     }
   };
 
@@ -232,16 +220,6 @@ export default function LoginPage() {
                   </Button>
                 )}
               </form>
-            )}
-
-            {GOOGLE_CLIENT_ID && (
-              <>
-                <div className="my-4 flex items-center gap-3 text-2xs text-muted-foreground">
-                  <span className="h-px flex-1 bg-border" /> or{" "}
-                  <span className="h-px flex-1 bg-border" />
-                </div>
-                <GoogleSignIn clientId={GOOGLE_CLIENT_ID} onSuccess={onGoogle} />
-              </>
             )}
 
             <p className="mt-4 text-center text-xs text-muted-foreground">

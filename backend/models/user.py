@@ -21,12 +21,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(100))
-    # Passwordless for OAuth-only accounts (e.g. Google sign-in).
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    # Google subject id when the account was created/linked via Google OAuth.
-    google_id: Mapped[str | None] = mapped_column(
-        String(255), unique=True, index=True, nullable=True
-    )
     avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     bio: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
@@ -44,7 +39,7 @@ class User(Base):
 
     @property
     def has_password(self) -> bool:
-        """True if the user can log in with a password (not Google-only)."""
+        """True if the user can log in with a password."""
         return self.password_hash is not None
 
     def to_public_dict(self) -> dict[str, str | bool | None]:

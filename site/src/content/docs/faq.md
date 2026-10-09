@@ -57,13 +57,6 @@ Yes — that's the point. Every community gets its own stream key and RTMP path
 instance. Two streamers can be live at the same time; only your server's
 uplink bounds it.
 
-## How do I enable Google sign-in?
-
-Create an OAuth 2.0 Web client ID at
-[Google Cloud Console](https://console.cloud.google.com/apis/credentials),
-then set `GOOGLE_CLIENT_ID` and `VITE_GOOGLE_CLIENT_ID` in `.env` and
-rebuild the frontend (`make up --build frontend`).
-
 ## Chat says "offline" / WebSocket won't connect
 
 - Check `/ws` isn't stripped or blocked by your reverse proxy (upgrade

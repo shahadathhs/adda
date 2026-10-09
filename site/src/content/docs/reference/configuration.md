@@ -36,8 +36,6 @@ Used by Docker Compose and shared by services.
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080`                        | access-token lifetime              |
 | `RESET_TOKEN_EXPIRE_MINUTES` | `30`                           | password-reset token lifetime      |
 | `PASSWORD_RESET_URL`        | `http://localhost:5173/reset-password` | frontend URL for reset links |
-| `GOOGLE_CLIENT_ID`          | *(empty)*                        | enables Google sign-in             |
-| `VITE_GOOGLE_CLIENT_ID`     | *(empty)*                        | same ID, for the browser button   |
 
 ### Backend
 
@@ -104,7 +102,6 @@ Seeding is idempotent — it only creates accounts that don't exist yet.
 | ---------------------- | ------------------------ | ------------------------- |
 | `VITE_API_BASE_URL`    | `http://localhost:7001`  | fallback; runtime-overridable |
 | `VITE_HLS_BASE_URL`    | `http://localhost:8888`  | fallback; runtime-overridable |
-| `VITE_GOOGLE_CLIENT_ID`| *(empty)*                | Google sign-in button     |
 
 :::note[Runtime server config]
 The desktop app (and the web app) store a server config in localStorage key

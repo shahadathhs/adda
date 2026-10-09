@@ -27,8 +27,6 @@ from models.user import User
 from modules.auth.schemas import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
-    GoogleAuthRequest,
-    GoogleLinkRequest,
     Login2faVerify,
     OtpRequest,
     OtpVerify,
@@ -45,14 +43,11 @@ from modules.auth.schemas import (
 from modules.auth.service.auth_service import (
     authenticate,
     create_user,
-    get_or_create_google_user,
     get_user_by_email,
     get_user_by_username,
-    link_google_account,
     set_password,
     update_profile,
 )
-from modules.auth.service.oauth import verify_google_id_token
 from modules.auth.service.refresh_tokens import (
     create_session,
     revoke_refresh_token,
@@ -281,56 +276,3 @@ async def disable_2fa(
     current_user.two_factor_enabled = False
     await db.commit()
     return {"message": "Two-factor authentication disabled."}
-
-
-# ── Google OAuth ──────────────────────────────────────────────────────
-@router.post("/google", response_model=Token)
-async def google_login(data: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
-    if not settings.google_client_id:
-        raise BadRequestException("Google sign-in is not configured")
-    payload = verify_google_id_token(data.id_token)
-    if payload is None:
-        raise UnauthorizedException("Invalid Google token")
-
-    email = payload.get("email")
-    google_id = payload.get("sub")
-    if not email or not google_id:
-        raise UnauthorizedException("Invalid Google token")
-
-    user = await get_or_create_google_user(
-        db,
-        google_id=str(google_id),
-        email=str(email),
-        name=payload.get("name"),
-        picture=payload.get("picture"),
-    )
-    if not user.is_active:
-        raise ForbiddenException("Account suspended")
-
-    return await create_session(db, user)
-
-
-@router.post("/google/link", response_model=UserOut)
-async def google_link(
-    data: GoogleLinkRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    if current_user.google_id:
-        raise BadRequestException("Google account is already linked.")
-    if not settings.google_client_id:
-        raise BadRequestException("Google sign-in is not configured.")
-    payload = verify_google_id_token(data.id_token)
-    if payload is None:
-        raise UnauthorizedException("Invalid Google token")
-
-    google_id = str(payload.get("sub"))
-    email = str(payload.get("email"))
-
-    # Check the Google account isn't already linked to someone else.
-    existing = await get_user_by_email(db, email)
-    if existing and existing.google_id and existing.id != current_user.id:
-        raise ConflictException("That Google account is linked to another user.")
-
-    user = await link_google_account(db, current_user, google_id, payload.get("picture"))
-    return user

@@ -61,22 +61,3 @@ async def send_2fa_setup_email(to: str, code: str) -> None:
     This code expires in 5 minutes. If you didn't request this, ignore this email.</p>
 </div>""",
     )
-
-
-async def send_google_linked_email(to: str) -> None:
-    from core.email import send_email
-
-    await send_email(
-        to,
-        "Google account linked to your adda account",
-        "Your adda account was just linked to a Google account. "
-        "You can now sign in with either method.",
-        f"""\
-<div style="font-family:sans-serif;line-height:1.6;max-width:560px;margin:auto">
-  <h2 style="color:#7c3aed">Google account linked</h2>
-  <p>Your adda account ({to}) was just linked to a Google account.</p>
-  <p>You can now sign in with either your password or "Sign in with Google".</p>
-  <p style="color:#6b7280;font-size:14px">
-    If you didn't do this, please change your password immediately.</p>
-</div>""",
-    )

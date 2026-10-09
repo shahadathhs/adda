@@ -24,12 +24,6 @@ export const verify2faLogin = (temp_token: string, code: string) =>
     body: JSON.stringify({ temp_token, code }),
   });
 
-export const googleLogin = (id_token: string) =>
-  request<Token>("/api/auth/google", {
-    method: "POST",
-    body: JSON.stringify({ id_token }),
-  });
-
 export const requestOtp = (email: string) =>
   request<{ message: string }>("/api/auth/otp/request", {
     method: "POST",
@@ -92,10 +86,4 @@ export const disable2fa = (password: string) =>
   request<{ message: string }>("/api/auth/2fa/disable", {
     method: "POST",
     body: JSON.stringify({ password }),
-  });
-
-export const linkGoogle = (id_token: string) =>
-  request<User>("/api/auth/google/link", {
-    method: "POST",
-    body: JSON.stringify({ id_token }),
   });

@@ -25,7 +25,6 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - **JWT-based auth** with rotating **refresh tokens** (30-day, hashed at rest,
   reuse detection revokes the session) + 1-day access tokens; the frontend
   refreshes transparently on 401
-- **Google OAuth** sign-in (Google Identity Services + JWKS verification)
 - **Passwordless OTP login** (6-digit code via email, Redis-backed)
 - **Two-factor authentication** (2FA) — enable/disable/verify lifecycle
 - **Password reset** flow with signed JWT tokens
@@ -157,7 +156,7 @@ backend/
 │   ├── seed.py              Idempotent startup seeding
 │   ├── otp.py               Redis-backed OTP (generate/verify)
 │   ├── email.py             Async SMTP sender
-│   ├── auth_emails.py       HTML email templates (OTP, 2FA, Google link)
+│   ├── auth_emails.py       HTML email templates (OTP, 2FA)
 │   └── security/
 │       ├── jwt.py           HS256 access token create/decode
 │       ├── password.py      bcrypt hash/verify
@@ -175,7 +174,7 @@ backend/
 │   ├── follow.py            Follow (user × community)
 │   └── refresh_token.py     RefreshToken (hashed, revocable sessions)
 ├── modules/                 Feature modules (one folder per domain)
-│   ├── auth/                Register, login, JWT, 2FA, OTP, Google OAuth, password reset
+│   ├── auth/                Register, login, JWT, 2FA, OTP, password reset
 │   ├── communities/         CRUD, slugs, follows, stream keys, membership (+ admin_router)
 │   ├── channels/            Channel CRUD, messages, per-channel permissions
 │   ├── streaming/           Discover, live status, health, monitor, mediamtx webhook
@@ -194,7 +193,7 @@ apps/web/src/                # Next.js 15 App Router viewer (workspace member)
 │   ├── page.tsx             Browse (SSR: live-first grid, search, Following rail)
 │   ├── channel/[slug]/      Channel page (SSR + OG metadata, player, chat, setup)
 │   ├── community/[id]/      Legacy UUID links → channel view
-│   ├── login/ register/ reset-password/   (password · 2FA · OTP · Google)
+│   ├── login/ register/ reset-password/   (password · 2FA · OTP)
 │   ├── settings/            Profile, password, 2FA
 │   └── layout.tsx providers.tsx globals.css
 ├── components/              ui kit, LivePlayer (hls.js), ChatRail, ChannelView…
@@ -415,7 +414,7 @@ adda/
 
 ## Roadmap
 
-**Shipped:** authentication (JWT + refresh tokens + Google OAuth + 2FA + OTP +
+**Shipped:** authentication (JWT + refresh tokens + 2FA + OTP +
 password reset), communities (CRUD + slugs + follows + join requests + private
 communities), channels (permissions + message persistence), live streaming
 (RTMP → HLS via mediamtx, per-community keys, discover, stream titles & health,

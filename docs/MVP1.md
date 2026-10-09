@@ -32,7 +32,7 @@ one sitting, it is not in MVP1.
 is instant — no email verification (self-hosted; admin owns the mail
 domain).
 
-**Cut from MVP1:** Google OAuth, OTP-by-email login, email verification.
+**Cut from the product:** OTP-by-email login, email verification.
 All backend work exists; they re-enter in MVP2 after UI polish.
 
 ### F2 — Discover & watch
@@ -185,7 +185,7 @@ MVP1 marketing runs on screenshots. Every surface ships re-skinned to
 
 ## Explicitly deferred (MVP2+)
 
-Google OAuth · email-OTP login · email verification · private channels +
+email-OTP login · email verification · private channels +
 join-request approvals · restricted channels / permission grants · chat
 reactions/replies/edits UI · emotes · group DMs · typing indicators ·
 read receipts · DM attachments/media · DM search & export ·

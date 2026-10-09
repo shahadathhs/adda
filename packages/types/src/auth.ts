@@ -6,10 +6,8 @@ export interface User {
   avatar_url: string | null;
   bio: string | null;
   system_role: "user" | "admin" | "superadmin";
-  /** True when the account has a password set (OAuth-only accounts don't). */
+  /** True when the account has a password set. */
   has_password: boolean;
-  /** Google subject id when the account is linked to Google OAuth. */
-  google_id: string | null;
   /** Email-based two-factor authentication. */
   two_factor_enabled: boolean;
 }
