@@ -1,7 +1,7 @@
 # adda — Project Agent Instructions
 
-A self-hosted multi-tenant live-streaming platform (Twitch-like) with
-community chat. pnpm monorepo: FastAPI backend (`backend/`) + React/TS viewer
+A self-hosted multi-tenant live-streaming platform with community chat.
+pnpm monorepo: FastAPI backend (`backend/`) + React/TS viewer
 web app (`apps/web/`, Vite + TanStack) + Tauri operator console
 (`apps/desktop/`) + mediamtx streaming server + Astro/Starlight docs site
 (`site/`).
@@ -25,6 +25,17 @@ adda/
 **Boundary rule:** apps may import `@adda/*` packages but never each other's
 code. There is no `packages/ui` and there never will be — desktop and web UIs
 evolve independently.
+
+## Design system (required reading)
+
+`/DESIGN.md` is the law for all UI work — tokens, type, radius, motion,
+component patterns, and the anti-slop checklist. Per-surface rules live in
+`apps/web/AGENTS.md`, `apps/desktop/AGENTS.md`, and `site/AGENTS.md`. Core
+rules: marigold accent `#f5a623` with dark-ink text on fills (never white),
+live red `#eb3223` reserved for live states, violet/purple banned, radii
+only 4/6/8px, mono tabular numerics, spring motion (120ms micro / 250ms
+state, transform+opacity only), one exported React component per file.
+All three surfaces share one identity kit — density is the only variable.
 
 ## Commands
 
@@ -107,6 +118,10 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
 
 ## Conventions
 
+- **No competitor naming.** Never name or compare adda to any other
+  product/brand — streaming, chat, or messaging apps included — in
+  code, docs, comments, site content, or commits. Describe features in
+  adda's own words; the product stands on its own.
 - **WebSocket contract is sacred.** The message types in
   `backend/modules/realtime/protocol.py` and `packages/types/src/realtime.ts`
   (transport in `packages/api-client/src/ws.ts`) must stay in sync. When adding
