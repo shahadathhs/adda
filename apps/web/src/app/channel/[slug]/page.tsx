@@ -43,7 +43,7 @@ export default async function ChannelPage({ params }: Props) {
 
   return (
     <>
-      <main className="mx-auto max-w-6xl px-4 pb-10">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <ChannelView community={community} />
       </main>
     </>

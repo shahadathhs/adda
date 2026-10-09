@@ -15,7 +15,6 @@ import { LiveBadge, UserAvatar } from "@/components/ui/primitives";
 import { LivePlayer } from "@/components/live-player";
 import { ChatRail } from "@/components/chat-rail";
 import { RecordingsSection } from "@/components/recordings-section";
-import { StreamSetupCard } from "@/components/stream-setup-card";
 
 export function ChannelView({ community }: { community: Community }) {
   const { data: user } = useMe();
@@ -39,7 +38,6 @@ export function ChannelView({ community }: { community: Community }) {
   const viewers = status?.viewers ?? 0;
   const isMember = members.some((m) => m.user_id === user?.id);
   const isFollowing = followState?.following ?? false;
-  const isOwner = user?.id === community.owner_id;
 
   const joinMut = useMutation({
     mutationFn: () => joinCommunity(community.id),
@@ -59,9 +57,7 @@ export function ChannelView({ community }: { community: Community }) {
           <Card className="flex aspect-video flex-col items-center justify-center gap-2 rounded-lg text-center">
             <p className="font-display text-lg font-semibold">Offline</p>
             <p className="max-w-sm text-sm text-muted-foreground">
-              {isOwner
-                ? "You're offline. Paste your stream URL into OBS and go live."
-                : "This channel isn't broadcasting right now. Follow it to catch the next stream."}
+              This channel isn&apos;t broadcasting right now. Follow it to catch the next stream.
             </p>
             {!user && (
               <p className="mt-1 text-xs text-muted-foreground">
@@ -115,7 +111,7 @@ export function ChannelView({ community }: { community: Community }) {
                 {isFollowing ? "Following" : "Follow"}
               </Button>
             )}
-            {user && !isMember && community.owner_id !== user.id && (
+            {user && !isMember && (
               <Button
                 variant="outline"
                 size="sm"
@@ -128,8 +124,23 @@ export function ChannelView({ community }: { community: Community }) {
           </div>
         </div>
 
-        {isOwner && <StreamSetupCard community={community} />}
         <RecordingsSection communityId={community.id} />
+
+        {/* About — the page body below the player. */}
+        <Card className="space-y-3 p-5">
+          <h2 className="font-display text-base font-bold tracking-tight text-foreground">About</h2>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {community.description || "No description yet."}
+          </p>
+          <div className="flex flex-wrap gap-5 border-t border-border pt-3 text-xs text-muted-foreground">
+            <span>
+              <span className="font-num text-foreground">{community.member_count}</span> members
+            </span>
+            <span>
+              <span className="font-num text-foreground">{community.follower_count}</span> followers
+            </span>
+          </div>
+        </Card>
       </div>
 
       <div className="lg:sticky lg:top-16">

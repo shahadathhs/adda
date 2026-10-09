@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { resetPassword } from "@adda/api-client";
 import { Button } from "@/components/ui/button";
+import { AuthShell } from "@/components/auth-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
@@ -74,13 +75,17 @@ function ResetForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <Card className="w-full max-w-sm p-6">
-        <h1 className="mb-4 font-display text-lg font-bold tracking-tight">Reset your password</h1>
-        <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
-          <ResetForm />
-        </Suspense>
-      </Card>
-    </div>
+    <AuthShell>
+      <div className="flex min-h-screen items-center justify-center p-6 py-24">
+        <Card className="w-full max-w-sm p-6">
+          <h1 className="mb-4 font-display text-lg font-bold tracking-tight">
+            Reset your password
+          </h1>
+          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+            <ResetForm />
+          </Suspense>
+        </Card>
+      </div>
+    </AuthShell>
   );
 }

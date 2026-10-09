@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useLogin, useLogin2fa } from "@/lib/session";
+import { AuthShell } from "@/components/auth-shell";
 
 type Mode = "password" | "otp";
 
@@ -69,168 +70,170 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <Card className="w-full max-w-sm p-6">
-        <div className="mb-5 flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/15">
-            <Radio className="h-4 w-4 text-primary" />
+    <AuthShell>
+      <div className="flex min-h-screen items-center justify-center p-6 py-24">
+        <Card className="w-full max-w-sm p-6">
+          <div className="mb-5 flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/15">
+              <Radio className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h1 className="font-display text-lg font-bold tracking-tight">Welcome back</h1>
+              <p className="text-xs text-muted-foreground">Sign in to watch and chat</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-display text-lg font-bold tracking-tight">Welcome back</h1>
-            <p className="text-xs text-muted-foreground">Sign in to watch and chat</p>
-          </div>
-        </div>
 
-        {tempToken !== null ? (
-          <form
-            className="space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              login2fa.mutate({ tempToken, code }, { onSuccess: done });
-            }}
-          >
-            <p className="text-xs text-muted-foreground">
-              Enter the 6-digit code sent to your email.
-            </p>
-            <Input
-              inputMode="numeric"
-              maxLength={6}
-              required
-              placeholder="000000"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className="text-center tracking-[0.5em]"
-            />
-            <Button
-              variant="primary"
-              type="submit"
-              className="w-full"
-              disabled={login2fa.isPending || code.length !== 6}
-            >
-              {login2fa.isPending ? "Verifying…" : "Verify"}
-            </Button>
-            <Button
-              variant="ghost"
-              type="button"
-              className="w-full"
-              onClick={() => {
-                setTempToken(null);
-                setCode("");
+          {tempToken !== null ? (
+            <form
+              className="space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                login2fa.mutate({ tempToken, code }, { onSuccess: done });
               }}
             >
-              Back
-            </Button>
-          </form>
-        ) : (
-          <>
-            <div className="mb-4 flex gap-1 rounded-md bg-muted p-1">
-              {(["password", "otp"] as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={`flex-1 rounded-sm px-2 py-1 text-xs font-medium transition-colors ${
-                    mode === m
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {m === "password" ? "Password" : "Email code"}
-                </button>
-              ))}
-            </div>
-
-            {mode === "password" ? (
-              <form
-                className="space-y-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  login.mutate(
-                    { email: email.trim(), password },
-                    {
-                      onSuccess: (res) => {
-                        if ("requires_2fa" in res) setTempToken(res.temp_token);
-                        else done();
-                      },
-                    },
-                  );
+              <p className="text-xs text-muted-foreground">
+                Enter the 6-digit code sent to your email.
+              </p>
+              <Input
+                inputMode="numeric"
+                maxLength={6}
+                required
+                placeholder="000000"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                className="text-center tracking-[0.5em]"
+              />
+              <Button
+                variant="primary"
+                type="submit"
+                className="w-full"
+                disabled={login2fa.isPending || code.length !== 6}
+              >
+                {login2fa.isPending ? "Verifying…" : "Verify"}
+              </Button>
+              <Button
+                variant="ghost"
+                type="button"
+                className="w-full"
+                onClick={() => {
+                  setTempToken(null);
+                  setCode("");
                 }}
               >
-                <Input
-                  type="email"
-                  required
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <Input
-                  type="password"
-                  required
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-full"
-                  disabled={login.isPending || !email || !password}
-                >
-                  {login.isPending ? "Signing in…" : "Sign in"}
-                </Button>
-              </form>
-            ) : (
-              <form className="space-y-3" onSubmit={otpSent ? verifyOtpCode : sendOtp}>
-                <Input
-                  type="email"
-                  required
-                  disabled={otpSent}
-                  placeholder="Email"
-                  value={otpEmail}
-                  onChange={(e) => setOtpEmail(e.target.value)}
-                />
-                {otpSent && (
-                  <Input
-                    inputMode="numeric"
-                    maxLength={6}
-                    required
-                    placeholder="6-digit code"
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    className="text-center tracking-[0.5em]"
-                  />
-                )}
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-full"
-                  disabled={
-                    otpPending || (otpSent ? otpCode.length !== 6 : !otpEmail) || otpPending
-                  }
-                >
-                  {otpPending ? "…" : otpSent ? "Sign in with code" : "Email me a code"}
-                </Button>
-                {otpSent && (
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    className="w-full"
-                    onClick={() => setOtpSent(false)}
+                Back
+              </Button>
+            </form>
+          ) : (
+            <>
+              <div className="mb-4 flex gap-1 rounded-md bg-muted p-1">
+                {(["password", "otp"] as Mode[]).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMode(m)}
+                    className={`flex-1 rounded-sm px-2 py-1 text-xs font-medium transition-colors ${
+                      mode === m
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    Use a different email
-                  </Button>
-                )}
-              </form>
-            )}
+                    {m === "password" ? "Password" : "Email code"}
+                  </button>
+                ))}
+              </div>
 
-            <p className="mt-4 text-center text-xs text-muted-foreground">
-              No account?{" "}
-              <Link href="/register" className="text-primary hover:underline">
-                Create one
-              </Link>
-            </p>
-          </>
-        )}
-      </Card>
-    </div>
+              {mode === "password" ? (
+                <form
+                  className="space-y-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    login.mutate(
+                      { email: email.trim(), password },
+                      {
+                        onSuccess: (res) => {
+                          if ("requires_2fa" in res) setTempToken(res.temp_token);
+                          else done();
+                        },
+                      },
+                    );
+                  }}
+                >
+                  <Input
+                    type="email"
+                    required
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <Input
+                    type="password"
+                    required
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="w-full"
+                    disabled={login.isPending || !email || !password}
+                  >
+                    {login.isPending ? "Signing in…" : "Sign in"}
+                  </Button>
+                </form>
+              ) : (
+                <form className="space-y-3" onSubmit={otpSent ? verifyOtpCode : sendOtp}>
+                  <Input
+                    type="email"
+                    required
+                    disabled={otpSent}
+                    placeholder="Email"
+                    value={otpEmail}
+                    onChange={(e) => setOtpEmail(e.target.value)}
+                  />
+                  {otpSent && (
+                    <Input
+                      inputMode="numeric"
+                      maxLength={6}
+                      required
+                      placeholder="6-digit code"
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      className="text-center tracking-[0.5em]"
+                    />
+                  )}
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="w-full"
+                    disabled={
+                      otpPending || (otpSent ? otpCode.length !== 6 : !otpEmail) || otpPending
+                    }
+                  >
+                    {otpPending ? "…" : otpSent ? "Sign in with code" : "Email me a code"}
+                  </Button>
+                  {otpSent && (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      className="w-full"
+                      onClick={() => setOtpSent(false)}
+                    >
+                      Use a different email
+                    </Button>
+                  )}
+                </form>
+              )}
+
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                No account?{" "}
+                <Link href="/register" className="text-primary hover:underline">
+                  Create one
+                </Link>
+              </p>
+            </>
+          )}
+        </Card>
+      </div>
+    </AuthShell>
   );
 }
