@@ -28,7 +28,7 @@ export default function RegisterPage() {
             <Radio className="h-4 w-4 text-primary" />
           </div>
           <div>
-            <h1 className="font-semibold">Create your account</h1>
+            <h1 className="font-display text-lg font-bold tracking-tight">Create your account</h1>
             <p className="text-xs text-muted-foreground">Join this adda instance</p>
           </div>
         </div>

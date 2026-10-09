@@ -76,7 +76,7 @@ export default function LoginPage() {
             <Radio className="h-4 w-4 text-primary" />
           </div>
           <div>
-            <h1 className="font-semibold">Welcome back</h1>
+            <h1 className="font-display text-lg font-bold tracking-tight">Welcome back</h1>
             <p className="text-xs text-muted-foreground">Sign in to watch and chat</p>
           </div>
         </div>

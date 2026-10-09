@@ -1,50 +1,109 @@
 @import "tailwindcss";
 
+/* adda design tokens — /DESIGN.md is law.
+   Dark-first (ink ladder), marigold accent with ink-on-accent,
+   live red reserved for live states. No violet anywhere. */
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(222 47% 11%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(222 47% 11%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(222 47% 11%);
-  --primary: hsl(262 83% 58%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(210 40% 96%);
-  --secondary-foreground: hsl(222 47% 11%);
-  --muted: hsl(210 40% 96%);
-  --muted-foreground: hsl(215 16% 47%);
-  --accent: hsl(210 40% 96%);
-  --accent-foreground: hsl(222 47% 11%);
-  --destructive: hsl(0 84% 60%);
-  --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(214 32% 91%);
-  --input: hsl(214 32% 91%);
-  --ring: hsl(262 83% 58%);
-  --radius: 0.75rem;
+  /* Surfaces — the ink ladder */
+  --background: #0c0d10;
+  --foreground: #edeef2;
+  --card: #14161b;
+  --card-foreground: #edeef2;
+  --popover: #14161b;
+  --popover-foreground: #edeef2;
+  --secondary: #1c1f26;
+  --secondary-foreground: #edeef2;
+  --muted: #1c1f26;
+  --muted-foreground: #9aa1af;
+  --accent: #1c1f26;
+  --accent-foreground: #edeef2;
+
+  /* Brand — marigold, ink text on fills. Never white. */
+  --primary: #f5a623;
+  --primary-hover: #e29500;
+  --primary-active: #c98400;
+  --primary-foreground: #1a1205;
+  --primary-subtle: rgba(245, 166, 35, 0.14);
+
+  /* State colors — live red is sacred, never a button color */
+  --live: #eb3223;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --ok: #2fbf71;
+  --warn: #e0a33e;
+
+  /* Lines */
+  --border: #262a33;
+  --input: #262a33;
+  --ring: #f5a623;
+
+  /* Radii — the only allowed scale (DESIGN.md §5) */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Motion — spring tiers from §6 */
+  --ease-micro: linear(
+    0,
+    0.0147 1.42%,
+    0.0679 3.31%,
+    0.216 6.28%,
+    0.5118 10.49%,
+    0.8105 14.79%,
+    0.9758 18.87%,
+    1.0304 22.66%,
+    1.0405 26.15%,
+    1.0267 31.19%,
+    1.0042 38.85%,
+    0.9964 47.36%,
+    1
+  );
+  --ease-spring: linear(
+    0,
+    0.0036 0.68%,
+    0.0183 1.65%,
+    0.0679 3.31%,
+    0.1772 5.75%,
+    0.3628 8.42%,
+    0.5919 11.28%,
+    0.7879 14.15%,
+    0.9307 16.95%,
+    1.0152 19.94%,
+    1.0424 22.99%,
+    1.0455 25.9%,
+    1.0351 28.65%,
+    1.0117 33.05%,
+    0.9866 38.72%,
+    0.978 45.4%,
+    0.9866 55.5%,
+    0.9973 71.4%,
+    1
+  );
 }
 
+/* The app is dark-first; keep the .dark hook for compatibility. */
 .dark {
-  --background: hsl(222 47% 7%);
-  --foreground: hsl(210 40% 98%);
-  --card: hsl(222 40% 10%);
-  --card-foreground: hsl(210 40% 98%);
-  --popover: hsl(222 40% 10%);
-  --popover-foreground: hsl(210 40% 98%);
-  --primary: hsl(262 83% 66%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(217 33% 17%);
-  --secondary-foreground: hsl(210 40% 98%);
-  --muted: hsl(217 33% 17%);
-  --muted-foreground: hsl(215 20% 65%);
-  --accent: hsl(217 33% 17%);
-  --accent-foreground: hsl(210 40% 98%);
-  --destructive: hsl(0 72% 51%);
-  --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(217 33% 20%);
-  --input: hsl(217 33% 20%);
-  --ring: hsl(262 83% 66%);
+  --background: #0c0d10;
+  --foreground: #edeef2;
+  --card: #14161b;
+  --card-foreground: #edeef2;
+  --popover: #14161b;
+  --popover-foreground: #edeef2;
+  --secondary: #1c1f26;
+  --secondary-foreground: #edeef2;
+  --muted: #1c1f26;
+  --muted-foreground: #9aa1af;
+  --accent: #1c1f26;
+  --accent-foreground: #edeef2;
+  --primary: #f5a623;
+  --primary-foreground: #1a1205;
+  --border: #262a33;
+  --input: #262a33;
+  --ring: #f5a623;
 }
 
 @theme inline {
@@ -55,28 +114,96 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-live: var(--live);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    color-scheme: dark;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: var(--primary-subtle);
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2e37;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* Counts, durations, keys — always mono tabular (DESIGN.md §4) */
+  .font-num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The live pulse — brand heartbeat (§6 signature interaction) */
+  .live-dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background: var(--live);
+  }
+  .live-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--live);
+    animation: pulse-ring 2s var(--ease-micro) infinite;
+  }
+}
+
+@keyframes pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot::after {
+    animation: none;
+    display: none;
   }
 }

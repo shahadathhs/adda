@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Community } from "@adda/types";
 import { ssrFetch } from "@/lib/ssr";
-import { TopBar } from "@/components/top-bar";
 import { ChannelView } from "@/components/channel-view";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +16,6 @@ export default async function CommunityRedirectPage({
   if (!community) notFound();
   return (
     <>
-      <TopBar />
       <main className="mx-auto max-w-6xl px-4">
         <ChannelView community={community} />
       </main>

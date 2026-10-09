@@ -33,7 +33,7 @@ export function UserAvatar({
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-primary/15 font-semibold text-primary",
+        "flex items-center justify-center rounded-full bg-primary-subtle font-semibold text-primary",
         className,
       )}
       aria-label={name}
@@ -43,11 +43,14 @@ export function UserAvatar({
   );
 }
 
+// LIVE badge — live red fill, white 11px 700 uppercase, radius-xs,
+// pulse dot (DESIGN.md §7). Never the marigold accent.
 export function LiveBadge({ viewers }: { viewers?: number }) {
   return (
-    <span className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-500 dark:text-red-400">
-      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /> LIVE
-      {viewers != null && viewers > 0 && <span className="ml-1">{viewers}</span>}
+    <span className="inline-flex items-center gap-1.5 rounded-xs bg-live px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+      <span className="live-dot !h-1.5 !w-1.5" aria-hidden="true" />
+      LIVE
+      {viewers != null && viewers > 0 && <span className="font-num normal-case">{viewers}</span>}
     </span>
   );
 }

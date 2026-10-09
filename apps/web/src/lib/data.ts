@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   chatChannel,
+  communityChannel,
   discoverChannels,
   followCommunity,
   getCommunity,
@@ -12,8 +13,11 @@ import {
   streamStatus,
   unfollowCommunity,
 } from "@adda/api-client";
-import type { ChatMessage, Community, Recording } from "@adda/types";
+import type { ChatMessage, Community, Recording, StreamStatusPayload } from "@adda/types";
+import { apiBaseUrl } from "@adda/shared";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export const webKeys = {
   discover: (q?: string) => ["discover", q ?? ""] as const,
@@ -23,6 +27,49 @@ export const webKeys = {
   followed: ["followed"] as const,
   recordings: (id: string) => ["recordings", id] as const,
 };
+
+/** Live frame (or offline poster) for a channel's stream card. */
+export function thumbUrl(communityId: string) {
+  return `${apiBaseUrl()}/api/streaming/communities/${communityId}/thumb`;
+}
+
+/**
+ * The browse grid with instant live/offline transitions: subscribes to
+ * every listed channel's community topic and applies `stream_status`
+ * events in place — cards flip without a refetch.
+ */
+export function useLiveGrid<T extends { community_id: string; is_live: boolean; viewers: number }>(
+  initial: T[],
+): T[] {
+  const [channels, setChannels] = useState<T[]>(initial);
+  const key = initial
+    .map((c) => c.community_id)
+    .sort()
+    .join(",");
+
+  useEffect(() => {
+    setChannels(initial);
+    if (initial.length === 0) return;
+    socket.connect();
+    initial.forEach((c) => socket.subscribe(communityChannel(c.community_id)));
+    const off = socket.on((msg) => {
+      if (msg.type !== "stream_status" || !msg.data) return;
+      const d = msg.data as unknown as StreamStatusPayload;
+      setChannels((prev) =>
+        prev.map((c) =>
+          c.community_id === d.community_id ? { ...c, is_live: d.is_live, viewers: d.viewers } : c,
+        ),
+      );
+    });
+    return () => {
+      off();
+      initial.forEach((c) => socket.unsubscribe(communityChannel(c.community_id)));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  return channels;
+}
 
 export function useDiscover(q?: string) {
   return useQuery({
@@ -124,6 +171,36 @@ export function useStreamEvents(id: string, onChange: () => void) {
       socket.unsubscribe(channel);
     };
   }, [id, onChange]);
+}
+
+/**
+ * DM unread badge + toasts: listens on the personal `user/<id>` channel
+ * (auto-subscribed server-side). The count resets while the user is
+ * anywhere under /messages.
+ */
+export function useDmUnread(enabled: boolean) {
+  const [unread, setUnread] = useState(0);
+  const pathname = usePathname();
+  const viewing = pathname?.startsWith("/messages") ?? false;
+
+  useEffect(() => {
+    if (!enabled) return;
+    socket.connect();
+    const off = socket.on((msg) => {
+      if (msg.type === "dm_read") {
+        // Our own read (from another device) may clear the badge.
+        setUnread(0);
+      } else if (msg.type === "dm_message") {
+        setUnread((n) => n + 1);
+        const d = msg.data as { display_name: string; content: string };
+        if (!viewing) toast(`${d.display_name}: ${d.content}`, { duration: 4000 });
+      }
+    });
+    return off;
+  }, [enabled, viewing]);
+
+  // Derived, not an effect: the badge hides itself while reading messages.
+  return viewing ? 0 : unread;
 }
 
 export type { Recording };

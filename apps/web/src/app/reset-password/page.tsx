@@ -76,7 +76,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <Card className="w-full max-w-sm p-6">
-        <h1 className="mb-4 font-semibold">Reset your password</h1>
+        <h1 className="mb-4 font-display text-lg font-bold tracking-tight">Reset your password</h1>
         <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
           <ResetForm />
         </Suspense>

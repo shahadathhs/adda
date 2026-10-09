@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { Community } from "@adda/types";
 import { ssrFetch } from "@/lib/ssr";
-import { TopBar } from "@/components/top-bar";
 import { ChannelView } from "@/components/channel-view";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = community.is_live
     ? `${community.name} — ${community.stream_title || "LIVE"}`
     : `${community.name} (offline)`;
-  const description =
-    community.description ??
-    `Watch ${community.name} live on adda — self-hosted streaming for your community.`;
+  const description = community.description ?? `Watch ${community.name} live on adda.`;
 
   return {
     title,
@@ -46,7 +43,6 @@ export default async function ChannelPage({ params }: Props) {
 
   return (
     <>
-      <TopBar />
       <main className="mx-auto max-w-6xl px-4 pb-10">
         <ChannelView community={community} />
       </main>

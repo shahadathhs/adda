@@ -1,25 +1,24 @@
 import type { Metadata } from "next";
 import { ssrFetch } from "@/lib/ssr";
-import type { DiscoverChannel } from "@adda/types";
-import { TopBar } from "@/components/top-bar";
-import { BrowseClient } from "@/components/browse-client";
+import type { DiscoverChannel, RecordingFeedItem } from "@adda/types";
+import { HomeClient } from "@/components/home-client";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Browse live channels",
-  description: "Live channels and communities on this adda instance.",
+  title: "Live channels",
+  description: "Live channels, community chat, and recordings.",
 };
 
-export default async function BrowsePage() {
-  const initial = (await ssrFetch<DiscoverChannel[]>("/api/streaming/discover")) ?? [];
+export default async function HomePage() {
+  const [initial, recent] = await Promise.all([
+    ssrFetch<DiscoverChannel[]>("/api/streaming/discover").catch(() => []),
+    ssrFetch<RecordingFeedItem[]>("/api/recordings/recent?limit=12").catch(() => []),
+  ]);
 
   return (
-    <>
-      <TopBar />
-      <main className="mx-auto max-w-6xl px-4 py-6">
-        <BrowseClient initial={initial} />
-      </main>
-    </>
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <HomeClient initial={initial ?? []} recordings={recent ?? []} />
+    </main>
   );
 }

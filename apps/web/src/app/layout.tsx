@@ -1,18 +1,32 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { AppShell } from "@/components/app-shell";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: { default: "adda", template: "%s · adda" },
-  description: "Self-hosted live streaming for your community.",
+  description: "Live channels and community chat.",
   icons: [{ rel: "icon", url: "/favicon.svg", type: "image/svg+xml" }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className={`dark ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className="min-h-screen antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          <Suspense>
+            <AppShell>{children}</AppShell>
+          </Suspense>
+        </Providers>
       </body>
     </html>
   );

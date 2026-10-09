@@ -5,17 +5,19 @@ type Variant = "default" | "primary" | "outline" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
-  default: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-  primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-  outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-  ghost: "hover:bg-accent hover:text-accent-foreground",
-  danger: "bg-destructive/10 text-destructive hover:bg-destructive/20",
+  default: "bg-secondary text-secondary-foreground hover:bg-accent",
+  // Marigold fill, ink text — the brand signature. Never white-on-accent.
+  primary:
+    "bg-primary text-primary-foreground font-semibold hover:bg-primary-hover active:bg-primary-active",
+  outline: "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+  ghost: "text-muted-foreground hover:bg-accent hover:text-foreground",
+  danger: "bg-destructive text-destructive-foreground hover:bg-destructive/85",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-sm",
-  lg: "h-11 px-6 text-base",
+  sm: "h-7 rounded-xs px-2.5 text-[13px]",
+  md: "h-8 rounded-sm px-3.5 text-sm",
+  lg: "h-10 rounded-sm px-5 text-sm",
 };
 
 export function Button({
@@ -27,8 +29,10 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-ring",
+        "inline-flex cursor-pointer items-center justify-center gap-2 font-medium",
+        "transition-[background-color,border-color,color,scale] duration-120 ease-[var(--ease-micro)]",
+        "active:scale-[0.97]",
+        "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",
         variants[variant],
         sizes[size],
