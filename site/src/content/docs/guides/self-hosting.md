@@ -80,7 +80,8 @@ Route two hostnames: the **app** (`app.example.com` — frontend + API +
 WebSocket) and the **stream** (`stream.example.com` — HLS/WebRTC/RTMP from
 mediamtx). A minimal Caddy file:
 
-```caddy
+```nginx
+# Caddyfile — app + API + WebSocket on one domain
 app.example.com {
     reverse_proxy localhost:5173
 }
