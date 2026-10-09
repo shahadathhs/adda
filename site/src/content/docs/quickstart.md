@@ -3,40 +3,43 @@ title: Quickstart
 description: Your own live platform, on your domain, in one command.
 ---
 
-One command asks for your domain and admin email, generates every secret,
-and hands you a running platform with HTTPS. That's the whole install.
+One command asks for your domain and admin email, installs whatever is
+missing (Docker included), generates every secret, and hands you a
+running platform with HTTPS. That's the whole install.
 
 ## Prerequisites
 
-- A server (any VPS, 2 GB RAM is plenty to start) with **Docker** +
-  **Docker Compose v2**
-- A **domain** whose DNS A record points at that server
+- A server — any 2 GB VPS running Ubuntu or Debian
+- A **domain** you control (you'll point it at the server)
 - Ports **80**, **443** (HTTPS) and **1935** (RTMP ingest for OBS) open
+- Root access (or sudo)
 
-## 1. Get adda onto the server
+No Docker, no git, no terminal skills beyond pasting one line.
+
+## 1. Run the installer
+
+SSH into the server (your VPS provider shows you how — one command) and
+paste:
 
 ```bash
-git clone https://github.com/shahadathhs/adda.git
-cd adda
-```
-
-## 2. Run the installer
-
-```bash
-./scripts/install.sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/adda-v3/scripts/install.sh | sh
 ```
 
 You will be asked exactly two questions:
 
-1. **Your domain** — e.g. `adda.example.com` (already pointed at this server)
-2. **Admin email** — your login, and how the platform mails you
+1. **Your domain** — e.g. `adda.example.com`
+2. **Admin email** — your login
 
-Everything else is generated for you: the database password, the token
-signing secret, and your admin password. Email (SMTP) is optional — skip
-it now, add it later in `.env` and restart.
+The script then shows you the exact DNS record to add (your domain →
+this server's IP) and **waits with you** until it propagates. While
+waiting, add the record in your registrar's DNS dashboard. Everything
+else is automatic:
 
-The installer builds the images, starts everything behind automatic
-HTTPS, waits for health checks, and prints your credentials:
+- Docker and Compose installed if missing
+- adda downloaded to `/opt/adda`
+- database password, token secret, and admin password generated
+- images built, stack started behind automatic HTTPS
+- your credentials printed
 
 ```text
 adda is live:  https://adda.example.com
@@ -50,7 +53,14 @@ server and is never displayed again. Change it in **Settings** after
 first sign-in.
 :::
 
-## 3. Create your channel and go live
+:::note[Email]
+The installer skips email (SMTP) for now. Without it, everything works —
+admins can reset passwords from the desktop console — but automatic
+reset emails need SMTP: add the `SMTP_*` values to `/opt/adda/.env` and
+restart. See the [configuration reference](/reference/configuration/).
+:::
+
+## 2. Create your channel and go live
 
 1. Sign in at `https://your-domain`, create a channel from the **Browse**
    page.

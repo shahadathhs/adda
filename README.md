@@ -212,17 +212,22 @@ apps/desktop/src/            # operator console (own design system — no shared
 
 ### Install on a server (one command)
 
-Point a domain's DNS A record at a fresh server with Docker, open ports
-80, 443 and 1935, then:
+Get a server (any 2 GB VPS with Ubuntu/Debian), point your domain's DNS
+A record at it, then run **one command** as root:
 
 ```bash
-./scripts/install.sh        # or: curl -fsSL <release-url>/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/adda-v3/scripts/install.sh | sh
 ```
 
-It asks for two things — **your domain** and an **admin email** — and
-does the rest: generates the Postgres password, JWT secret, and admin
-password, writes `.env`, builds every image, starts the stack behind
-Caddy with automatic HTTPS, and prints your login exactly once.
+That's the whole install. The script asks two questions — **your
+domain** and an **admin email** — and does everything else:
+
+- installs Docker + Compose if they're missing
+- downloads the source (no git needed)
+- waits with you until your domain's DNS resolves
+- generates the Postgres password, JWT secret, and admin password
+- starts the stack behind Caddy with automatic HTTPS
+- prints your login exactly once
 
 ```text
 adda is live:  https://adda.example.com
@@ -232,7 +237,8 @@ adda is live:  https://adda.example.com
 ```
 
 Postgres, Redis, and the streaming internals are never exposed to the
-internet — only HTTPS (80/443) and RTMP (1935).
+internet — only HTTPS (80/443) and RTMP (1935). To update later:
+`cd /opt/adda && docker compose --profile prod up -d --build`.
 
 ### Prerequisites
 
