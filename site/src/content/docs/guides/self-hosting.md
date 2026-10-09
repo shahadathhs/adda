@@ -5,19 +5,9 @@ description: Production deployment guide — TLS, reverse proxy, persistence, sc
 
 adda is designed to be self-hosted on a single box (a 2 vCPU / 4 GB VPS is a
 fine start for a small community) and can scale horizontally when you outgrow
-it.
-
-## Deploying the docs/marketing site (Vercel)
-
-The Astro site is static and deploys to Vercel with zero config:
-
-1. Push the repo to GitHub
-2. In Vercel: **Add New Project** → import the repo
-3. Set the **Root Directory** to `site` — `site/vercel.json` takes care of the rest
-4. Point your domain (e.g. `adda.example.com`) at the Vercel project
-
-The marketing site is fully decoupled from your streaming stack — it can go
-down without affecting streams, chat, or viewers.
+it. You host two things: the **stack** (backend + web app + streaming) and
+nothing else — the desktop console is an installer your operators download,
+and there is no cloud component of ours anywhere in your deployment.
 
 ## Requirements
 
@@ -134,9 +124,11 @@ is rebuildable.
 
 ```bash
 git pull
-make up          # rebuilds changed images and restarts
-make migrate     # applies any new database migrations
+docker compose --profile prod up -d --build
 ```
+
+Rebuilds changed images and restarts. Database migrations run
+automatically on backend startup; they're idempotent.
 
 ## Scaling notes
 
