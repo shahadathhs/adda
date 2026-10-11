@@ -5,14 +5,11 @@ import { apiBaseUrl } from "@adda/shared";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRecordings } from "@/lib/data";
-import { useMe } from "@/lib/session";
 
 export function RecordingsSection({ communityId }: { communityId: string }) {
-  const { data: user } = useMe();
-  const { data: recs = [] } = useRecordings(communityId, !!user);
+  const { data: recs = [] } = useRecordings(communityId, true);
   const [playing, setPlaying] = useState<string | null>(null);
 
-  if (!user || recs.length === 0) return null;
   return (
     <section className="space-y-3">
       <h2 className="text-base font-semibold text-foreground">Recordings</h2>

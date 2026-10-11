@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.community import Community
 from models.follow import Follow
+from models.user import User
 
 
 async def follow_community(db: AsyncSession, community_id: uuid.UUID, user_id: uuid.UUID) -> Follow:
@@ -61,3 +62,17 @@ async def list_followed_communities(db: AsyncSession, user_id: uuid.UUID) -> lis
         .order_by(Follow.created_at.desc())
     )
     return list(result.scalars().all())
+
+
+async def list_followers(
+    db: AsyncSession, community_id: uuid.UUID
+) -> list[User]:
+    """Public follower list for a channel, most recent first."""
+    result = await db.execute(
+        select(User)
+        .join(Follow, Follow.user_id == User.id)
+        .where(Follow.community_id == community_id)
+        .order_by(Follow.created_at.desc())
+        .limit(200)
+    )
+    return list(result.scalars())

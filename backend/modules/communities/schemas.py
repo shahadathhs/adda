@@ -93,3 +93,12 @@ class AdminCommunityUpdate(BaseModel):
     description: str | None = Field(default=None, max_length=1000)
     is_private: bool | None = None
     is_suspended: bool | None = None
+
+
+class FollowerOut(BaseModel):
+    """A public follower of a channel (home-page/directory info only)."""
+
+    id: str
+    username: str
+    display_name: str
+    avatar_url: str | None = None

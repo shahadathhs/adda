@@ -15,6 +15,7 @@ from modules.communities.schemas import (
     CommunityCreate,
     CommunityOut,
     CommunityUpdate,
+    FollowerOut,
     JoinRequestOut,
     MemberOut,
     RoleUpdateBody,
@@ -30,6 +31,7 @@ from modules.communities.service.follows import (
     follow_community,
     is_following,
     list_followed_communities,
+    list_followers,
     unfollow_community,
 )
 from modules.communities.service.memberships import (
@@ -209,6 +211,24 @@ async def rotate_stream_key(
 
 
 # ── Follows ───────────────────────────────────────────────────────────
+@router.get("/{community_id}/followers", response_model=list[FollowerOut])
+async def channel_followers(
+    community_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+) -> list[FollowerOut]:
+    """Public follower list for the channel page's Followers tab."""
+    followers = await list_followers(db, community_id)
+    return [
+        FollowerOut(
+            id=str(u.id),
+            username=u.username,
+            display_name=u.display_name,
+            avatar_url=u.avatar_url,
+        )
+        for u in followers
+    ]
+
+
 @router.get("/{community_id}/follow")
 async def follow_state(
     community_id: uuid.UUID,

@@ -39,3 +39,10 @@ export interface JoinRequestOut {
   status: string;
   created_at: string;
 }
+
+export interface Follower {
+  id: string;
+  username: string;
+  display_name: string;
+  avatar_url: string | null;
+}

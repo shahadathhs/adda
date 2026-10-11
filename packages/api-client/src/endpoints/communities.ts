@@ -1,4 +1,4 @@
-import type { Community, JoinRequestOut, MemberOut, StreamCredentials } from "@adda/types";
+import type { Community, Follower, JoinRequestOut, MemberOut, StreamCredentials } from "@adda/types";
 import { request } from "../client";
 
 export const listCommunities = () => request<Community[]>("/api/communities");
@@ -72,3 +72,6 @@ export const denyJoinRequest = (id: string, requestId: string) =>
   request<void>(`/api/communities/${id}/join-requests/${requestId}/deny`, {
     method: "POST",
   });
+
+export const listFollowers = (id: string) =>
+  request<Follower[]>(`/api/communities/${id}/followers`);
