@@ -29,6 +29,13 @@ only 4/6/8px, mono tabular numerics, spring motion (120ms micro / 250ms
 state, transform+opacity only), one exported React component per file.
 Both surfaces (web and site) share one identity kit.
 
+## UI work (skills)
+
+Project skills in `.claude/skills/` apply to anything under `web/` or `site/`:
+`ui-build` (read before writing UI), `ux-states-a11y` (states, keyboard, WCAG 2.2
+AA) and `ui-review` (audit before commit). `pnpm check:design` is the
+automated gate for the banned patterns in `/DESIGN.md` and runs in CI.
+
 ## Commands
 
 ### Install (workspace — covers web and site)

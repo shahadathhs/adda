@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-5 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2" aria-label="adda home">
             <Radio className="h-5 w-5 text-primary" aria-hidden="true" />

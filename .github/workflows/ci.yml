@@ -62,6 +62,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Design gate (DESIGN.md banned patterns)
+        run: pnpm check:design
+
       - name: Build
         run: pnpm -C web build
 
