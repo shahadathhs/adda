@@ -82,5 +82,5 @@ test("a wrong password shows an error under the field", async ({ page }) => {
   await page.getByLabel("Email").fill("nobody@example.com");
   await page.getByLabel("Password").fill("not-the-password");
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toBeVisible();
 });
