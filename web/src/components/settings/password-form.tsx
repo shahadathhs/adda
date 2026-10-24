@@ -31,7 +31,7 @@ export function PasswordForm() {
 
   return (
     <form
-      className="max-w-md space-y-5 rounded-md border border-border bg-card p-5"
+      className="space-y-5 rounded-md border border-border bg-card p-5"
       onSubmit={(e) => {
         e.preventDefault();
         setCurrentError(null);

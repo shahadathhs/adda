@@ -8,7 +8,7 @@ export default function ProfileSettingsPage() {
   const { data: user } = useMe();
   if (!user) return null;
   return (
-    <div className="space-y-8">
+    <div className="grid items-start gap-8 lg:grid-cols-2">
       <section aria-labelledby="profile-heading">
         <h2
           id="profile-heading"

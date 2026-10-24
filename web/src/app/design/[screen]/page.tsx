@@ -102,7 +102,7 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
   if (screen === "settings-profile")
     return (
       <SettingsFrame current="/settings">
-        <div className="space-y-8">
+        <div className="grid items-start gap-8 lg:grid-cols-2">
           <section>
             <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">Profile</h2>
             <ProfileForm user={{ ...fixtureUser, bio: "Radio hobbyist. Learning to solder." }} />
@@ -115,8 +115,10 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
   if (screen === "settings-password")
     return (
       <SettingsFrame current="/settings/password">
-        <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">Password</h2>
-        <PasswordForm />
+        <section className="lg:w-1/2 lg:pr-4">
+          <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">Password</h2>
+          <PasswordForm />
+        </section>
       </SettingsFrame>
     );
 
