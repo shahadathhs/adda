@@ -9,7 +9,6 @@ import { TextTabs } from "@/components/page-tabs";
 import { ProfileCard } from "@/components/settings-profile-card";
 import { PasswordCard } from "@/components/settings-password-card";
 import { TwoFactorCard } from "@/components/settings-2fa-card";
-import { DmView } from "@/components/dm-view";
 import { StudioClient } from "@/components/studio-client";
 import { useMe } from "@/lib/session";
 
@@ -28,7 +27,6 @@ function Dashboard() {
   return (
     <DashboardShell>
       {tab === "profile" && user && <ProfileCard user={user} />}
-      {tab === "messages" && <DmView />}
       {tab === "studio" && <StudioClient />}
       {tab === "settings" && (
         <div className="space-y-6">

@@ -6,7 +6,7 @@ import { Radio } from "lucide-react";
 const claims = [
   "Live streams with real-time chat",
   "Recordings of every broadcast",
-  "Direct messages — private by design",
+  "Self-hosted — your server, your data",
 ];
 
 /**

@@ -15,9 +15,7 @@ import {
 } from "@adda/api-client";
 import type { ChatMessage, Community, Recording, StreamStatusPayload } from "@adda/types";
 import { apiBaseUrl } from "@adda/shared";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
 export const webKeys = {
   discover: (q?: string) => ["discover", q ?? ""] as const,
@@ -171,36 +169,6 @@ export function useStreamEvents(id: string, onChange: () => void) {
       socket.unsubscribe(channel);
     };
   }, [id, onChange]);
-}
-
-/**
- * DM unread badge + toasts: listens on the personal `user/<id>` channel
- * (auto-subscribed server-side). The count resets while the user is
- * anywhere under /messages.
- */
-export function useDmUnread(enabled: boolean) {
-  const [unread, setUnread] = useState(0);
-  const pathname = usePathname();
-  const viewing = pathname?.startsWith("/messages") ?? false;
-
-  useEffect(() => {
-    if (!enabled) return;
-    socket.connect();
-    const off = socket.on((msg) => {
-      if (msg.type === "dm_read") {
-        // Our own read (from another device) may clear the badge.
-        setUnread(0);
-      } else if (msg.type === "dm_message") {
-        setUnread((n) => n + 1);
-        const d = msg.data as { display_name: string; content: string };
-        if (!viewing) toast(`${d.display_name}: ${d.content}`, { duration: 4000 });
-      }
-    });
-    return off;
-  }, [enabled, viewing]);
-
-  // Derived, not an effect: the badge hides itself while reading messages.
-  return viewing ? 0 : unread;
 }
 
 export type { Recording };

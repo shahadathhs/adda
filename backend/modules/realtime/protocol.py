@@ -29,9 +29,7 @@ ServerMessageType = Literal[
     "chat_message",  # echoes + broadcasts new chat messages
     "presence",  # online members in a channel
     "stream_status",  # a community went live / offline
-    "dm_message",  # a direct message arrived (delivered on user:<id>)
-    "dm_read",  # the peer read a DM thread
-    "notification",  # personal notification
+    "notification",  # personal notification (delivered on user/<id>)
     "error",
     "pong",
 ]
@@ -86,23 +84,3 @@ class StreamStatusPayload(BaseModel):
     is_live: bool
     viewers: int = 0
     started_at: str | None = None  # ISO 8601
-
-
-class DmMessagePayload(BaseModel):
-    """Shape of the `data` field for a `dm_message` (channel is user:<id>)."""
-
-    id: str
-    thread_id: str
-    sender_id: str
-    username: str
-    display_name: str
-    content: str
-    created_at: str  # ISO 8601
-
-
-class DmReadPayload(BaseModel):
-    """Shape of the `data` field for a `dm_read`."""
-
-    thread_id: str
-    reader_id: str
-    last_read_message_id: str

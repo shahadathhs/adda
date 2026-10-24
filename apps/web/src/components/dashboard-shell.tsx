@@ -2,13 +2,13 @@
 
 import type { ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MessagesSquare, Settings, Sparkles, UserRound } from "lucide-react";
+import { Settings, Sparkles, UserRound } from "lucide-react";
 import { RequireAuth } from "@/components/app-shell";
 import { PillTabs } from "@/components/page-tabs";
 
 /**
  * The user dashboard — ONE surface (reference: Simfree dashboards):
- * big title, primary pill tabs (Profile / Messages / Studio / Settings),
+ * big title, primary pill tabs (Profile / Studio / Settings),
  * content below. Personal tools are tabs of this page, not nav items.
  */
 export function DashboardShell({ children }: { children: ReactNode }) {
@@ -29,11 +29,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 id: "profile",
                 label: "Profile",
                 icon: <UserRound className="h-4 w-4" aria-hidden="true" />,
-              },
-              {
-                id: "messages",
-                label: "Messages",
-                icon: <MessagesSquare className="h-4 w-4" aria-hidden="true" />,
               },
               {
                 id: "studio",

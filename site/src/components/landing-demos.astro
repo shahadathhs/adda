@@ -1,11 +1,10 @@
 ---
 /*
- * Demo band — the product equation, shown not told: community channels,
- * live, direct messages, each rendered in the real component anatomy.
+ * Demo band — the product equation, shown not told: live,
+ * chat, recordings, each rendered in the real component anatomy.
  */
 import StreamCard from './demo/stream-card.astro';
 import ChatThread from './demo/chat-thread.astro';
-import DmThread from './demo/dm-thread.astro';
 ---
 
 <section class="demos">
@@ -19,10 +18,6 @@ import DmThread from './demo/dm-thread.astro';
 		<div class="cell">
 			<ChatThread />
 			<p class="caption"><strong>Channels</strong> — realtime chat that belongs to your community, persisted on your disk.</p>
-		</div>
-		<div class="cell">
-			<DmThread />
-			<p class="caption"><strong>Direct messages</strong> — private by design: not even the server admin can read them.</p>
 		</div>
 	</div>
 </section>
@@ -51,7 +46,7 @@ import DmThread from './demo/dm-thread.astro';
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 1.5rem;
 	}
 

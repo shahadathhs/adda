@@ -2,7 +2,6 @@ from models.base import Base
 from models.channel import Channel
 from models.channel_member import ChannelMember
 from models.community import Community
-from models.dm import DmMessage, DmThread, UserBlock
 from models.follow import Follow
 from models.join_request import JoinRequest
 from models.membership import CommunityRole, Membership
@@ -16,13 +15,10 @@ __all__ = [
     "ChannelMember",
     "Community",
     "CommunityRole",
-    "DmMessage",
-    "DmThread",
     "Follow",
     "JoinRequest",
     "Membership",
     "Message",
     "RefreshToken",
     "User",
-    "UserBlock",
 ]

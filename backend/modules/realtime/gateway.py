@@ -58,8 +58,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     )
     manager.register(conn)
 
-    # Every authed connection listens on its personal channel — DMs and
-    # future notifications are delivered there without explicit subscribe.
+    # Every authed connection listens on its personal channel — personal
+    # notifications are delivered there without explicit subscribe.
     user_channel = f"user/{conn.user_id}"
     await manager.subscribe(conn, user_channel)
 

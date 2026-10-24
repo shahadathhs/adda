@@ -3,20 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, MessagesSquare, Settings, Wand2 } from "lucide-react";
+import { LogOut, Settings, Wand2 } from "lucide-react";
 import { UserAvatar } from "@/components/ui/primitives";
 import { useMe, useLogout } from "@/lib/session";
-import { useDmUnread } from "@/lib/data";
 
 /**
  * Avatar dropdown — personal tools live here, not in the nav
- * (Messages / Studio / Settings / Sign out), streaming-platform style.
+ * (Studio / Settings / Sign out), streaming-platform style.
  */
 export function UserMenu() {
   const { data: user } = useMe();
   const logout = useLogout();
   const router = useRouter();
-  const unread = useDmUnread(!!user);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -57,20 +55,6 @@ export function UserMenu() {
           </div>
 
           <div className="p-1">
-            <Link
-              href="/dashboard?tab=messages"
-              role="menuitem"
-              className={item}
-              onClick={() => setOpen(false)}
-            >
-              <MessagesSquare className="h-4 w-4" aria-hidden="true" />
-              Messages
-              {unread > 0 && (
-                <span className="ml-auto rounded-xs bg-primary px-1.5 font-num text-[11px] font-bold leading-4 text-primary-foreground">
-                  {unread > 9 ? "9+" : unread}
-                </span>
-              )}
-            </Link>
             <Link
               href="/dashboard?tab=studio"
               role="menuitem"
