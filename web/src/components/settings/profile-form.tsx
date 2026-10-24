@@ -10,7 +10,7 @@ import type { User } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { UserAvatar } from "@/components/ui/primitives";
+import { AvatarEditor } from "@/components/settings/avatar-editor";
 
 const BIO_MAX = 280;
 
@@ -56,11 +56,7 @@ export function ProfileForm({ user }: { user: User }) {
         save.mutate();
       }}
     >
-      <UserAvatar
-        name={form.display_name || user.username}
-        src={user.avatar_url}
-        className="h-16 w-16 text-xl"
-      />
+      <AvatarEditor user={user} />
       <Field label="Display name" htmlFor="display_name">
         <Input
           id="display_name"

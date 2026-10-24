@@ -40,7 +40,7 @@ new password through the [admin API](/docs/guides/admin) (`POST /api/admin/users
 ## Where are recordings stored?
 
 In `recordings/` next to `compose.yaml`, written by mediamtx as MP4 files. They are not in the
-database. [Back that folder up](/docs/operations) together with `uploads/` (emotes and banners).
+database. [Back that folder up](/docs/operations) together with `uploads/` (emotes, banners and profile pictures).
 
 ## Can one server host many streamers?
 

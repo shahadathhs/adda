@@ -15,6 +15,7 @@ import { LivePage } from "@/components/studio/live-page";
 import { ChannelPage } from "@/components/studio/channel-page";
 import { ModeratorsPage } from "@/components/studio/moderators-page";
 import { SettingsFrame } from "@/components/settings/settings-frame";
+import { StatusCard } from "@/components/settings/status-card";
 import { IdentitySection } from "@/components/settings/identity-section";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { PasswordForm } from "@/components/settings/password-form";
@@ -108,6 +109,7 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
             <ProfileForm user={{ ...fixtureUser, bio: "Radio hobbyist. Learning to solder." }} />
           </section>
           <div className="space-y-8">
+            <StatusCard user={fixtureUser} />
             <IdentitySection user={fixtureUser} />
             <section>
               <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">Password</h2>

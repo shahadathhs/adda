@@ -54,7 +54,7 @@ installer writes `.env` for you.
 | ---------------- | --------------- | ---------------------------------------------- |
 | `RECORDINGS_DIR` | `../recordings` | Where mediamtx writes MP4 files (a bind mount) |
 | `THUMBS_DIR`     | `../thumbs`     | Live frames used as card posters               |
-| `UPLOADS_DIR`    | `../uploads`    | Emotes and banners                             |
+| `UPLOADS_DIR`    | `../uploads`    | Emotes, banners and profile pictures           |
 
 ## Bootstrap accounts
 

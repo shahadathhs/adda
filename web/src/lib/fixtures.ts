@@ -18,6 +18,7 @@ export const fixtureUser: User = {
   bio: null,
   system_role: "user",
   identity_mode: "named",
+  status: null,
 };
 
 const channel = (

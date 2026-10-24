@@ -49,7 +49,7 @@ Logs are one JSON object per line (`ts`, `level`, `logger`, `msg`, and for reque
 ## Back up and restore
 
 Everything that matters is in three places: the Postgres database, `uploads/` (emotes and
-banners) and `recordings/`.
+banners, profile pictures) and `recordings/`.
 
 ```bash
 scripts/backup.sh /srv/adda-backups          # db.sql.gz, uploads.tar.gz, recordings.tar.gz

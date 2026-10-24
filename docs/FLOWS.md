@@ -34,6 +34,10 @@ user, and publishes a test pattern with ffmpeg.
   and expires (30 minutes by default). Without SMTP the link is logged for the
   host and the page says to ask the host.
 - Profile edits validate username uniqueness.
+- A profile picture (PNG, JPEG or WebP, up to 2 MB and 2000 px, checked by its
+  bytes) can be uploaded, replaced and removed; replacing deletes the old file.
+- A status is an emoji and/or up to 80 characters, with an optional end
+  (1 hour, today, 7 days). Expired statuses read as unset. It can be cleared.
 
 Tests: pytest for each rule; Playwright for register, login, reset.
 

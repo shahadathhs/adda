@@ -29,6 +29,7 @@ from modules.stats.router import router as stats_router
 from modules.streaming.router import admin_router as streaming_admin_router
 from modules.streaming.router import router as streaming_router
 from modules.streaming.webhook import router as streams_router
+from modules.users.profile_router import router as user_profile_router
 from modules.users.router import router as users_router
 
 configure_logging(settings.log_format)
@@ -157,6 +158,7 @@ app.include_router(emotes_router, prefix=settings.api_prefix)
 app.include_router(profile_router, prefix=settings.api_prefix)
 app.include_router(notifications_router, prefix=settings.api_prefix)
 app.include_router(communities_admin_router, prefix=settings.api_prefix)
+app.include_router(user_profile_router, prefix=settings.api_prefix)
 app.include_router(users_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)
 app.include_router(streaming_admin_router, prefix=settings.api_prefix)

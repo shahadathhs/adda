@@ -9,7 +9,16 @@ export interface User {
   bio: string | null;
   system_role: "user" | "admin" | "superadmin";
   identity_mode: IdentityMode;
+  status: UserStatus | null;
 }
+
+export interface UserStatus {
+  emoji: string | null;
+  text: string;
+  expires_at: string | null;
+}
+
+export type StatusExpiry = "never" | "hour" | "today" | "week";
 
 export interface Token {
   access_token: string;

@@ -1,4 +1,4 @@
-import type { IdentityMode, Token, User } from "@/lib/types";
+import type { IdentityMode, StatusExpiry, Token, User } from "@/lib/types";
 import { request } from "../client";
 
 export const register = (data: {
@@ -48,6 +48,19 @@ export const updateProfile = (data: {
     method: "PATCH",
     body: JSON.stringify(data),
   });
+
+export const uploadAvatar = (file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  return request<User>("/api/auth/me/avatar", { method: "POST", body: form });
+};
+
+export const removeAvatar = () => request<User>("/api/auth/me/avatar", { method: "DELETE" });
+
+export const setStatus = (data: { emoji: string | null; text: string; expires: StatusExpiry }) =>
+  request<User>("/api/auth/me/status", { method: "PUT", body: JSON.stringify(data) });
+
+export const clearStatus = () => request<User>("/api/auth/me/status", { method: "DELETE" });
 
 export const setIdentityMode = (mode: IdentityMode) =>
   request<User>("/api/me/identity-mode", { method: "PUT", body: JSON.stringify({ mode }) });

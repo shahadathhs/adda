@@ -52,6 +52,12 @@ export function UserMenu() {
           <div className="border-b border-border px-3 py-2.5">
             <p className="truncate text-sm font-semibold text-foreground">{user.display_name}</p>
             <p className="truncate text-xs text-muted-foreground">@{user.username}</p>
+            {user.status && (
+              <p className="mt-1.5 truncate text-xs text-foreground">
+                {user.status.emoji && <span aria-hidden="true">{user.status.emoji} </span>}
+                {user.status.text}
+              </p>
+            )}
           </div>
 
           <div className="p-1">

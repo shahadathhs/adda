@@ -1,4 +1,6 @@
-from sqlalchemy import Boolean, String, text
+from datetime import UTC, datetime
+
+from sqlalchemy import Boolean, DateTime, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
@@ -35,8 +37,27 @@ class User(Base):
     identity_mode: Mapped[str] = mapped_column(
         String(10), default="named", server_default=text("'named'")
     )
+    # A short status line ("Away until Monday"), optionally with an emoji and an end time.
+    status_emoji: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    status_text: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    status_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     # Suspended accounts cannot log in (admin moderation lever).
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=text("true"))
+
+    @property
+    def status(self) -> dict[str, str | None] | None:
+        """The current status, or None when unset or past its end time."""
+        if not (self.status_emoji or self.status_text):
+            return None
+        if self.status_expires_at is not None and self.status_expires_at <= datetime.now(UTC):
+            return None
+        return {
+            "emoji": self.status_emoji,
+            "text": self.status_text or "",
+            "expires_at": self.status_expires_at.isoformat() if self.status_expires_at else None,
+        }
 
     def to_public_dict(self) -> dict[str, str | bool | None]:
         return {

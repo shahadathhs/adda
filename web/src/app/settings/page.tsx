@@ -2,6 +2,7 @@
 
 import { IdentitySection } from "@/components/settings/identity-section";
 import { PasswordForm } from "@/components/settings/password-form";
+import { StatusCard } from "@/components/settings/status-card";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { useMe } from "@/lib/session";
 
@@ -20,6 +21,7 @@ export default function ProfileSettingsPage() {
         <ProfileForm key={user.id} user={user} />
       </section>
       <div className="space-y-8">
+        <StatusCard key={user.id} user={user} />
         <IdentitySection user={user} />
         <section aria-labelledby="password-heading">
           <h2

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { mediaUrl } from "@/lib/media-url";
 import { toneClass } from "@/lib/tone";
 
 const initials = (name: string) =>
@@ -24,7 +25,7 @@ export function UserAvatar({
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={src}
+        src={mediaUrl(src) ?? src}
         alt={name}
         className={cn("rounded-full object-cover", className)}
         loading="lazy"
