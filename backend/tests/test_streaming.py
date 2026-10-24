@@ -2,6 +2,8 @@
 
 import uuid
 
+import pytest
+
 from tests.conftest import Account, TestClient
 
 
@@ -107,3 +109,47 @@ async def test_force_stop_unknown_channel_is_404(client: TestClient, make_admin)
     admin = await make_admin()
     resp = await client.post(f"/admin/communities/{uuid.uuid4()}/stop", admin.access)
     assert resp.status_code == 404
+
+
+# ── stream health (the studio's Live tab) ─────────────────────────────
+def test_track_codecs_reads_current_and_older_mediamtx_shapes() -> None:
+    from modules.streaming.service.mediamtx import track_codecs
+
+    current = {
+        "tracks": ["H264", "MPEG-4 Audio"],
+        "tracks2": [
+            {"codec": "H264", "codecProps": {"width": 1280, "height": 720}},
+            {"codec": "MPEG-4 Audio", "codecProps": {"sampleRate": 48000}},
+        ],
+    }
+    older = {"tracks": [{"type": "video", "codec": "H264"}, {"type": "audio", "codec": "Opus"}]}
+    assert track_codecs(current) == ("H264", "MPEG-4 Audio")
+    assert track_codecs(older) == ("H264", "Opus")
+    assert track_codecs(None) == (None, None)
+    assert track_codecs({"tracks": ["H264"]}) == (None, None)  # names alone cannot be told apart
+
+
+async def test_health_reports_a_live_stream_without_crashing(
+    client: TestClient, make_user, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    owner = await make_user("owner")
+    cid = (
+        await client.post("/communities", owner.access, json={"name": "A", "slug": "health-one"})
+    ).json()["id"]
+
+    async def fake_details(_: str) -> dict:
+        return {
+            "tracks": ["H264", "MPEG-4 Audio"],
+            "tracks2": [
+                {"codec": "H264", "codecProps": {"width": 1280}},
+                {"codec": "MPEG-4 Audio", "codecProps": {"sampleRate": 48000}},
+            ],
+            "readers": [{}, {}],
+        }
+
+    monkeypatch.setattr("modules.streaming.router.path_details", fake_details)
+    resp = await client.get(f"/streaming/communities/{cid}/health", owner.access)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["is_live"] is True and body["viewers"] == 2
+    assert (body["video_codec"], body["audio_codec"]) == ("H264", "MPEG-4 Audio")

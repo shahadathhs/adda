@@ -5,7 +5,15 @@ import { notFound } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { ChannelView } from "@/components/channel/channel-view";
+import { NotFoundContent } from "@/components/not-found-content";
+import { SearchResults } from "@/components/search-results";
+import { EndedPanel } from "@/components/channel/ended-panel";
 import { HomeClient } from "@/components/home-client";
+import { StudioFrame } from "@/components/studio/studio-frame";
+import { SetupPage } from "@/components/studio/setup-page";
+import { LivePage } from "@/components/studio/live-page";
+import { ChannelPage } from "@/components/studio/channel-page";
+import { ModeratorsPage } from "@/components/studio/moderators-page";
 import { SettingsFrame } from "@/components/settings/settings-frame";
 import { IdentitySection } from "@/components/settings/identity-section";
 import { ProfileForm } from "@/components/settings/profile-form";
@@ -14,6 +22,10 @@ import {
   fixtureChannelRecordings,
   fixtureChannels,
   fixtureChat,
+  fixtureCreds,
+  fixtureFollowers,
+  fixtureHealth,
+  fixtureModerators,
   fixtureCommunity,
   fixtureFollowed,
   fixtureRecordings,
@@ -37,6 +49,7 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
   const guest = screen.endsWith("-guest");
   qc.setQueryData(sessionKeys.me, guest ? null : fixtureUser);
   qc.setQueryData(["followed"], fixtureFollowed);
+  qc.setQueryData(["discover", ""], fixtureChannels);
   qc.setQueryData(["followers", "c-1"], []);
   qc.setQueryData(webKeys.follow("c-1"), { following: !guest });
   qc.setQueryData(webKeys.recordings("c-1"), fixtureChannelRecordings);
@@ -47,6 +60,41 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
         <HomeClient initial={fixtureChannels} recordings={fixtureRecordings} />
       </main>
     );
+
+  if (screen === "search")
+    return (
+      <main>
+        <SearchResults initial={fixtureChannels} q="radio" />
+      </main>
+    );
+
+  if (screen === "not-found") return <NotFoundContent />;
+
+  if (screen === "ended")
+    return (
+      <main className="mx-auto max-w-3xl p-6">
+        <EndedPanel community={fixtureCommunity(false)} seconds={3 * 3600 + 41 * 60} />
+      </main>
+    );
+
+  if (screen.startsWith("studio-")) {
+    const live = screen === "studio-live";
+    qc.setQueryData(["mine"], [{ ...fixtureCommunity(live), my_role: "owner" }]);
+    qc.setQueryData(webKeys.status("c-1"), fixtureStatus(live));
+    qc.setQueryData(["stream-key", "c-1"], fixtureCreds);
+    qc.setQueryData(["studio-health", "c-1"], fixtureHealth);
+    qc.setQueryData(["moderators", "c-1"], fixtureModerators);
+    qc.setQueryData(["followers", "c-1"], fixtureFollowers);
+    const pages: Record<string, [string, React.ReactNode]> = {
+      "studio-setup": ["/studio", <SetupPage key="s" />],
+      "studio-live": ["/studio/live", <LivePage key="l" />],
+      "studio-channel": ["/studio/channel", <ChannelPage key="c" />],
+      "studio-moderators": ["/studio/moderators", <ModeratorsPage key="m" />],
+    };
+    const page = pages[screen];
+    if (!page) notFound();
+    return <StudioFrame current={page[0]}>{page[1]}</StudioFrame>;
+  }
 
   if (screen === "settings-profile")
     return (

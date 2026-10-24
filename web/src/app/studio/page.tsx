@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { SetupPage } from "@/components/studio/setup-page";
 
-export default function StudioRedirect() {
-  redirect("/dashboard?tab=studio");
+export default function StudioSetupRoute() {
+  return <SetupPage />;
 }

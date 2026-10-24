@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
-/** Header search; submits to the home grid, which filters by `?q=`. */
+/** Header search; submits to the search page. */
 export function SearchBox() {
   const router = useRouter();
   const q = useSearchParams().get("q") ?? "";
@@ -15,7 +15,7 @@ export function SearchBox() {
       onSubmit={(e) => {
         e.preventDefault();
         const value = String(new FormData(e.currentTarget).get("q") ?? "").trim();
-        router.push(value ? `/?q=${encodeURIComponent(value)}` : "/");
+        router.push(value ? `/search?q=${encodeURIComponent(value)}` : "/search");
       }}
     >
       <Search

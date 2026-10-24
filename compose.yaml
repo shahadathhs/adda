@@ -49,6 +49,8 @@ services:
     restart: unless-stopped
     environment:
       MTX_AUTHHTTPADDRESS: ${MTX_AUTH_ADDRESS:-http://backend:7001/api/streams/auth}
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # so a backend running on the host is reachable
     ports:
       - "${RTMP_PORT:-1935}:1935" # RTMP ingest — OBS streams here (public)
       - "127.0.0.1:${HLS_PORT:-8888}:8888" # HLS, local only (Caddy proxies it in production)

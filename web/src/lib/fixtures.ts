@@ -165,3 +165,42 @@ export const fixtureChat: ChatMessage[] = [
   line(7, author("u5", "sadia", ["moderator", "follower"]), "she covered it at 02:40"),
   line(8, author("u-rafi", "rafi"), "thanks both, rewinding now"),
 ];
+
+export const fixtureCreds = {
+  stream_url: "rtmp://live.nilaworkshop.example:1935/community/c-1?key=8f3a1c9d27b64e05a1d9c3e7",
+  stream_key: "8f3a1c9d27b64e05a1d9c3e7",
+};
+
+export const fixtureHealth = {
+  community_id: "c-1",
+  is_live: true,
+  viewers: 312,
+  started_at: new Date(Date.now() - (3 * 3600 + 41 * 60 + 8) * 1000).toISOString(),
+  uptime_seconds: 3 * 3600 + 41 * 60 + 8,
+  video_codec: "H264",
+  audio_codec: "AAC",
+};
+
+export const fixtureModerators = [
+  {
+    user_id: "u5",
+    username: "sadia",
+    display_name: "Sadia",
+    avatar_url: null,
+    since: "2026-04-02T00:00:00Z",
+  },
+  {
+    user_id: "u3",
+    username: "mehedi",
+    display_name: "Mehedi",
+    avatar_url: null,
+    since: "2026-03-11T00:00:00Z",
+  },
+];
+
+export const fixtureFollowers = ["tania_r", "tanvir", "imran", "joy_k"].map((u, i) => ({
+  id: `f${i}`,
+  username: u,
+  display_name: u,
+  avatar_url: null,
+}));

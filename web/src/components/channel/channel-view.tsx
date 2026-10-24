@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { hlsBaseUrl } from "@/lib/config";
 import type { Community } from "@/lib/types";
+import { useStreamEnded } from "@/lib/use-stream-ended";
 import { useRecordings, useStreamEvents, useStreamStatus, webKeys } from "@/lib/data";
 import { ChatRail } from "@/components/chat-rail";
 import { AboutPanel } from "@/components/channel/about-panel";
 import { ChannelHeader } from "@/components/channel/channel-header";
 import { FollowersList } from "@/components/channel/followers-list";
+import { EndedPanel } from "@/components/channel/ended-panel";
 import { OfflinePanel } from "@/components/channel/offline-panel";
 import { LivePlayer } from "@/components/live-player";
 import { RecordingsSection } from "@/components/recordings-section";
@@ -27,8 +30,8 @@ export function ChannelView({
   chat?: ReactNode;
 }) {
   const [tab, setTab] = useState("about");
-  const [recording, setRecording] = useState<string | null>(null);
   const qc = useQueryClient();
+  const router = useRouter();
   const onChange = useCallback(() => {
     qc.invalidateQueries({ queryKey: webKeys.status(community.id) });
     qc.invalidateQueries({ queryKey: webKeys.detail(community.id) });
@@ -41,6 +44,8 @@ export function ChannelView({
   const isLive = status?.is_live ?? community.is_live;
   const lastStreamedAt = recs?.[0]?.created_at ?? null;
 
+  const ended = useStreamEnded(isLive, status?.started_at ?? null);
+
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-5 px-4 py-5 sm:px-6">
@@ -49,13 +54,19 @@ export function ChannelView({
             hlsUrl={`${hlsBaseUrl()}/community/${community.id}/index.m3u8`}
             viewers={status?.viewers ?? 0}
           />
+        ) : ended ? (
+          <EndedPanel community={community} seconds={ended.seconds} />
         ) : (
           <OfflinePanel
             community={community}
             lastStreamedAt={lastStreamedAt}
             onWatchLast={() => {
-              setTab("recordings");
-              setRecording(recs?.[0]?.path ?? null);
+              const latest = recs?.[0];
+              if (latest)
+                router.push(
+                  `/channel/${community.slug}/recording?path=${encodeURIComponent(latest.path)}`,
+                );
+              else setTab("recordings");
             }}
           />
         )}
@@ -87,8 +98,7 @@ export function ChannelView({
             <RecordingsSection
               communityId={community.id}
               communityName={community.name}
-              selected={recording}
-              onSelect={setRecording}
+              communitySlug={community.slug}
             />
           )}
           {tab === "followers" && <FollowersList communityId={community.id} />}
@@ -96,11 +106,11 @@ export function ChannelView({
       </div>
 
       <aside
-        aria-label={isLive ? "Chat" : "About this channel"}
+        aria-label={isLive || ended ? "Chat" : "About this channel"}
         className="border-t border-border lg:sticky lg:top-14 lg:h-[calc(100vh-3.5rem)] lg:border-l lg:border-t-0"
       >
-        {isLive ? (
-          (chat ?? <ChatRail communityId={community.id} name={community.name} />)
+        {isLive || ended ? (
+          (chat ?? <ChatRail communityId={community.id} name={community.name} ended={!isLive} />)
         ) : (
           <AboutPanel community={community} />
         )}

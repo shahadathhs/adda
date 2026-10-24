@@ -94,8 +94,11 @@ ps: ## List running containers
 
 # ── Local dev ─────────────────────────────────────────────────────────
 
+# The backend runs on the host here, so mediamtx must reach it through the host
+# gateway, not the compose service name used when the backend is a container.
 infra: env ## Start the infra (postgres + redis + mediamtx) and wait until it is ready
-	$(COMPOSE) up -d --wait postgres redis mediamtx
+	MTX_AUTH_ADDRESS=http://host.docker.internal:7001/api/streams/auth \
+	  $(COMPOSE) up -d --wait postgres redis mediamtx
 
 dev: infra migrate ## Run backend (:7001) + web (:5173) with hot reload (starts infra, applies migrations)
 	@trap 'kill 0' EXIT; \

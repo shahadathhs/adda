@@ -45,6 +45,7 @@ export function ChatPanel({
   error,
   clearError,
   send,
+  ended = false,
 }: {
   name: string;
   messages: ChatMessage[];
@@ -54,6 +55,8 @@ export function ChatPanel({
   error: { code: string; message: string } | null;
   clearError: () => void;
   send: (content: string) => void;
+  /** The broadcast is over; chat stays open. */
+  ended?: boolean;
 }) {
   const { data: user } = useMe();
   const qc = useQueryClient();
@@ -75,12 +78,14 @@ export function ChatPanel({
       <header className="flex h-12 shrink-0 items-center justify-between px-5">
         <h2 className="text-sm font-semibold text-foreground">Chat</h2>
         <span className="text-xs text-muted-foreground">
-          {connected ? (
+          {!connected ? (
+            "Reconnecting…"
+          ) : ended ? (
+            "Stream ended"
+          ) : (
             <>
               <span className="font-num">{online.toLocaleString()}</span> here
             </>
-          ) : (
-            "Reconnecting…"
           )}
         </span>
       </header>
@@ -119,6 +124,12 @@ export function ChatPanel({
         ))}
         <div ref={bottomRef} />
       </div>
+
+      {ended && connected && (
+        <p className="shrink-0 border-t border-border px-5 py-2 text-center text-xs text-muted-foreground">
+          The stream ended. Chat stays open.
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="shrink-0 px-5 pb-1 text-xs text-destructive">

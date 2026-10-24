@@ -1,3 +1,5 @@
+import { apiBaseUrl } from "@/lib/config";
+
 /** A recording's display title, from its file name (`2026-10-24T18-30-00-title.mp4`). */
 export function recordingTitle(name: string): string {
   const stem = name.replace(/\.[^.]+$/, "");
@@ -7,3 +9,7 @@ export function recordingTitle(name: string): string {
     .trim();
   return cleaned || stem;
 }
+
+/** Direct URL of a recording file. */
+export const recordingFileUrl = (path: string) =>
+  `${apiBaseUrl()}/api/recordings/file?path=${encodeURIComponent(path)}`;

@@ -10,7 +10,7 @@ import { StreamThumb } from "@/components/stream-thumb";
 export function RecordingCard({ recording: r }: { recording: RecordingFeedItem }) {
   return (
     <Link
-      href={`/channel/${r.community_slug}`}
+      href={`/channel/${r.community_slug}/recording?path=${encodeURIComponent(r.path)}`}
       className="group block overflow-hidden rounded-lg border border-border bg-card outline-none transition-[translate,border-color] duration-120 ease-[var(--ease-micro)] hover:-translate-y-0.5 hover:border-muted-foreground/40 focus-visible:outline-2 focus-visible:outline-ring"
     >
       <div className="relative border-b border-border">

@@ -55,12 +55,7 @@ export function UserMenu() {
           </div>
 
           <div className="p-1">
-            <Link
-              href="/dashboard?tab=studio"
-              role="menuitem"
-              className={item}
-              onClick={() => setOpen(false)}
-            >
+            <Link href="/studio" role="menuitem" className={item} onClick={() => setOpen(false)}>
               <Wand2 className="h-4 w-4" aria-hidden="true" />
               Studio
             </Link>

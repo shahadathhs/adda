@@ -19,7 +19,12 @@ from modules.communities.service.queries import get_community, search_communitie
 from modules.communities.service.roles import can_moderate
 from modules.streaming.schemas import DiscoverItem, LiveStreamOut, StreamHealthOut
 from modules.streaming.service import monitor
-from modules.streaming.service.mediamtx import kick_publisher, path_details, viewer_count
+from modules.streaming.service.mediamtx import (
+    kick_publisher,
+    path_details,
+    track_codecs,
+    viewer_count,
+)
 from modules.streaming.service.playback import (
     hls_url,
     is_community_live,
@@ -155,9 +160,7 @@ async def stream_health(
     cid = str(community_id)
     details = await path_details(cid)
     started = await monitor.started_at(cid)
-    tracks = (details or {}).get("tracks") or []
-    video = next((t.get("codec") for t in tracks if t.get("type") == "video"), None)
-    audio = next((t.get("codec") for t in tracks if t.get("type") == "audio"), None)
+    video, audio = track_codecs(details)
     return StreamHealthOut(
         community_id=cid,
         is_live=details is not None,

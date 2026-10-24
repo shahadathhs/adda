@@ -28,7 +28,7 @@ export function CreateChannelForm({ onDone }: { onDone: () => void }) {
       toast.success("Channel created. Open Studio to get your stream key.");
       void qc.invalidateQueries();
       onDone();
-      router.push("/dashboard?tab=studio");
+      router.push("/studio");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Could not create the channel"),
   });

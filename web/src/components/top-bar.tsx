@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Radio } from "lucide-react";
+import { Radio, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notification-bell";
 import { SearchBox } from "@/components/search-box";
@@ -21,7 +21,7 @@ export function TopBar() {
   const { data: user } = useMe();
   const pathname = usePathname();
   const following = useSearchParams().get("tab") === "following";
-  const onHome = pathname === "/";
+  const onHome = pathname === "/" || pathname === "/search";
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
@@ -33,7 +33,7 @@ export function TopBar() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1" aria-label="Primary">
+        <nav className="hidden items-center gap-1 sm:flex" aria-label="Primary">
           {user && (
             <Link
               href="/?tab=following"
@@ -55,6 +55,13 @@ export function TopBar() {
         <SearchBox />
 
         <div className="ml-auto flex items-center gap-3 sm:ml-0">
+          <Link
+            href="/search"
+            aria-label="Search channels"
+            className="grid h-8 w-8 place-items-center rounded-sm text-muted-foreground hover:bg-secondary hover:text-foreground sm:hidden"
+          >
+            <Search className="h-[18px] w-[18px]" aria-hidden="true" />
+          </Link>
           {user ? (
             <>
               <NotificationBell />

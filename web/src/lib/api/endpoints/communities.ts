@@ -20,6 +20,9 @@ export const updateCommunity = (id: string, data: Partial<Community>) =>
     body: JSON.stringify(data),
   });
 
+export const deleteCommunity = (id: string) =>
+  request<void>(`/api/communities/${id}`, { method: "DELETE" });
+
 export const getStreamKey = (id: string) =>
   request<StreamCredentials>(`/api/communities/${id}/stream-key`);
 
