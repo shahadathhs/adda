@@ -77,7 +77,7 @@ publisher against the channel's key.
 | ------------------------------------ | ------------------------------------- |
 | Accounts, channels, chat, polls      | Postgres (the `postgres_data` volume) |
 | Recordings                           | `./recordings/`                       |
-| Emotes, banners and profile pictures | `./uploads/`                          |
+| Emotes, banners, pictures and videos | `./uploads/`                          |
 | Presence, rate limits, live tallies  | Redis, ephemeral by design            |
 
 [Back up](/docs/operations) the database, `uploads/` and `recordings/`. Everything else rebuilds.

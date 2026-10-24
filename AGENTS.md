@@ -135,7 +135,7 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   `redis_client.py`, `seed.py`, `security/` (jwt/password/deps/guards),
   `exceptions.py`. The shared `models/` package and `alembic/` sit at the
   backend root. Features live in `modules/<feature>/` — one folder per feature
-  (`auth`, `users`, `communities`, `chat`, `streaming`, `recordings`, `stats`,
+  (`auth`, `users`, `communities`, `chat`, `streaming`, `recordings`, `videos`, `browse`, `stats`,
   `realtime`, `notifications`). Channel roles:
   the owner is `Community.owner_id`; moderators are `ChannelModerator` rows.
   "Community" is the internal name for a streamer's channel; the UI, docs and

@@ -32,6 +32,9 @@ export function HomeHero({ live, channels }: { live: number; channels: number })
           <Link href="/channels" className={chip}>
             Channels <span className="font-num text-foreground">{channels}</span>
           </Link>
+          <Link href="/videos" className={chip}>
+            Videos
+          </Link>
           <Link href="/recordings" className={chip}>
             Recordings
           </Link>

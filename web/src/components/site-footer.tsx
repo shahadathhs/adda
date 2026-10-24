@@ -50,6 +50,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/videos" className={link}>
+                Videos
+              </Link>
+            </li>
+            <li>
               <Link href="/recordings" className={link}>
                 Recordings
               </Link>

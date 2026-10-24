@@ -60,7 +60,12 @@ export function GlobalSearch({
         href: `/channel/${channel.slug}`,
       }));
   const settled = !typing || (search.data && search.data.query === value.trim());
-  const nothing = typing && settled && !result?.channels.length && !result?.recordings.length;
+  const nothing =
+    typing &&
+    settled &&
+    !result?.channels.length &&
+    !result?.recordings.length &&
+    !result?.videos.length;
   const optionId = (i: number) => `${listId}-${i}`;
 
   const go = (href: string) => {

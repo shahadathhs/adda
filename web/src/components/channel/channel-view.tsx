@@ -14,7 +14,9 @@ import { FollowersList } from "@/components/channel/followers-list";
 import { EndedPanel } from "@/components/channel/ended-panel";
 import { OfflinePanel } from "@/components/channel/offline-panel";
 import { LivePlayer } from "@/components/live-player";
+import { VideosSection } from "@/components/channel/videos-section";
 import { RecordingsSection } from "@/components/recordings-section";
+import { useChannelVideos } from "@/lib/use-videos";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
 
 /**
@@ -41,6 +43,7 @@ export function ChannelView({
 
   const { data: status } = useStreamStatus(community.id);
   const { data: recs } = useRecordings(community.id, true);
+  const { data: vids } = useChannelVideos(community.id);
   const isLive = status?.is_live ?? community.is_live;
   const lastStreamedAt = recs?.[0]?.created_at ?? null;
 
@@ -84,6 +87,11 @@ export function ChannelView({
           tabs={[
             { id: "about", label: "About" },
             { id: "recordings", label: "Recordings", count: recs?.length },
+            {
+              id: "videos",
+              label: "Videos",
+              count: vids?.filter((v) => v.status === "ready" && v.visibility === "public").length,
+            },
             { id: "followers", label: "Followers", count: community.follower_count },
           ]}
         />
@@ -101,6 +109,7 @@ export function ChannelView({
               communitySlug={community.slug}
             />
           )}
+          {tab === "videos" && <VideosSection communityId={community.id} />}
           {tab === "followers" && <FollowersList communityId={community.id} />}
         </div>
       </div>

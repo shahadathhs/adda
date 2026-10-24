@@ -1,5 +1,6 @@
 import type { DiscoverChannel } from "./streaming";
 import type { RecordingFeedItem } from "./recording";
+import type { Video } from "./video";
 
 export interface Page<T> {
   items: T[];
@@ -12,6 +13,7 @@ export interface SearchResult {
   query: string;
   channels: DiscoverChannel[];
   recordings: RecordingFeedItem[];
+  videos: Video[];
 }
 
 export type ChannelStatus = "all" | "live" | "offline";

@@ -135,7 +135,7 @@ built" table.
 - A light theme, and an admin web UI
 - Email digests, marketing mail, and any mail beyond reset links and live alerts
 - Low-latency WebRTC playback (HLS only)
-- Clips, transcoding ladders, VOD chapters
+- Clips, transcoding ladders, VOD chapters (uploaded videos play as sent, with no re-encoding)
 - Multi-node deployment documentation
 
 This code is **not deleted**: it remains in git history (everything before

@@ -20,6 +20,7 @@ const navLink = (active: boolean) =>
 const SECTIONS = [
   { href: "/live", label: "Live" },
   { href: "/channels", label: "Channels" },
+  { href: "/videos", label: "Videos" },
   { href: "/recordings", label: "Recordings" },
 ];
 

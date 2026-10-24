@@ -175,6 +175,37 @@ fan-out.
   or recency; markers show on the timeline; clicking a timestamp seeks.
 - Authors and moderators can delete a comment. Guests can read only.
 
+## F17 — Uploaded videos (studio Videos tab, channel Videos tab, /videos)
+
+- The channel owner (and staff) uploads a video from the studio. Nobody else can:
+  the API refuses it for moderators, other accounts and guests.
+- MP4, M4V, MOV or WebM up to 4 GB, judged by what ffprobe finds, not the file name.
+  H.264, VP8, VP9 or AV1 video with AAC, MP3, Opus, Vorbis or FLAC audio plays directly;
+  anything else fails with a message that names the codec and what to re-encode it as.
+  There is no transcoding.
+- The upload is chunked and resumable: 8 MB parts at an explicit offset. A wrong
+  offset is a 409; the video reports how many bytes the server has, and the web app
+  retries from there, so a dropped connection does not restart the file. A paused
+  upload continues by choosing the same file again. Untouched uploads are removed after
+  24 hours.
+- When the last part arrives the server prepares the file in the background: MP4-family
+  files are remuxed (copied, not re-encoded) with the index first so playback starts at
+  once and seeking works, and a poster frame is taken. The video is `processing`, then
+  `ready` or `failed` with the reason.
+- Visibility is public (listed on the channel, in `/videos` and in search), unlisted
+  (anyone with the link) or private (the owner). The owner can edit the title,
+  description and visibility, and delete a video in any state. Deleting a channel
+  deletes its videos.
+- Files are served with range requests. Private and unlisted media accept the viewer's
+  token as `?token=` because a video element cannot send a header.
+- `/videos` has the same filtering, sorting and numbered pagination as the other
+  directories; videos also appear on the home page, in the search dropdown and on
+  `/search`. Private and suspended channels never appear.
+
+Tests: pytest for the upload protocol, ownership, validation, codec rules,
+visibility, browse and cleanup (ffmpeg is faked); Playwright for the real flow with a
+generated MP4 through ffmpeg in the backend container.
+
 ## Screen map
 
 | Screen | Flow(s)          | Backend module              | Proven by                       |

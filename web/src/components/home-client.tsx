@@ -6,6 +6,8 @@ import { useLiveGrid } from "@/lib/data";
 import { FeaturedStream } from "@/components/home/featured-stream";
 import { FollowingView } from "@/components/home/following-view";
 import { FollowingStrip } from "@/components/home/following-strip";
+import { VideoCard } from "@/components/video-card";
+import { useBrowseVideos } from "@/lib/use-videos";
 import { HomeHero } from "@/components/home/home-hero";
 import { CardGrid } from "@/components/browse/card-grid";
 import { Reveal } from "@/components/reveal";
@@ -28,6 +30,7 @@ export function HomeClient({
   const following = params.get("tab") === "following";
 
   const channels = useLiveGrid(initial);
+  const videos = useBrowseVideos({ page_size: PREVIEW });
   const live = channels.filter((c) => c.is_live).sort((a, b) => b.viewers - a.viewers);
   const offline = channels.filter((c) => !c.is_live);
 
@@ -70,6 +73,22 @@ export function HomeClient({
                 <CardGrid>
                   {offline.slice(0, PREVIEW).map((c) => (
                     <StreamCard key={c.community_id} channel={c} />
+                  ))}
+                </CardGrid>
+              </HomeSection>
+            </Reveal>
+
+            <Reveal>
+              <HomeSection
+                title="Videos"
+                count={videos.data?.total}
+                hint="Uploaded by channel owners"
+                href="/videos"
+                empty="Videos uploaded by channel owners appear here."
+              >
+                <CardGrid>
+                  {(videos.data?.items ?? []).map((v) => (
+                    <VideoCard key={v.id} video={v} />
                   ))}
                 </CardGrid>
               </HomeSection>

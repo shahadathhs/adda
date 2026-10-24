@@ -32,6 +32,7 @@ from modules.streaming.router import router as streaming_router
 from modules.streaming.webhook import router as streams_router
 from modules.users.profile_router import router as user_profile_router
 from modules.users.router import router as users_router
+from modules.videos.router import router as videos_router
 
 configure_logging(settings.log_format)
 access_log = logging.getLogger("adda.access")
@@ -44,15 +45,18 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     from modules.chat.service import polls, reactions
     from modules.realtime.manager import manager
     from modules.streaming.service import monitor
+    from modules.videos.service import uploads as video_uploads
 
     await seed_db()
     await manager.start()
     monitor.start()
+    await video_uploads.resume_processing()
     logging.getLogger("adda").info("Backend startup complete. Debug=%s", settings.debug)
     try:
         yield
     finally:
         await monitor.stop()
+        await video_uploads.stop()
         await reactions.batcher.stop()
         await polls.stop()
         await manager.stop()
@@ -151,6 +155,7 @@ async def health() -> dict[str, str]:
 # at the root (no prefix).
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(browse_router, prefix=settings.api_prefix)
+app.include_router(videos_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
 app.include_router(chat_router, prefix=settings.api_prefix)
 app.include_router(identity_router, prefix=settings.api_prefix)

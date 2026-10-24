@@ -7,3 +7,4 @@ export * from "./admin";
 export * from "./realtime";
 export * from "./notification";
 export * from "./browse";
+export * from "./video";

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useGlobalSearch } from "@/lib/use-browse";
 import { useUrlParams } from "@/lib/use-url-params";
+import { VideoCard } from "@/components/video-card";
 import { RecordingCard } from "@/components/recording-card";
 import { StreamCard } from "@/components/stream-card";
 import { BrowseHeader } from "@/components/browse/browse-header";
@@ -39,7 +40,7 @@ export function SearchPage({ query }: { query?: string }) {
     </section>
   );
 
-  const nothing = data && !data.channels.length && !data.recordings.length;
+  const nothing = data && !data.channels.length && !data.recordings.length && !data.videos.length;
   const enc = encodeURIComponent(q);
 
   return (
@@ -61,6 +62,9 @@ export function SearchPage({ query }: { query?: string }) {
               </Link>
               <Link href="/channels" className={buttonClass("outline")}>
                 All channels
+              </Link>
+              <Link href="/videos" className={buttonClass("outline")}>
+                Videos
               </Link>
               <Link href="/recordings" className={buttonClass("outline")}>
                 Recordings
@@ -90,6 +94,13 @@ export function SearchPage({ query }: { query?: string }) {
               data.channels.length,
               `/channels?q=${enc}`,
               data.channels.map((c) => <StreamCard key={c.community_id} channel={c} />),
+            )}
+          {data.videos.length > 0 &&
+            group(
+              "Videos",
+              data.videos.length,
+              `/videos?q=${enc}`,
+              data.videos.map((v) => <VideoCard key={v.id} video={v} />),
             )}
           {data.recordings.length > 0 &&
             group(

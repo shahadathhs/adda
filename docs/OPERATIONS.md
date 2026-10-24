@@ -45,8 +45,8 @@ Logs are one JSON object per line (`ts`, `level`, `logger`, `msg`, and for reque
 
 ## Back up and restore
 
-Everything that matters is in three places: the Postgres database, `uploads/` (emotes and
-banners, profile pictures) and `recordings/`.
+Everything that matters is in three places: the Postgres database, `uploads/` (emotes,
+banners, profile pictures and uploaded videos) and `recordings/`.
 
 ```bash
 scripts/backup.sh /srv/adda-backups          # db.sql.gz, uploads.tar.gz, recordings.tar.gz
@@ -79,7 +79,14 @@ The backend applies pending migrations when it starts. Take a backup first; migr
 
 ## Things to know
 
-- **Recordings are not transcoded.** Quality is whatever the encoder sends.
+- **Recordings and uploaded videos are not transcoded.** Quality is whatever the encoder or
+  the uploader sends. Uploads are limited to 4 GB each and must be H.264, VP8, VP9 or AV1
+  video, so they play directly in browsers. The backend image includes ffmpeg for
+  inspecting them, fixing the MP4 index and taking a poster.
+- **Uploaded videos live in `uploads/videos/`**, with one folder per video, so back up
+  `uploads/` with the database. Uploads are sent in 8 MB parts; a reverse proxy in front
+  of the API only needs to allow bodies of that size. Unfinished uploads are removed
+  after 24 hours.
 - **Playback is HLS**, a few seconds behind the encoder.
 - **One backend instance is the tested default;** more work behind one Redis but
   deployment of that is not documented beyond this page.

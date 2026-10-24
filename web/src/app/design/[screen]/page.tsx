@@ -58,6 +58,7 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
     query: "radio",
     channels: fixtureChannels.slice(0, 4),
     recordings: fixtureRecordings.slice(0, 3),
+    videos: [],
   });
   qc.setQueryData(["followers", "c-1"], []);
   qc.setQueryData(webKeys.follow("c-1"), { following: !guest });

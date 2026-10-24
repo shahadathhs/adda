@@ -23,6 +23,8 @@ fees, no cloud.
 - **Follows and a notification bell** (optional email alerts when a followed
   channel goes live).
 - **Recordings** of every broadcast, with timestamped comments.
+- **Video uploads:** channel owners upload MP4, MOV or WebM (up to 4 GB, resumable) and
+  viewers watch them on the channel, in a video directory and in search.
 - **Channel pages** with about text, links, announcements, badges and
   moderators.
 - **Moderation:** delete, time out, ban, slow mode, followers-only.
@@ -71,11 +73,12 @@ Every flow, with its acceptance criteria and the screen it belongs to, is in
 | F9–F14 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode    | Built                                       |
 | F15    | Channel profile: about, links, banner, announcements, followers                            | Built                                       |
 | F16    | Recording comments                                                                         | Built                                       |
+| F17    | Uploaded videos: resumable upload, direct play, visibility, directory                      | Built; no transcoding                       |
 
-Tests: `make test` runs 151 backend tests (accounts and tokens, channels, streams, chat
+Tests: `make test` runs 159 backend tests (accounts and tokens, channels, streams, chat
 rules, polls, emotes, notifications, identity, the channel page, recording comments,
 migrations, operability) against an embedded Postgres, and one more test starts two real
-server processes against one Redis. `pnpm e2e` runs 11 Playwright tests against the real
+server processes against one Redis. `pnpm e2e` runs 12 Playwright tests against the real
 stack with an ffmpeg test-pattern publisher. CI runs all of it
 ([docs/SCOPE.md](docs/SCOPE.md) has the milestones).
 

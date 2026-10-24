@@ -15,6 +15,7 @@ from models.poll import Poll, PollOption, PollVote
 from models.recording_comment import RecordingComment
 from models.refresh_token import RefreshToken
 from models.user import User
+from models.video import Video
 
 __all__ = [
     "Announcement",
@@ -36,4 +37,5 @@ __all__ = [
     "RecordingComment",
     "RefreshToken",
     "User",
+    "Video",
 ]

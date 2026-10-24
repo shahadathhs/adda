@@ -9,3 +9,4 @@ export * from "./endpoints/streaming";
 export * from "./endpoints/recordings";
 export * from "./endpoints/admin";
 export * from "./endpoints/browse";
+export * from "./endpoints/videos";

@@ -60,7 +60,7 @@ backend/
 ├── models/      SQLAlchemy models, one per file
 ├── alembic/     migrations (applied on container start and by `make migrate`)
 └── modules/<feature>/   router.py, schemas.py, service/ (short focused files)
-    auth  users  communities  chat  notifications  streaming  recordings  stats  realtime
+    auth  users  communities  chat  notifications  streaming  recordings  videos  browse  stats  realtime
 ```
 
 - Routers stay thin; logic is in `service/`. Admin endpoints live in their feature module

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Film, Search } from "lucide-react";
+import { Clapperboard, Film, Search } from "lucide-react";
 import { UserAvatar } from "@/components/ui/primitives";
 import { recordingTitle } from "@/lib/recordings";
 import { cn } from "@/lib/cn";
@@ -64,6 +64,25 @@ export function SearchOption({
             <span className="font-num normal-case">{c.viewers}</span>
           </span>
         )}
+      </Link>
+    );
+  }
+
+  if (hit.kind === "video") {
+    const v = hit.video;
+    return (
+      <Link href={hit.href} {...shared}>
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-sm bg-background text-muted-foreground">
+          <Clapperboard className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm text-muted-foreground">
+            <Highlight text={v.title} q={q} />
+          </span>
+          <span className="block truncate text-xs text-muted-foreground/80">
+            {v.community_name} · video
+          </span>
+        </span>
       </Link>
     );
   }
