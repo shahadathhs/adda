@@ -111,11 +111,11 @@ key via an auth webhook, so unauthenticated publishes are rejected.
 
 ## 4. Persistence
 
-| Data                    | Where it lives                                        |
-| ----------------------- | ----------------------------------------------------- |
-| Users, channels, chats  | Docker volume `adda_postgres_data`                    |
-| Recordings              | `./recordings/` bind mount (host path, easy to mount) |
-| Live state (presence)   | Redis — ephemeral by design                            |
+| Data                   | Where it lives                                        |
+| ---------------------- | ----------------------------------------------------- |
+| Users, channels, chats | Docker volume `adda_postgres_data`                    |
+| Recordings             | `./recordings/` bind mount (host path, easy to mount) |
+| Live state (presence)  | Redis — ephemeral by design                           |
 
 Back up the Postgres volume and the `recordings/` directory. Everything else
 is rebuildable.
@@ -141,13 +141,13 @@ automatically on backend startup; they're idempotent.
 
 ## Ports reference
 
-| Service          | Container port | Purpose                     |
-| ---------------- | -------------- | --------------------------- |
-| Web (Next.js)    | 5173           | viewer web app (SSR)       |
-| Backend API      | 7001           | REST + WebSocket            |
-| PostgreSQL       | 5432           | database                    |
-| Redis            | 6379           | pub/sub, presence          |
-| mediamtx RTMP    | 1935           | OBS ingest                  |
-| mediamtx HLS     | 8888           | playback (browser)          |
-| mediamtx WebRTC  | 8889           | low-latency playback        |
-| mediamtx API     | 9997           | control (auth webhook, etc) |
+| Service         | Container port | Purpose                     |
+| --------------- | -------------- | --------------------------- |
+| Web (Next.js)   | 5173           | viewer web app (SSR)        |
+| Backend API     | 7001           | REST + WebSocket            |
+| PostgreSQL      | 5432           | database                    |
+| Redis           | 6379           | pub/sub, presence           |
+| mediamtx RTMP   | 1935           | OBS ingest                  |
+| mediamtx HLS    | 8888           | playback (browser)          |
+| mediamtx WebRTC | 8889           | low-latency playback        |
+| mediamtx API    | 9997           | control (auth webhook, etc) |

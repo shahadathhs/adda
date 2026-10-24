@@ -46,5 +46,5 @@ favor of `/DESIGN.md`.
 
 ## Quality
 
-- After every change: `pnpm -C apps/web lint && pnpm -C apps/web build`.
+- After every change: `pnpm lint && pnpm typecheck && pnpm -C apps/web build` (run from the repo root; lint config is centralised there).
 - Pre-ship the `/DESIGN.md` §8 anti-slop checklist.

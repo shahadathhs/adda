@@ -1,4 +1,10 @@
-import type { Community, Follower, JoinRequestOut, MemberOut, StreamCredentials } from "@adda/types";
+import type {
+  Community,
+  Follower,
+  JoinRequestOut,
+  MemberOut,
+  StreamCredentials,
+} from "@adda/types";
 import { request } from "../client";
 
 export const listCommunities = () => request<Community[]>("/api/communities");

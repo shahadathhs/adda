@@ -24,17 +24,17 @@ recorded walkthrough, the architecture, and measured numbers.
 
 ## The flows (all must close)
 
-| ID  | Flow                | Summary                                                                                                  |
-| --- | ------------------- | -------------------------------------------------------------------------------------------------------- |
-| F0  | Install             | `./scripts/install.sh` → secrets generated, stack up behind Caddy with HTTPS, admin created               |
-| F1  | Auth                | Register, login, rotating refresh tokens, logout, change/reset password, profile                          |
-| F2  | Discover and watch  | Live-first browse grid, channel page (SSR + OG metadata), HLS player with reconnect, viewer count         |
-| F3  | Channel lifecycle   | Create channel, reveal/copy stream key + RTMP URL, rotate key (kicks publisher), edit, delete             |
-| F4  | Go live             | OBS publishes → publish-auth webhook → live pushed over WebSocket → offline within seconds on stop        |
-| F5  | Chat                | History, send, presence count, delete message, moderation (timeout/ban), reconnect with catch-up         |
-| F6  | Follows             | Follow/unfollow, followers tab, following rail with live indicators                                      |
-| F7  | Recordings          | Stream end → recording + thumbnail on the channel page → play in page, download                          |
-| F8  | Operate             | Seeded admin account; force-stop, suspend and delete through the documented admin API (no admin UI in v1) |
+| ID  | Flow               | Summary                                                                                                   |
+| --- | ------------------ | --------------------------------------------------------------------------------------------------------- |
+| F0  | Install            | `./scripts/install.sh` → secrets generated, stack up behind Caddy with HTTPS, admin created               |
+| F1  | Auth               | Register, login, rotating refresh tokens, logout, change/reset password, profile                          |
+| F2  | Discover and watch | Live-first browse grid, channel page (SSR + OG metadata), HLS player with reconnect, viewer count         |
+| F3  | Channel lifecycle  | Create channel, reveal/copy stream key + RTMP URL, rotate key (kicks publisher), edit, delete             |
+| F4  | Go live            | OBS publishes → publish-auth webhook → live pushed over WebSocket → offline within seconds on stop        |
+| F5  | Chat               | History, send, presence count, delete message, moderation (timeout/ban), reconnect with catch-up          |
+| F6  | Follows            | Follow/unfollow, followers tab, following rail with live indicators                                       |
+| F7  | Recordings         | Stream end → recording + thumbnail on the channel page → play in page, download                           |
+| F8  | Operate            | Seeded admin account; force-stop, suspend and delete through the documented admin API (no admin UI in v1) |
 
 ## Out of scope for v1
 

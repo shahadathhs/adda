@@ -17,7 +17,7 @@ a two-step setup: copy the URL, paste it into OBS.
 1. **Settings → Stream**
 2. **Service:** `Custom`
 3. **Server:** paste the Stream URL
-4. **Stream Key:** *(leave empty — it's inside the URL)*
+4. **Stream Key:** _(leave empty — it's inside the URL)_
 5. **Start Streaming**
 
 The channel flips to **LIVE** on adda within a few seconds — both for you and
@@ -64,9 +64,9 @@ the admin dashboard.
 
 ## Troubleshooting
 
-| Symptom                        | Fix                                                            |
-| ------------------------------ | -------------------------------------------------------------- |
-| Status stays offline           | Check the URL includes `?key=…`; verify RTMP port 1935 is open |
-| `403` on publish               | Key mismatch — rotate + re-copy the URL                        |
-| Video stutters for viewers     | Passthrough HLS — lower your OBS output bitrate/resolution     |
-| Chat works, video doesn't      | `HLS_BASE_URL` must be reachable from the viewer's browser     |
+| Symptom                    | Fix                                                            |
+| -------------------------- | -------------------------------------------------------------- |
+| Status stays offline       | Check the URL includes `?key=…`; verify RTMP port 1935 is open |
+| `403` on publish           | Key mismatch — rotate + re-copy the URL                        |
+| Video stutters for viewers | Passthrough HLS — lower your OBS output bitrate/resolution     |
+| Chat works, video doesn't  | `HLS_BASE_URL` must be reachable from the viewer's browser     |

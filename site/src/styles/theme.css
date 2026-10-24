@@ -14,47 +14,47 @@
 }
 
 :root {
-	--adda-ink: #1a1205;
-	--adda-accent: #f5a623;
-	--adda-accent-hover: #e29500;
-	--adda-accent-active: #c98400;
-	--adda-accent-subtle: rgba(245, 166, 35, 0.14);
-	--adda-live: #eb3223;
-	--adda-ease-micro: linear(
-		0,
-		0.0147 1.42%,
-		0.0679 3.31%,
-		0.216 6.28%,
-		0.5118 10.49%,
-		0.8105 14.79%,
-		0.9758 18.87%,
-		1.0304 22.66%,
-		1.0405 26.15%,
-		1.0267 31.19%,
-		1.0042 38.85%,
-		0.9964 47.36%,
-		1
-	);
-	--adda-font-display: 'Space Grotesk', var(--sl-font-system, system-ui), sans-serif;
+  --adda-ink: #1a1205;
+  --adda-accent: #f5a623;
+  --adda-accent-hover: #e29500;
+  --adda-accent-active: #c98400;
+  --adda-accent-subtle: rgba(245, 166, 35, 0.14);
+  --adda-live: #eb3223;
+  --adda-ease-micro: linear(
+    0,
+    0.0147 1.42%,
+    0.0679 3.31%,
+    0.216 6.28%,
+    0.5118 10.49%,
+    0.8105 14.79%,
+    0.9758 18.87%,
+    1.0304 22.66%,
+    1.0405 26.15%,
+    1.0267 31.19%,
+    1.0042 38.85%,
+    0.9964 47.36%,
+    1
+  );
+  --adda-font-display: "Space Grotesk", var(--sl-font-system, system-ui), sans-serif;
 }
 
 /* Minimal reset so bespoke pages (the landing) sit on the same ink. */
 html {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 *,
 *::before,
 *::after {
-	box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 body {
-	margin: 0;
-	background: #0c0d10;
-	color: #edeef2;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
-	-webkit-font-smoothing: antialiased;
+  margin: 0;
+  background: #0c0d10;
+  color: #edeef2;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ── Dark scope (primary) — the ink ladder ────────────────────────── */
@@ -167,62 +167,62 @@ h1 {
 /* Buttons — full base styles here so bespoke pages and docs match.
    Radii from the scale: 4px controls, 6px panels — no pills except tags */
 .sl-link-button {
-	align-items: center;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	display: inline-flex;
-	gap: 0.5em;
-	font-size: 0.8125rem;
-	font-weight: 600;
-	line-height: 1.2;
-	padding: 0.5rem 1rem;
-	text-decoration: none;
-	transition:
-		background-color 120ms var(--adda-ease-micro),
-		border-color 120ms var(--adda-ease-micro),
-		color 120ms var(--adda-ease-micro),
-		scale 120ms var(--adda-ease-micro);
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  display: inline-flex;
+  gap: 0.5em;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  transition:
+    background-color 120ms var(--adda-ease-micro),
+    border-color 120ms var(--adda-ease-micro),
+    color 120ms var(--adda-ease-micro),
+    scale 120ms var(--adda-ease-micro);
 }
 
 .sl-link-button:active {
-	scale: 0.97;
+  scale: 0.97;
 }
 
 .sl-link-button.primary {
-	background: var(--adda-accent);
-	border-color: var(--adda-accent);
-	color: var(--adda-ink);
+  background: var(--adda-accent);
+  border-color: var(--adda-accent);
+  color: var(--adda-ink);
 }
 
 .sl-link-button.primary:hover {
-	background: var(--adda-accent-hover);
-	border-color: var(--adda-accent-hover);
-	color: var(--adda-ink);
+  background: var(--adda-accent-hover);
+  border-color: var(--adda-accent-hover);
+  color: var(--adda-ink);
 }
 
 .sl-link-button.secondary {
-	border-color: var(--sl-color-hairline, #262a33);
-	color: var(--sl-color-white, #edeef2);
-	font-weight: 500;
+  border-color: var(--sl-color-hairline, #262a33);
+  color: var(--sl-color-white, #edeef2);
+  font-weight: 500;
 }
 
 .sl-link-button.secondary:hover {
-	background: #1c1f26;
+  background: #1c1f26;
 }
 
 .sl-link-button.minimal {
-	color: #9aa1af;
-	font-weight: 500;
-	padding-inline: 0.5rem;
+  color: #9aa1af;
+  font-weight: 500;
+  padding-inline: 0.5rem;
 }
 
 .sl-link-button.minimal:hover {
-	color: #edeef2;
+  color: #edeef2;
 }
 
 starlight-aside,
 .sl-markdown-content details {
-	border-radius: 6px;
+  border-radius: 6px;
 }
 
 .sl-markdown-content :not(pre) > code {

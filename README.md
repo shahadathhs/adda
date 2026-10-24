@@ -22,6 +22,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 ## Features
 
 ### Authentication & Security
+
 - **JWT-based auth** with rotating **refresh tokens** (30-day, hashed at rest,
   reuse detection revokes the session) + 1-day access tokens; the frontend
   refreshes transparently on 401
@@ -32,6 +33,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - **Profile management** — update display name, bio, avatar; set/change password
 
 ### Communities
+
 - Create communities with unique slugs, banners, descriptions
 - **Public & private** communities (private requires admin approval to join)
 - **Member management** — promote/demote roles (owner → admin → moderator →
@@ -42,6 +44,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
   `announcements`, `live`)
 
 ### Channels & Messaging
+
 - **Community channels** within each community (`text`, `announcement`, `live`)
 - **Permission-controlled** — restricted channels require explicit read/write grants
 - **Real-time chat** via WebSocket (reactions, replies, edits)
@@ -50,6 +53,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - Channel CRUD (default channels are deletion-protected)
 
 ### Live Streaming
+
 - **RTMP ingest → HLS playback** via [mediamtx](https://github.com/bluenviron/mediamtx)
 - **Per-community stream keys** with instant rotation (kicks active publisher)
 - **Publish-auth webhook** — mediamtx calls back to backend to validate stream key
@@ -63,11 +67,13 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - OBS/Streamlabs ready — just paste the stream URL
 
 ### Recordings
+
 - Automatic recording of live streams (stored locally on disk)
 - List, play, and delete recordings per community
 - Admin can manage all recordings across communities
 
 ### Real-time Infrastructure
+
 - **WebSocket gateway** with typed protocol (client ↔ server contract in sync)
 - **Redis pub/sub fan-out** for multi-instance scaling
 - **Presence tracking** via Redis sets
@@ -76,6 +82,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
   `community:<id>:presence`, `channel:<uuid>`, `user:<id>`
 
 ### Creator Console (Desktop)
+
 - **Dedicated operator client** — dense, dark, keyboard-first desktop app
   (not a wrapped website): Dashboard (stats + active streams), Streams
   (live monitor, viewer counts, force-stop), Communities (members, kick,
@@ -86,12 +93,13 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 - **Native notifications** the moment any channel goes live
 - Window state + last view remembered across launches; update-available
   check against GitHub releases
-- **For every kind of user**: sign in and see *your* channels (owner/
+- **For every kind of user**: sign in and see _your_ channels (owner/
   moderator/streamer roles) with per-channel tools; system admins
   additionally get the Platform section (users, all communities, live
   monitor, all recordings)
 
 ### Desktop Console (Tauri v2)
+
 - **Operator client** — its own app (own UI, dense + dark + keyboard-first),
   not a wrapped website: dashboard, live monitor with force-stop, community
   management (members, stream keys), users, recordings, chat moderation
@@ -104,6 +112,7 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
   macOS/Windows installers build natively
 
 ### Docs & Marketing Site (Astro + Starlight → Vercel)
+
 - Splash landing with hero CTAs and feature tour
 - Full guides: quickstart, self-hosting (TLS/proxy/persistence/scaling),
   going live with OBS, desktop console, administration
@@ -114,16 +123,16 @@ Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
 
 ## Tech Stack
 
-| Layer          | Technology                                                           |
-|----------------|----------------------------------------------------------------------|
-| **Viewer web** | Next.js 15 (App Router, SSR channel pages) · React 19 · TanStack Query · Tailwind CSS · hls.js |
-| **Desktop console** | Tauri v2 operator client (own dense UI, ⌘K palette, native notifications) |
-| **Backend**    | FastAPI · async SQLAlchemy 2.0 · asyncpg · Pydantic v2 · PyJWT + cryptography · bcrypt · aiosmtplib · httpx |
-| **Database**   | PostgreSQL 16 (async) · Redis 7 (pub/sub + presence + OTP)          |
-| **Streaming**  | mediamtx (RTMP ingest → HLS/WebRTC playback)                        |
-| **Realtime**   | WebSocket gateway with Redis fan-out                                |
-| **Infra**      | Docker Compose (single-command full stack)                          |
-| **Tooling**    | uv (Python) · pnpm (JS) · Ruff + Pyright · ESLint · Husky · CI      |
+| Layer               | Technology                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Viewer web**      | Next.js 15 (App Router, SSR channel pages) · React 19 · TanStack Query · Tailwind CSS · hls.js              |
+| **Desktop console** | Tauri v2 operator client (own dense UI, ⌘K palette, native notifications)                                   |
+| **Backend**         | FastAPI · async SQLAlchemy 2.0 · asyncpg · Pydantic v2 · PyJWT + cryptography · bcrypt · aiosmtplib · httpx |
+| **Database**        | PostgreSQL 16 (async) · Redis 7 (pub/sub + presence + OTP)                                                  |
+| **Streaming**       | mediamtx (RTMP ingest → HLS/WebRTC playback)                                                                |
+| **Realtime**        | WebSocket gateway with Redis fan-out                                                                        |
+| **Infra**           | Docker Compose (single-command full stack)                                                                  |
+| **Tooling**         | uv (Python) · pnpm (JS) · Ruff + Pyright · ESLint · Husky · CI                                              |
 
 ---
 
@@ -258,11 +267,11 @@ Open **http://localhost:5173**.
 
 **Seeded accounts** (dev only — `SEED_TEST_USERS=true` via the dev overlay):
 
-| User   | Email                | Password      | Role       |
-|--------|----------------------|---------------|------------|
-| admin  | `admin@example.com`  | `admin12345`  | superadmin |
-| alice  | `alice@example.com`  | `password123` | member     |
-| bob    | `bob@example.com`    | `password123` | member     |
+| User  | Email               | Password      | Role       |
+| ----- | ------------------- | ------------- | ---------- |
+| admin | `admin@example.com` | `admin12345`  | superadmin |
+| alice | `alice@example.com` | `password123` | member     |
+| bob   | `bob@example.com`   | `password123` | member     |
 
 > Production stacks made by `install.sh` seed **only** the admin, with a
 > generated password. `SEED_TEST_USERS` defaults to false.
@@ -319,7 +328,7 @@ Streams are secured by a **per-community stream key**.
 3. In OBS → **Settings → Stream**:
    - **Service:** Custom
    - **Server:** paste the Stream URL
-   - **Stream Key:** *(leave empty)*
+   - **Stream Key:** _(leave empty)_
 4. Click **Start Streaming**
 
 Set a **stream title** in the same card — it shows on your channel page and
@@ -373,16 +382,16 @@ make clean             # remove containers + Docker volumes (keeps recordings)
 
 ## Ports
 
-| Service          | Port |
-|------------------|------|
-| Web (Next.js)    | 5173 |
-| Backend API      | 7001 |
-| PostgreSQL       | 5432 |
-| Redis            | 6379 |
-| mediamtx RTMP    | 1935 |
-| mediamtx HLS     | 8888 |
-| mediamtx WebRTC  | 8889 |
-| mediamtx API     | 9997 |
+| Service         | Port |
+| --------------- | ---- |
+| Web (Next.js)   | 5173 |
+| Backend API     | 7001 |
+| PostgreSQL      | 5432 |
+| Redis           | 6379 |
+| mediamtx RTMP   | 1935 |
+| mediamtx HLS    | 8888 |
+| mediamtx WebRTC | 8889 |
+| mediamtx API    | 9997 |
 
 ---
 

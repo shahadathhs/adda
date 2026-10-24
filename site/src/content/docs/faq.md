@@ -15,7 +15,6 @@ Something else on the machine already uses Redis's port (another project's
 container or a local Redis). Either stop it, or change `REDIS_PORT` in `.env`
 and `REDIS_URL` to match, then `make up` again.
 
-
 ## Is there transcoding / multi-bitrate?
 
 No — playback is **passthrough HLS**: viewers receive your encoder's original

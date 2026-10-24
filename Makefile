@@ -156,10 +156,10 @@ format: ## Format backend (ruff)
 
 # ── Frontend ──────────────────────────────────────────────────────────
 
-lint-web: ## Lint web app (oxlint + eslint + prettier)
-	@cd $(FRONTEND_DIR) && $(PNPM) lint
+lint-web: ## Lint JS/TS and docs (oxlint + prettier, repo-wide)
+	@$(PNPM) lint
 
-lint: lint-backend lint-web ## Lint backend (ruff) + web (oxlint/eslint/prettier)
+lint: lint-backend lint-web ## Lint backend (ruff) + JS/TS (oxlint/prettier)
 
 build-web: ## Build web app (next build)
 	@cd $(FRONTEND_DIR) && $(PNPM) build

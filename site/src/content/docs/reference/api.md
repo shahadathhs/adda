@@ -19,36 +19,36 @@ Other flows: register, change password, password reset (email link).
 
 ### Communities / channels
 
-| Method   | Path                                       | Auth    |
-| -------- | ------------------------------------------ | ------- |
-| `GET`    | `/api/communities?q=&limit=&offset=`       | public  |
-| `GET`    | `/api/communities/{id}`                    | public  |
-| `POST`   | `/api/communities`                         | user    |
-| `PATCH`  | `/api/communities/{id}`                    | owner   |
-| `DELETE` | `/api/communities/{id}`                    | owner   |
-| `GET`    | `/api/communities/{id}/stream-key`         | owner   |
-| `POST`   | `/api/communities/{id}/stream-key/rotate`  | owner   |
-| `GET`    | `/api/communities/{id}/follow`             | user    |
-| `POST`   | `/api/communities/{id}/follow`             | user    |
-| `DELETE` | `/api/communities/{id}/follow`             | user    |
-| `GET`    | `/api/communities/followed/by-me`          | user    |
-| `GET`    | `/api/communities/{id}/members`            | public  |
-| `POST`   | `/api/communities/{id}/members`            | user    |
-| `PATCH`  | `/api/communities/{id}/members/{user_id}`  | c-admin |
-| `DELETE` | `/api/communities/{id}/members/{user_id}`  | c-admin |
+| Method   | Path                                      | Auth    |
+| -------- | ----------------------------------------- | ------- |
+| `GET`    | `/api/communities?q=&limit=&offset=`      | public  |
+| `GET`    | `/api/communities/{id}`                   | public  |
+| `POST`   | `/api/communities`                        | user    |
+| `PATCH`  | `/api/communities/{id}`                   | owner   |
+| `DELETE` | `/api/communities/{id}`                   | owner   |
+| `GET`    | `/api/communities/{id}/stream-key`        | owner   |
+| `POST`   | `/api/communities/{id}/stream-key/rotate` | owner   |
+| `GET`    | `/api/communities/{id}/follow`            | user    |
+| `POST`   | `/api/communities/{id}/follow`            | user    |
+| `DELETE` | `/api/communities/{id}/follow`            | user    |
+| `GET`    | `/api/communities/followed/by-me`         | user    |
+| `GET`    | `/api/communities/{id}/members`           | public  |
+| `POST`   | `/api/communities/{id}/members`           | user    |
+| `PATCH`  | `/api/communities/{id}/members/{user_id}` | c-admin |
+| `DELETE` | `/api/communities/{id}/members/{user_id}` | c-admin |
 
 Channels: CRUD under `/api/communities/{id}/channels/…` plus
 `GET /api/channels/{channel_id}/messages` (cursor-paginated).
 
 ### Streaming
 
-| Method | Path                                       | Auth    | Purpose                       |
-| ------ | ------------------------------------------ | ------- | ----------------------------- |
-| `GET`  | `/api/streaming/discover?q=`               | public  | browse grid, live-first       |
-| `GET`  | `/api/streaming/live`                      | public  | live ids + playback URLs      |
-| `GET`  | `/api/streaming/communities/{id}/status`   | public  | live, viewers, URLs           |
-| `GET`  | `/api/streaming/communities/{id}/health`   | owner   | health snapshot               |
-| `GET`  | `/api/streaming/playbook`                  | user    | OBS instructions              |
+| Method | Path                                     | Auth   | Purpose                  |
+| ------ | ---------------------------------------- | ------ | ------------------------ |
+| `GET`  | `/api/streaming/discover?q=`             | public | browse grid, live-first  |
+| `GET`  | `/api/streaming/live`                    | public | live ids + playback URLs |
+| `GET`  | `/api/streaming/communities/{id}/status` | public | live, viewers, URLs      |
+| `GET`  | `/api/streaming/communities/{id}/health` | owner  | health snapshot          |
+| `GET`  | `/api/streaming/playbook`                | user   | OBS instructions         |
 
 ### Recordings
 
@@ -67,24 +67,24 @@ Connect to **`/ws?token=<access_token>`**. Messages are JSON with a `type`.
 
 **Client → server**
 
-| Type            | Fields                          |
-| --------------- | ------------------------------- |
-| `subscribe`     | `channel`                       |
-| `unsubscribe`   | `channel`                       |
-| `chat_message`  | `channel`, `data.content`       |
-| `ping`          |                                 |
+| Type           | Fields                    |
+| -------------- | ------------------------- |
+| `subscribe`    | `channel`                 |
+| `unsubscribe`  | `channel`                 |
+| `chat_message` | `channel`, `data.content` |
+| `ping`         |                           |
 
 **Server → client**
 
-| Type            | Payload                                      |
-| --------------- | -------------------------------------------- |
-| `subscribed`    | `channel`                                    |
-| `unsubscribed`  | `channel`                                    |
-| `chat_message`  | `ChatMessagePayload`                         |
-| `presence`      | `channel`, `online_count`, `user_ids`        |
-| `stream_status` | `community_id`, `is_live`, `viewers`, `started_at` |
-| `notification`  | *(reserved)*                                 |
-| `pong` / `error`|                                              |
+| Type             | Payload                                            |
+| ---------------- | -------------------------------------------------- |
+| `subscribed`     | `channel`                                          |
+| `unsubscribed`   | `channel`                                          |
+| `chat_message`   | `ChatMessagePayload`                               |
+| `presence`       | `channel`, `online_count`, `user_ids`              |
+| `stream_status`  | `community_id`, `is_live`, `viewers`, `started_at` |
+| `notification`   | _(reserved)_                                       |
+| `pong` / `error` |                                                    |
 
 **Channel namespaces**
 

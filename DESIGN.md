@@ -6,10 +6,10 @@ hard rules.
 
 **Surfaces — one product, three densities:**
 
-| Surface | Location | Density | Type |
-|---|---|---|---|
-| Viewer web app | `apps/web/` | medium, content-first | display + system + mono |
-| Marketing + docs | `site/` | editorial spacing | display + system + mono |
+| Surface          | Location    | Density               | Type                    |
+| ---------------- | ----------- | --------------------- | ----------------------- |
+| Viewer web app   | `apps/web/` | medium, content-first | display + system + mono |
+| Marketing + docs | `site/`     | editorial spacing     | display + system + mono |
 
 **The surfaces are one product.** Density and chrome vary; the identity
 kit is identical everywhere and copied verbatim, never reinterpreted:
@@ -34,14 +34,14 @@ defaults is a bug.
 ## 1. Brand
 
 **adda** (আড্ডা) — Bengali for an informal, wide-ranging conversation among
-friends. The brand is *warm conversation in a dark room*.
+friends. The brand is _warm conversation in a dark room_.
 
-| Concept | Expression |
-|---|---|
-| Warmth | Marigold accent — borrowed from marigold garlands, not from SaaS |
-| Liveness | Live red is its own token, never the brand accent |
-| Density | Content-first: video and chat dominate, chrome recedes |
-| Precision | Counts, keys, timers always in tabular mono |
+| Concept   | Expression                                                       |
+| --------- | ---------------------------------------------------------------- |
+| Warmth    | Marigold accent — borrowed from marigold garlands, not from SaaS |
+| Liveness  | Live red is its own token, never the brand accent                |
+| Density   | Content-first: video and chat dominate, chrome recedes           |
+| Precision | Counts, keys, timers always in tabular mono                      |
 
 ### The two-color rule (sacred)
 
@@ -49,7 +49,7 @@ friends. The brand is *warm conversation in a dark room*.
 substitute for each other.**
 
 - Marigold = actions, links, focus, brand moments
-- Live red = on-air state, recording, force-stop — *only*
+- Live red = on-air state, recording, force-stop — _only_
 
 If a surface is live, it shows live red. Buttons never turn red "for
 emphasis". This is the single most important rule in the system.
@@ -60,13 +60,13 @@ emphasis". This is the single most important rule in the system.
 
 The five non-default decisions everything else derives from:
 
-| Axiom | adda | Escapes the default of |
-|---|---|---|
-| Density | Medium, content-first | spacious SaaS layouts |
-| Radius | 4px controls / 6px panels / 8px media | `rounded-xl` everywhere |
-| Saturation | one warm accent on near-black ink; state colors quiet | timid slate-on-white |
-| Type | grotesk display + system body + mono numerics | Inter-for-everything |
-| Motion | spring tiers: 120ms micro / 250ms state / signature moments | flat 400ms+ ease-out mush |
+| Axiom      | adda                                                        | Escapes the default of    |
+| ---------- | ----------------------------------------------------------- | ------------------------- |
+| Density    | Medium, content-first                                       | spacious SaaS layouts     |
+| Radius     | 4px controls / 6px panels / 8px media                       | `rounded-xl` everywhere   |
+| Saturation | one warm accent on near-black ink; state colors quiet       | timid slate-on-white      |
+| Type       | grotesk display + system body + mono numerics               | Inter-for-everything      |
+| Motion     | spring tiers: 120ms micro / 250ms state / signature moments | flat 400ms+ ease-out mush |
 
 ---
 
@@ -77,46 +77,46 @@ The five non-default decisions everything else derives from:
 Layering goes **dark → less dark** as surfaces elevate; text runs the
 inverse. This is the ink-ladder pattern, not slate-gray flatness.
 
-| Token | Web value | Desktop value | Role |
-|---|---|---|---|
-| `bg` | `#0c0d10` | `#0b0d10` | page background |
-| `panel` | `#14161b` | `#12151a` | cards, sidebars, chat |
-| `panel-2` | `#1c1f26` | `#171b22` | hover fills, secondary panels |
-| `input` | `#262a33` | — | inputs, search fields |
-| `line` | `#262a33` | `#232833` | borders, dividers |
+| Token     | Web value | Desktop value | Role                          |
+| --------- | --------- | ------------- | ----------------------------- |
+| `bg`      | `#0c0d10` | `#0b0d10`     | page background               |
+| `panel`   | `#14161b` | `#12151a`     | cards, sidebars, chat         |
+| `panel-2` | `#1c1f26` | `#171b22`     | hover fills, secondary panels |
+| `input`   | `#262a33` | —             | inputs, search fields         |
+| `line`    | `#262a33` | `#232833`     | borders, dividers             |
 
 Never use pure `#000` or pure `#fff` as surfaces. Never place alpha
 borders on top of each other — draw each border once, solid.
 
 ### Text
 
-| Token | Web | Desktop | Role |
-|---|---|---|---|
-| `fg` | `#edeef2` | `#e7ebf2` | primary text |
-| `fg-muted` | `#9aa1af` | `#8b94a3` | secondary text, metadata |
-| `fg-subtle` | `#676e7c` | — | timestamps, captions |
+| Token       | Web       | Desktop   | Role                     |
+| ----------- | --------- | --------- | ------------------------ |
+| `fg`        | `#edeef2` | `#e7ebf2` | primary text             |
+| `fg-muted`  | `#9aa1af` | `#8b94a3` | secondary text, metadata |
+| `fg-subtle` | `#676e7c` | —         | timestamps, captions     |
 
 ### Accent — marigold
 
-| Token | Value | Role |
-|---|---|---|
-| `accent` | `#f5a623` | primary buttons, links, active states, focus |
-| `accent-hover` | `#e29500` | hover |
-| `accent-active` | `#c98400` | pressed |
-| `accent-fg` | `#1a1205` | text/icons ON marigold — **dark ink, never white** |
-| `accent-subtle` | `rgba(245,166,35,0.14)` | tinted fills, selected rows, mentions |
+| Token           | Value                   | Role                                               |
+| --------------- | ----------------------- | -------------------------------------------------- |
+| `accent`        | `#f5a623`               | primary buttons, links, active states, focus       |
+| `accent-hover`  | `#e29500`               | hover                                              |
+| `accent-active` | `#c98400`               | pressed                                            |
+| `accent-fg`     | `#1a1205`               | text/icons ON marigold — **dark ink, never white** |
+| `accent-subtle` | `rgba(245,166,35,0.14)` | tinted fills, selected rows, mentions              |
 
 White text on marigold fails contrast and looks cheap. Ink on marigold is
 the brand signature — protect it.
 
 ### State colors
 
-| Token | Value | Role |
-|---|---|---|
-| `live` | `#eb3223` | LIVE badges, on-air dots, recording — only |
-| `danger` | `#ef4444` | destructive actions, errors |
-| `ok` | `#2fbf71` | success, online, healthy |
-| `warn` | `#e0a33e` | warnings, degraded |
+| Token    | Value     | Role                                       |
+| -------- | --------- | ------------------------------------------ |
+| `live`   | `#eb3223` | LIVE badges, on-air dots, recording — only |
+| `danger` | `#ef4444` | destructive actions, errors                |
+| `ok`     | `#2fbf71` | success, online, healthy                   |
+| `warn`   | `#e0a33e` | warnings, degraded                         |
 
 ### Charts/data-viz
 
@@ -157,23 +157,23 @@ The site is public-facing brand, so it carries the identity hardest:
 Web and site ship one webfont (display); desktop ships none (native feel).
 The site self-hosts Space Grotesk as woff2 (no third-party font CDN).
 
-| Role | Face | Notes |
-|---|---|---|
-| Display / headings / wordmark | **Space Grotesk** 500/700 | `next/font` (web), self-hosted woff2 (site) |
-| Body / UI | system stack (`-apple-system, "Segoe UI", Roboto, …`) | never a webfont |
-| Numerics / keys / durations | `ui-monospace, "SF Mono", …` + `tabular-nums` | class `font-num` |
+| Role                          | Face                                                  | Notes                                       |
+| ----------------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| Display / headings / wordmark | **Space Grotesk** 500/700                             | `next/font` (web), self-hosted woff2 (site) |
+| Body / UI                     | system stack (`-apple-system, "Segoe UI", Roboto, …`) | never a webfont                             |
+| Numerics / keys / durations   | `ui-monospace, "SF Mono", …` + `tabular-nums`         | class `font-num`                            |
 
 ### Scale (web)
 
-| Style | Size/line | Weight | Tracking |
-|---|---|---|---|
-| display | 40/44 | 700 | -0.02em |
-| h1 | 28/32 | 700 | -0.01em |
-| h2 | 20/28 | 600 | -0.01em |
-| h3 | 16/22 | 600 | 0 |
-| body | 14/20 | 400 | 0 |
-| secondary | 13/18 | 400 | 0 |
-| caption | 12/16 | 500 | 0.01em |
+| Style     | Size/line | Weight | Tracking |
+| --------- | --------- | ------ | -------- |
+| display   | 40/44     | 700    | -0.02em  |
+| h1        | 28/32     | 700    | -0.01em  |
+| h2        | 20/28     | 600    | -0.01em  |
+| h3        | 16/22     | 600    | 0        |
+| body      | 14/20     | 400    | 0        |
+| secondary | 13/18     | 400    | 0        |
+| caption   | 12/16     | 500    | 0.01em   |
 
 Desktop base is 13px with the same proportions; scale down one step
 (h2 → 15px, body → 13px, caption → 11px).
@@ -191,14 +191,14 @@ Rules:
 
 ### Radius scale — the only radii allowed
 
-| Token | Value | Used for |
-|---|---|---|
-| `radius-xs` | 3px | badges, tiny chips |
-| `radius-sm` | 4px | buttons, inputs, menu items |
-| `radius-md` | 6px | panels, cards, tooltips |
-| `radius-lg` | 8px | media cards, modals |
-| `radius-pill` | 999px | tags only |
-| `radius-round` | 50% | avatars only |
+| Token          | Value | Used for                    |
+| -------------- | ----- | --------------------------- |
+| `radius-xs`    | 3px   | badges, tiny chips          |
+| `radius-sm`    | 4px   | buttons, inputs, menu items |
+| `radius-md`    | 6px   | panels, cards, tooltips     |
+| `radius-lg`    | 8px   | media cards, modals         |
+| `radius-pill`  | 999px | tags only                   |
+| `radius-round` | 50%   | avatars only                |
 
 `rounded-xl` (12px+) is banned on everything.
 
@@ -209,22 +209,22 @@ Desktop: 4 / 8 / 12 / 16. Page gutters: 24 web, 12 desktop.
 
 ### Fixed chrome
 
-| Surface | Web | Desktop |
-|---|---|---|
-| Top bar | 56px | 36px (titlebar) |
-| Chat panel | 320–340px, collapsible | per-tab layout |
+| Surface         | Web                       | Desktop          |
+| --------------- | ------------------------- | ---------------- |
+| Top bar         | 56px                      | 36px (titlebar)  |
+| Chat panel      | 320–340px, collapsible    | per-tab layout   |
 | Control heights | 32px buttons, 36px inputs | 24–26px controls |
-| Icon buttons | 32px | 24px |
+| Icon buttons    | 32px                      | 24px             |
 
 ### Elevation
 
 Three levels, translucent black only (never opaque gray):
 
-| Level | Shadow |
-|---|---|
-| 1 | `0 1px 2px rgba(0,0,0,.4)` — cards |
-| 2 | `0 4px 12px rgba(0,0,0,.5)` — dropdowns, popovers |
-| 3 | `0 8px 32px rgba(0,0,0,.6)` — modals |
+| Level | Shadow                                            |
+| ----- | ------------------------------------------------- |
+| 1     | `0 1px 2px rgba(0,0,0,.4)` — cards                |
+| 2     | `0 4px 12px rgba(0,0,0,.5)` — dropdowns, popovers |
+| 3     | `0 8px 32px rgba(0,0,0,.6)` — modals              |
 
 Prefer surface-ladder elevation over shadows; shadows are for floating
 elements only.
@@ -243,30 +243,54 @@ purposeful tiers — the same curve family on every surface.
 ```css
 /* Standard spring — subtle overshoot, state changes */
 --ease-spring: linear(
-  0, 0.0036 0.68%, 0.0183 1.65%, 0.0679 3.31%, 0.1772 5.75%,
-  0.3628 8.42%, 0.5919 11.28%, 0.7879 14.15%, 0.9307 16.95%,
-  1.0152 19.94%, 1.0424 22.99%, 1.0455 25.9%, 1.0351 28.65%,
-  1.0117 33.05%, 0.9866 38.72%, 0.978 45.4%, 0.9866 55.5%,
-  0.9973 71.4%, 1
+  0,
+  0.0036 0.68%,
+  0.0183 1.65%,
+  0.0679 3.31%,
+  0.1772 5.75%,
+  0.3628 8.42%,
+  0.5919 11.28%,
+  0.7879 14.15%,
+  0.9307 16.95%,
+  1.0152 19.94%,
+  1.0424 22.99%,
+  1.0455 25.9%,
+  1.0351 28.65%,
+  1.0117 33.05%,
+  0.9866 38.72%,
+  0.978 45.4%,
+  0.9866 55.5%,
+  0.9973 71.4%,
+  1
 );
 
 /* Micro spring — no visible overshoot, feedback only */
 --ease-micro: linear(
-  0, 0.0147 1.42%, 0.0679 3.31%, 0.216 6.28%, 0.5118 10.49%,
-  0.8105 14.79%, 0.9758 18.87%, 1.0304 22.66%, 1.0405 26.15%,
-  1.0267 31.19%, 1.0042 38.85%, 0.9964 47.36%, 1
+  0,
+  0.0147 1.42%,
+  0.0679 3.31%,
+  0.216 6.28%,
+  0.5118 10.49%,
+  0.8105 14.79%,
+  0.9758 18.87%,
+  1.0304 22.66%,
+  1.0405 26.15%,
+  1.0267 31.19%,
+  1.0042 38.85%,
+  0.9964 47.36%,
+  1
 );
 ```
 
 ### Tiers
 
-| Tier | When | Duration / curve |
-|---|---|---|
-| Micro feedback | hover, focus, press, toggle | 120ms `--ease-micro` |
-| State change | panels, popovers, dialogs, tab indicators | 250ms `--ease-spring` |
-| Navigation | route/view transitions | 300ms crossfade + 8px slide |
-| Signature | going live/offline, celebrations | 400–600ms `--ease-spring` |
-| Entrance choreography | lists, grids, site sections | 250ms spring, 35ms stagger, total ≤400ms |
+| Tier                  | When                                      | Duration / curve                         |
+| --------------------- | ----------------------------------------- | ---------------------------------------- |
+| Micro feedback        | hover, focus, press, toggle               | 120ms `--ease-micro`                     |
+| State change          | panels, popovers, dialogs, tab indicators | 250ms `--ease-spring`                    |
+| Navigation            | route/view transitions                    | 300ms crossfade + 8px slide              |
+| Signature             | going live/offline, celebrations          | 400–600ms `--ease-spring`                |
+| Entrance choreography | lists, grids, site sections               | 250ms spring, 35ms stagger, total ≤400ms |
 
 **Exits are 0.7× their entrance.** Leaving should feel faster than
 arriving.
@@ -287,17 +311,17 @@ arriving.
 
 ### Element rules
 
-| Element | Motion |
-|---|---|
-| Buttons | press `scale .97`, 120ms micro spring return |
-| Popover/dialog/menu | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms |
-| Stream card | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms |
-| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render) |
-| ⌘K palette | `scale .98→1` + fade, 150ms |
-| Chat message | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom |
-| Viewer counts | digits swap in place — tabular mono keeps width stable; **no odometer rolls** |
-| Site page change | cross-document View Transition crossfade; headings morph via `view-transition-name` |
-| Site scroll reveals | 12px rise + fade, once per element, `animation-timeline: view()` with IO fallback |
+| Element                 | Motion                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| Buttons                 | press `scale .97`, 120ms micro spring return                                        |
+| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                           |
+| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                  |
+| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)       |
+| ⌘K palette              | `scale .98→1` + fade, 150ms                                                         |
+| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom       |
+| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**       |
+| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name` |
+| Site scroll reveals     | 12px rise + fade, once per element, `animation-timeline: view()` with IO fallback   |
 
 ### Engineering rules
 
@@ -337,13 +361,13 @@ arriving.
 
 ### Buttons
 
-| Variant | Fill | Text |
-|---|---|---|
-| primary | `accent` | `accent-fg` (ink) |
-| secondary | transparent, 1px `line` border | `fg`; hover: `panel-2` |
-| ghost | transparent | `fg-muted`; hover: `panel-2` + `fg` |
-| danger | `danger` | white (red passes with white) |
-| on-live | n/a — never accent a live state with marigold | |
+| Variant   | Fill                                          | Text                                |
+| --------- | --------------------------------------------- | ----------------------------------- |
+| primary   | `accent`                                      | `accent-fg` (ink)                   |
+| secondary | transparent, 1px `line` border                | `fg`; hover: `panel-2`              |
+| ghost     | transparent                                   | `fg-muted`; hover: `panel-2` + `fg` |
+| danger    | `danger`                                      | white (red passes with white)       |
+| on-live   | n/a — never accent a live state with marigold |                                     |
 
 Height 32px web / 26px desktop; 13px 600 label; radius-sm.
 
@@ -386,38 +410,38 @@ Run before shipping any UI change:
 ## 9. Agent quick reference
 
 ```yaml
-bg: "#0c0d10"          # web / "#0b0d10" desktop
-panel: "#14161b"       # web / "#12151a" desktop
-panel2: "#1c1f26"      # web / "#171b22" desktop
+bg: "#0c0d10" # web / "#0b0d10" desktop
+panel: "#14161b" # web / "#12151a" desktop
+panel2: "#1c1f26" # web / "#171b22" desktop
 input: "#262a33"
-line: "#262a33"        # web / "#232833" desktop
+line: "#262a33" # web / "#232833" desktop
 
-accent: "#f5a623"      # marigold — actions, links, focus
+accent: "#f5a623" # marigold — actions, links, focus
 accent_hover: "#e29500"
 accent_active: "#c98400"
-accent_fg: "#1a1205"   # ink on marigold — NEVER white
+accent_fg: "#1a1205" # ink on marigold — NEVER white
 accent_subtle: "rgba(245,166,35,0.14)"
 
-live: "#eb3223"        # live states ONLY
+live: "#eb3223" # live states ONLY
 danger: "#ef4444"
 ok: "#2fbf71"
 warn: "#e0a33e"
 
-fg: "#edeef2"          # web / "#e7ebf2" desktop
-fg_muted: "#9aa1af"    # web / "#8b94a3" desktop
+fg: "#edeef2" # web / "#e7ebf2" desktop
+fg_muted: "#9aa1af" # web / "#8b94a3" desktop
 fg_subtle: "#676e7c"
 
-font_display: "Space Grotesk"   # headings, wordmark (web)
+font_display: "Space Grotesk" # headings, wordmark (web)
 font_body: "system-ui stack"
 font_mono: "ui-monospace + tabular-nums for counts/keys/durations"
 
-radius: { xs: 3, sm: 4, md: 6, lg: 8, pill: 999 }   # px
+radius: { xs: 3, sm: 4, md: 6, lg: 8, pill: 999 } # px
 motion:
-  micro:  "120ms --ease-micro"    # hover/press/toggle
-  state:  "250ms --ease-spring"   # panels/popovers/indicators
-  nav:    "300ms crossfade + 8px slide"
-  signature: "400-600ms --ease-spring"  # going live, celebrations
-  exit_scale: 0.7                        # exits = 0.7x entrance
+  micro: "120ms --ease-micro" # hover/press/toggle
+  state: "250ms --ease-spring" # panels/popovers/indicators
+  nav: "300ms crossfade + 8px slide"
+  signature: "400-600ms --ease-spring" # going live, celebrations
+  exit_scale: 0.7 # exits = 0.7x entrance
   curves: "linear() springs in /DESIGN.md §6 — shared verbatim"
 type_px: { display: 40, h1: 28, h2: 20, h3: 16, body: 14, secondary: 13, caption: 12 }
 ```

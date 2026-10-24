@@ -15,6 +15,7 @@ entrance. When touching UI, extend these tokens — never hardcode colors
 or reintroduce framework defaults.
 
 Known follow-ups (not blockers):
+
 - Expressive-Code block theme still stock — tune to the ink ladder
 - Cross-document view transitions (ClientRouter) deferred — the site
   stays zero-JS-first; revisit if navigation motion is wanted

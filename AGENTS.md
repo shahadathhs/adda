@@ -59,7 +59,8 @@ uv run pyright                        # type checking (must pass, no new warning
 
 ```bash
 pnpm -C apps/web dev                  # dev server → http://localhost:5173
-pnpm -C apps/web lint                 # oxlint + eslint + prettier
+pnpm lint                             # oxlint + prettier (whole repo)
+pnpm typecheck                        # tsc --noEmit
 pnpm -C apps/web build                # next build (standalone output)
 ```
 
@@ -91,7 +92,7 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
 - Run type checking after every backend change: `cd backend && uv run pyright`.
   No new warnings in changed files.
 - Run web lint/build after web or package changes:
-  `pnpm -C apps/web lint && pnpm -C apps/web build`.
+  `pnpm lint && pnpm typecheck && pnpm -C apps/web build`.
 - Run `pnpm -C site build` after docs-site changes.
 
 ## Conventions

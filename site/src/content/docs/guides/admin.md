@@ -5,11 +5,11 @@ description: The admin dashboard — users, communities, live streams, recording
 
 Every deployment has three system roles:
 
-| Role       | Powers                                                             |
-| ---------- | ------------------------------------------------------------------ |
-| `user`     | Normal member — uses the app                                       |
-| `admin`    | Full admin dashboard access                                        |
-| `superadmin` | Everything an admin can do (intended for the instance owner)     |
+| Role         | Powers                                                       |
+| ------------ | ------------------------------------------------------------ |
+| `user`       | Normal member — uses the app                                 |
+| `admin`      | Full admin dashboard access                                  |
+| `superadmin` | Everything an admin can do (intended for the instance owner) |
 
 The seeded `admin@example.com` account is a superadmin. Promote others from
 **Admin → Users**.
@@ -42,7 +42,7 @@ Manage **every** channel on the instance — even ones you don't own:
 ### Live
 
 Active streams with viewer counts and a **force-stop** button per stream.
-Useful when moderation has to happen *now*.
+Useful when moderation has to happen _now_.
 
 ### Recordings
 

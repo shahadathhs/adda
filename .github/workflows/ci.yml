@@ -52,14 +52,15 @@ jobs:
         with:
           node-version: "20"
 
-      # pnpm-lock.yaml is intentionally gitignored, so resolve fresh (no
-      # --frozen-lockfile, no lockfile-keyed cache). Root install covers the
-      # whole workspace (apps/web + packages + site).
+      # The lockfile is committed; a root install covers the whole workspace.
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm -C apps/web lint
+      - name: Lint (oxlint + prettier)
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
 
       - name: Build
         run: pnpm -C apps/web build
@@ -79,7 +80,7 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm -C site build

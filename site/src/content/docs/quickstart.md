@@ -65,7 +65,7 @@ restart. See the [configuration reference](/reference/configuration/).
 1. Sign in at `https://your-domain`, create a channel from the **Browse**
    page.
 2. Open the channel → **Live** tab → copy the **Stream URL** and **stream
-   key** from *Stream setup (OBS)*.
+   key** from _Stream setup (OBS)_.
 3. In OBS: **Settings → Stream → Custom**, paste the server URL and key,
    click **Start Streaming**.
 

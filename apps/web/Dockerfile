@@ -3,7 +3,7 @@
 FROM node:26-alpine AS build
 WORKDIR /repo
 RUN npm install -g pnpm@10
-COPY package.json pnpm-workspace.yaml ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages ./packages
 COPY apps/web/package.json apps/web/
 COPY site/package.json site/
@@ -15,7 +15,7 @@ ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
     NEXT_PUBLIC_HLS_BASE_URL=$NEXT_PUBLIC_HLS_BASE_URL \
     NEXT_TELEMETRY_DISABLED=1
 
-RUN pnpm install --filter @adda/web... --no-frozen-lockfile
+RUN pnpm install --frozen-lockfile --filter @adda/web...
 COPY apps/web ./apps/web
 RUN pnpm --filter @adda/web build
 
