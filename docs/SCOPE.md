@@ -59,7 +59,7 @@ recorded walkthrough, the architecture, and measured numbers.
 | ID  | Flow               | Summary                                                                                                   |
 | --- | ------------------ | --------------------------------------------------------------------------------------------------------- |
 | F0  | Install            | `./scripts/install.sh` → secrets generated, stack up behind Caddy with HTTPS, admin created               |
-| F1  | Accounts           | Register, login, rotating refresh tokens, logout, change password, profile (password recovery: see below) |
+| F1  | Accounts           | Register, login, rotating refresh tokens, logout, change password, email reset link, profile              |
 | F2  | Discover and watch | Live-first browse grid, channel page (SSR + OG metadata), HLS player with reconnect, viewer count         |
 | F3  | Channel lifecycle  | Create channel, reveal/copy stream key + RTMP URL, rotate key (kicks publisher), edit, delete             |
 | F4  | Go live            | OBS publishes → publish-auth webhook → live pushed over WebSocket → offline within seconds on stop        |
@@ -67,26 +67,38 @@ recorded walkthrough, the architecture, and measured numbers.
 | F6  | Follows            | Follow/unfollow, followers tab, following rail with live indicators                                       |
 | F7  | Recordings         | Stream end → recording + thumbnail on the channel page → play in page, download                           |
 | F8  | Operate            | Seeded admin account; force-stop, suspend and delete through the documented admin API (no admin UI in v1) |
-| F9  | Guests             | Watch and chat without an account; pick a display name for the session; rate-limited                      |
+| F9  | Guests             | Read-only visitors: browse, watch and read chat. No chatting, reacting, voting or following               |
 | F10 | Chat extras        | Replies, @mentions (highlighted for the person mentioned), message reactions, pinned message              |
 | F11 | Emotes             | Streamer uploads emotes for their channel; chat renders `:name:`                                          |
 | F12 | Polls              | Streamer starts a poll; viewers vote; live results; closes and keeps the result                           |
-| F13 | Notifications      | In-app bell only: followed channel goes live, you were mentioned, someone replied. No email, no SMTP      |
-| F14 | Channel profile    | About text, links, follower count, badges (owner, mod, follower since), channel announcements             |
-| F15 | Recording comments | Timestamped comments on a past broadcast; click a timestamp to seek                                       |
+| F13 | Notifications      | In-app bell plus optional email: followed channel goes live, you were mentioned, someone replied          |
+| F14 | Identity mode      | An account chooses how it appears in chat: its name or "Anonymous" (still recorded under the account)     |
+| F15 | Channel profile    | About text, links, follower count, badges (owner, mod, follower since), channel announcements             |
+| F16 | Recording comments | Timestamped comments on a past broadcast; click a timestamp to seek                                       |
 
 ### Who can do what
 
-| Capability                                    | Guest | Account |
-| --------------------------------------------- | ----- | ------- |
-| Browse, watch, read chat and polls            | yes   | yes     |
-| Chat, react, vote in polls (per-session)      | yes   | yes     |
-| Follow channels, notification bell            | no    | yes     |
-| Create a channel, stream, upload emotes       | no    | yes     |
-| Comment on recordings, be @mentioned reliably | no    | yes     |
+Every interaction is performed by an account and recorded against it in the
+backend. Guests are read-only.
 
-Guests are anonymous by design. Accounts exist for identity and ownership;
-how an account holder appears in chat (named or anonymous) is a per-user choice.
+| Capability                                       | Guest | Account |
+| ------------------------------------------------ | ----- | ------- |
+| Browse, watch, read chat, see polls and profiles | yes   | yes     |
+| Chat, reply, mention, react, vote                | no    | yes     |
+| Follow channels, notification bell, email alerts | no    | yes     |
+| Create a channel, stream, upload emotes          | no    | yes     |
+| Comment on recordings                            | no    | yes     |
+
+**Identity mode.** An account chooses how it appears to other viewers: under
+its name, or as "Anonymous". Anonymous hides the name from viewers only — the
+backend still records the account, and the channel owner, its moderators and
+the admin can see who is behind a message for moderation. Blocking and
+abuse handling therefore work the same in both modes.
+
+**Email.** SMTP is optional configuration. When set, adda sends password-reset
+links and (opt-in per user) "a channel you follow is live" emails, limited to
+one per channel per hour. When unset, those features are hidden and the rest
+of the product works unchanged.
 
 ## Out of scope for v1
 
@@ -100,7 +112,7 @@ built" table.
 - OTP login, TOTP 2FA, set-password flow, email verification
 - Social login
 - Message edits
-- Email of any kind (no SMTP): no reset emails, no email notifications
+- Email digests, marketing mail, and any mail beyond reset links and live alerts
 - Low-latency WebRTC playback (HLS only)
 - Clips, transcoding ladders, VOD chapters
 - Multi-node deployment documentation
