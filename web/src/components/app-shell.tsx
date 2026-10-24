@@ -7,6 +7,7 @@ import { UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMe } from "@/lib/session";
 import { SiteFooter } from "@/components/site-footer";
+import { PageContainer } from "@/components/page-container";
 import { TopBar } from "@/components/top-bar";
 
 const AUTH_PREFIXES = ["/login", "/register", "/reset-password", "/forgot-password"];
@@ -19,7 +20,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar />
-      <div className="flex-1">{children}</div>
+      <div className="flex-1">
+        <PageContainer>{children}</PageContainer>
+      </div>
       <SiteFooter />
     </div>
   );

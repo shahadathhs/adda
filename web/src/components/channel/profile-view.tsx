@@ -24,7 +24,7 @@ export function ProfileView({ community }: { community: Community }) {
         )}
       </div>
 
-      <div className="mx-auto max-w-[1100px] px-4 sm:px-6">
+      <div className="px-4 sm:px-6">
         <div className="-mt-8 flex flex-wrap items-end gap-4">
           <UserAvatar
             name={community.name}

@@ -30,7 +30,7 @@ export function SearchResults({ initial, q }: { initial: DiscoverChannel[]; q: s
   const filters: Filter[] = user ? ["all", "live", "following"] : ["all", "live"];
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className="px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">

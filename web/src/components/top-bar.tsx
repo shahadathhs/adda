@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Radio, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notification-bell";
+import { PageContainer } from "@/components/page-container";
 import { SearchBox } from "@/components/search-box";
 import { UserMenu } from "@/components/user-menu";
 import { useMe } from "@/lib/session";
@@ -25,7 +26,7 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <div className="flex h-14 items-center gap-5 px-4 sm:px-6">
+      <PageContainer className="flex h-14 items-center gap-5 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2" aria-label="adda home">
           <Radio className="h-5 w-5 text-primary" aria-hidden="true" />
           <span className="font-display text-lg font-bold tracking-tight text-foreground">
@@ -82,7 +83,7 @@ export function TopBar() {
             </>
           )}
         </div>
-      </div>
+      </PageContainer>
     </header>
   );
 }

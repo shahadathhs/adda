@@ -41,7 +41,7 @@ export function RecordingWatch({ community, path }: { community: Community; path
   const others = (recs ?? []).filter((r) => r.path !== path).slice(0, 6);
 
   return (
-    <div className="mx-auto grid max-w-[1400px] gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="grid gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-5">
         <div className="overflow-hidden rounded-lg border border-border bg-black">
           <video

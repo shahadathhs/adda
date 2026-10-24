@@ -204,6 +204,15 @@ Rules:
 4px base grid: 8 / 12 / 16 / 24 (component → section). Page gutters: 24px on
 desktop widths, 16px on mobile.
 
+### Page width
+
+One content width: `PageContainer` (`web/src/components/page-container.tsx`)
+centres everything, the top bar and footer content included, in a column capped
+at 1280px. Wider screens get even side margins; nothing runs edge to edge.
+Pages fill the column (the player pages use it for video plus the 340px chat
+rail). Only forms and prose pages (settings, 404, auth) go narrower inside it.
+Do not add per-page `max-w-` wrappers wider than the column.
+
 ### Fixed chrome
 
 | Element         | Size                                          |
