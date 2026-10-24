@@ -1,14 +1,14 @@
 # web — Agent Instructions (viewer and studio app)
 
-Next.js 15 App Router app for viewers and streamers. Inherits `/DESIGN.md` — read it before
+Next.js 15 App Router app for viewers and streamers. Inherits `/docs/DESIGN.md` — read it before
 any UI work. This file adds web-specific hard rules. Conflicts resolve in
-favor of `/DESIGN.md`.
+favor of `/docs/DESIGN.md`.
 
 ## Design implementation
 
 - Tokens live in `src/app/globals.css` as shadcn-style CSS variables
   (`--background`, `--primary`, …) mapped through `@theme inline`.
-  Values come from `/DESIGN.md` §3 — the current violet values
+  Values come from `/docs/DESIGN.md` §3 — the current violet values
   (`hsl(262 83% 58%)`) are legacy and must be replaced, never reused.
 - Accent = marigold `#f5a623` with **ink** `accent-fg` `#1a1205` on
   accent fills. Never white-on-accent.
@@ -19,7 +19,7 @@ favor of `/DESIGN.md`.
   mono + `tabular-nums` for counts, durations, keys.
 - Radii: use the scale (4/6/8px) via `--radius-sm|md|lg`. Ban
   `rounded-xl`+ on controls.
-- Motion: CSS-first springs from `/DESIGN.md` §6 — 120ms micro
+- Motion: CSS-first springs from `/docs/DESIGN.md` §6 — 120ms micro
   (`--ease-micro`), 250ms state (`--ease-spring`), View Transitions for
   navigation (thumbnail morphs into the player via
   `view-transition-name`), `@starting-style` +
@@ -47,4 +47,4 @@ favor of `/DESIGN.md`.
 ## Quality
 
 - After every change: `pnpm lint && pnpm typecheck && pnpm -C web build` (run from the repo root; lint config is centralised there).
-- Pre-ship the `/DESIGN.md` §8 anti-slop checklist.
+- Pre-ship the `/docs/DESIGN.md` §8 anti-slop checklist.

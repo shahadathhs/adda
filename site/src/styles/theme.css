@@ -1,5 +1,5 @@
 /*
- * adda theme — ink ladder + marigold (see /DESIGN.md).
+ * adda theme — ink ladder + marigold (see /docs/DESIGN.md).
  * Unlayered on purpose: beats every `@layer starlight.*` rule.
  * Dark is the primary scope (`:root`); light is a warm paper variant
  * so the theme toggle stays honest.

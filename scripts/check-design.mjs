@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Design gate: scans UI source for the "default generated UI" tells banned by
-// /DESIGN.md (§8–9). Errors fail the run; warnings are printed for review.
+// /docs/DESIGN.md (§8–9). Errors fail the run; warnings are printed for review.
 // Usage: node scripts/check-design.mjs [dir ...]   (default: web/src site/src)
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";

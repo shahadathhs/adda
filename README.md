@@ -134,7 +134,7 @@ make check          # everything, including the builds
 
 ## Design
 
-The visual system is in [DESIGN.md](DESIGN.md): dark ink surfaces, one marigold
+The visual system is in [DESIGN.md](docs/DESIGN.md): dark ink surfaces, one marigold
 accent, a separate red that is only ever used for live states, mono numerals,
 and a strict radius and motion scale. Concept renders of all 23 screens are in
 [docs/design/](docs/design/SCREENS.md); regenerate them with
@@ -148,7 +148,7 @@ and a strict radius and motion scale. Concept renders of all 23 screens are in
 | [docs/FLOWS.md](docs/FLOWS.md)                   | Acceptance criteria per flow and the screen-to-test map |
 | [docs/CHAT.md](docs/CHAT.md)                     | Chat backend design: data model, wire protocol, rules   |
 | [docs/design/SCREENS.md](docs/design/SCREENS.md) | The concept screens                                     |
-| [DESIGN.md](DESIGN.md)                           | Design system                                           |
+| [DESIGN.md](docs/DESIGN.md)                      | Design system                                           |
 | [AGENTS.md](AGENTS.md)                           | Conventions for contributors and coding agents          |
 
 ## Contributing

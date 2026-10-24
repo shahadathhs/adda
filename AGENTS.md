@@ -11,7 +11,7 @@ milestones live in `docs/SCOPE.md`.
 | `docs/FLOWS.md`          | Acceptance criteria per flow (F0–F16) and the screen-to-test map |
 | `docs/CHAT.md`           | Chat backend: data model, wire protocol, rules, build order      |
 | `docs/design/SCREENS.md` | The concept screens to match (`docs/design/screens/*.png`)       |
-| `DESIGN.md`              | Tokens, type, motion, component patterns, anti-slop checklist    |
+| `docs/DESIGN.md`         | Tokens, type, motion, component patterns, anti-slop checklist    |
 
 **Definition of done for a feature:** its flow's acceptance criteria in
 `docs/FLOWS.md` hold, they are covered by tests (pytest for the API and
@@ -36,7 +36,7 @@ adda/
 
 ## Design system (required reading)
 
-`/DESIGN.md` is the law for all UI work — tokens, type, radius, motion,
+`/docs/DESIGN.md` is the law for all UI work — tokens, type, radius, motion,
 component patterns, and the anti-slop checklist. Per-surface rules live in
 `web/AGENTS.md` and `site/AGENTS.md`. Core
 rules: marigold accent `#f5a623` with dark-ink text on fills (never white),
@@ -50,7 +50,7 @@ Both surfaces (web and site) share one identity kit.
 Project skills in `.claude/skills/` apply to anything under `web/` or `site/`:
 `ui-build` (read before writing UI), `ux-states-a11y` (states, keyboard, WCAG 2.2
 AA) and `ui-review` (audit before commit). `pnpm check:design` is the
-automated gate for the banned patterns in `/DESIGN.md` and runs in CI.
+automated gate for the banned patterns in `/docs/DESIGN.md` and runs in CI.
 
 ## Commands
 

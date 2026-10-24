@@ -16,7 +16,7 @@ Review UI work the way a design lead would, with evidence, not vibes.
    `pnpm check:design` (banned patterns from DESIGN.md) and
    `pnpm lint && pnpm typecheck`.
 3. Read each changed component against:
-   - `/DESIGN.md` §8 anti-slop checklist
+   - `/docs/DESIGN.md` §8 anti-slop checklist
    - the `ui-build` rules (tokens, type, shape, motion, content, one component per file)
    - the `ux-states-a11y` tables (states, keyboard/focus, semantics)
 4. If the app can run, look at it at 375px and 1280px and say what you saw.

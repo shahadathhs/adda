@@ -467,7 +467,7 @@ Run before shipping any UI change:
 
 ## 9. Agent quick reference
 
-Concept renders of every screen are in `docs/design/` ([SCREENS.md](docs/design/SCREENS.md));
+Concept renders of every screen are in `docs/design/` ([SCREENS.md](design/SCREENS.md));
 match them, and regenerate them with `node scripts/render-design.mjs` when a
 screen's design changes.
 
@@ -504,7 +504,7 @@ motion:
   nav: "300ms crossfade + 8px slide"
   signature: "400-600ms --ease-spring" # going live, celebrations
   exit_scale: 0.7 # exits = 0.7x entrance
-  curves: "linear() springs in /DESIGN.md §6 — shared verbatim"
+  curves: "linear() springs in /docs/DESIGN.md §6 — shared verbatim"
 type_px: { display: 40, h1: 28, h2: 20, h3: 16, body: 14, secondary: 13, caption: 12 }
 ```
 

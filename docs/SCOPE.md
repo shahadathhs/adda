@@ -160,7 +160,7 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
 - **Docs.** A `docs/` index: architecture, realtime protocol, streaming
   pipeline, deployment, CI, design. Behavior changes update docs in the same
   commit.
-- **Design.** Every surface follows `/DESIGN.md` and its anti-slop checklist.
+- **Design.** Every surface follows `/docs/DESIGN.md` and its anti-slop checklist.
 
 ## Milestones
 

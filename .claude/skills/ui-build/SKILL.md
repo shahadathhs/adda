@@ -1,6 +1,6 @@
 ---
 name: ui-build
-description: Use before writing or changing any UI in web/ or site/ (components, pages, styles, copy). Forces a design pass against /DESIGN.md so the result is recognisably adda and not default generated UI.
+description: Use before writing or changing any UI in web/ or site/ (components, pages, styles, copy). Forces a design pass against /docs/DESIGN.md so the result is recognisably adda and not default generated UI.
 ---
 
 # Building UI for adda
@@ -12,7 +12,7 @@ Avoid it by deciding first and building from tokens — never from adjectives li
 
 ## 1. Before any code
 
-1. Read `/DESIGN.md` (§3 colour, §4 type, §5 geometry, §6 motion, §7 patterns)
+1. Read `/docs/DESIGN.md` (§3 colour, §4 type, §5 geometry, §6 motion, §7 patterns)
    and the surface file: `web/AGENTS.md` or `site/AGENTS.md`.
 2. Look at 2–3 existing components in the same area (`web/src/components/`)
    and reuse their anatomy. A new screen should look like a sibling of those.

@@ -1,7 +1,7 @@
 # adda — Concept screens
 
 Concept renders of the web app, in the dark theme (adda is dark-first; see
-[/DESIGN.md](../../DESIGN.md)). They are design targets, not final art: stream
+[DESIGN.md](../DESIGN.md)). They are design targets, not final art: stream
 frames are flat placeholders for real captures, names and numbers are
 invented, and spacing will be tuned when the screens are built.
 

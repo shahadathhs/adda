@@ -1,9 +1,9 @@
 # site/ — Agent Instructions (marketing + docs)
 
 Astro + Starlight marketing and docs site (deploys to Vercel). Inherits
-`/DESIGN.md` — read it before any UI work. The site is the public face of
+`/docs/DESIGN.md` — read it before any UI work. The site is the public face of
 the brand, so the design system applies hardest here. Conflicts resolve
-in favor of `/DESIGN.md`.
+in favor of `/docs/DESIGN.md`.
 
 ## Current state
 
@@ -26,7 +26,7 @@ Known follow-ups (not blockers):
   `customCss` in `astro.config.mjs`, overriding `--sl-color-*`
   variables in both light and dark scopes (keep dark as the primary):
   - `--sl-color-bg` → `#0c0d10` · panels → `#14161b` · borders →
-    `#262a33` (the `/DESIGN.md` §3 surface ladder)
+    `#262a33` (the `/docs/DESIGN.md` §3 surface ladder)
   - Accent → marigold `#f5a623`; **text/CTAs on accent use ink
     `#1a1205`, never white**; links use marigold, not purple
   - Live red `#eb3223` only where copy refers to actual live states
@@ -36,7 +36,7 @@ Known follow-ups (not blockers):
 - Splash page: one marigold primary CTA + ghost secondaries; feature
   content as real tables/lists/screenshots — **no three-icon-card
   grids, no emoji decoration, no gradient text**.
-- Motion: pure CSS only per `/DESIGN.md` §6 — `linear()` springs,
+- Motion: pure CSS only per `/docs/DESIGN.md` §6 — `linear()` springs,
   `@starting-style` entrances, scroll-driven reveals with IO fallback.
   No animation libraries; keep the site zero-JS. The live pulse motif
   appears wherever copy shows live states.
@@ -65,7 +65,7 @@ Known follow-ups (not blockers):
 - Theme lives in `src/styles/theme.css` (ink ladder + marigold, both
   scopes, landing reset) with Space Grotesk self-hosted in
   `public/fonts/`. Demo/mock components render the real product anatomy
-  from `/DESIGN.md` §7 — flat surfaces only, no gradients.
+  from `/docs/DESIGN.md` §7 — flat surfaces only, no gradients.
 - Docs content lives in `src/content/docs/` (Starlight collections;
   sidebar in `astro.config.mjs`). There is intentionally no
   `docs/index.md` — the landing owns `/`.
@@ -78,5 +78,5 @@ Known follow-ups (not blockers):
 
 - After every change: `pnpm -C site build` (and `make site-dev` to
   eyeball dark theme + splash).
-- Pre-ship the `/DESIGN.md` §8 anti-slop checklist — for the site it
+- Pre-ship the `/docs/DESIGN.md` §8 anti-slop checklist — for the site it
   is the brand's first impression.
