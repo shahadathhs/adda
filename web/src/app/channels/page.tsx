@@ -1,6 +1,15 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { ChannelBrowser } from "@/components/browse/channel-browser";
 
-/** The old directory page is now search with an empty query. */
-export default function ChannelsRedirect() {
-  redirect("/search");
+export const metadata: Metadata = { title: "All channels" };
+
+export default function Page() {
+  return (
+    <main>
+      <Suspense>
+        <ChannelBrowser />
+      </Suspense>
+    </main>
+  );
 }

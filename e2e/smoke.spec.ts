@@ -43,7 +43,7 @@ test("a streamer goes live and a guest watches, reads chat and sees a poll", asy
     // ── a guest watches: player badge, read-only chat ──
     const guest = await (await browser.newContext()).newPage();
     await guest.goto(`/channel/${slug}`);
-    await expect(guest.getByText("LIVE").first()).toBeVisible({ timeout: 30_000 });
+    await expect(guest.getByText("LIVE", { exact: true }).first()).toBeVisible({ timeout: 30_000 });
     await expect(guest.getByText("You are watching as a guest")).toBeVisible();
     await expect(guest.getByRole("textbox", { name: "Chat message" })).toHaveCount(0);
 

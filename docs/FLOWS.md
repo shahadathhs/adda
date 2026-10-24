@@ -45,7 +45,16 @@ Tests: pytest for each rule; Playwright for register, login, reset.
 
 - Home lists live channels first, sorted by viewers; the top one is featured.
   The following rail needs an account.
-- Search matches channel name and stream title; empty results offer a way on.
+- One search box in every page's top bar (and the home hero) suggests channels
+  and recordings as you type, with live channels first; arrow keys, Enter and
+  Escape work. `/search` shows every match, grouped.
+- Live, Channels and Recordings each have a directory page with a text filter,
+  status or channel filter, sorting and numbered pagination (12 per page). The
+  filters and the page number live in the address. Private and suspended
+  channels never appear. Home sections show 8 cards and link to "View all".
+- Cards fade in as they scroll into view; nothing is hidden without JavaScript
+  or under reduced motion.
+- An About page names the author and links the source, the docs and the site.
 - Channel pages are server-rendered with title and Open Graph metadata.
 - The HLS player starts muted, shows reconnecting state, and recovers.
 - Offline channels show the offline panel and recordings. An unknown slug

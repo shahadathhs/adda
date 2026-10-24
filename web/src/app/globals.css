@@ -259,3 +259,19 @@
     display: none;
   }
 }
+
+/* Scroll reveal (components/reveal.tsx): opacity and transform only. */
+[data-reveal] {
+  transition:
+    opacity 250ms var(--ease-micro),
+    transform 250ms var(--ease-spring);
+}
+[data-reveal="armed"] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+}

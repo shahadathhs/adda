@@ -1,25 +1,15 @@
 import type { Metadata } from "next";
-import { ssrFetch } from "@/lib/ssr";
-import type { DiscoverChannel } from "@/lib/types";
-import { SearchResults } from "@/components/search-results";
-
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import { SearchPage } from "@/components/search/search-page";
 
 export const metadata: Metadata = { title: "Search" };
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
-  const q = ((await searchParams).q ?? "").trim();
-  const initial =
-    (await ssrFetch<DiscoverChannel[]>(
-      `/api/streaming/discover${q ? `?q=${encodeURIComponent(q)}` : ""}`,
-    ).catch(() => [])) ?? [];
+export default function Page() {
   return (
     <main>
-      <SearchResults key={q} initial={initial} q={q} />
+      <Suspense>
+        <SearchPage />
+      </Suspense>
     </main>
   );
 }

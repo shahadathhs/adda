@@ -1,6 +1,5 @@
 """Streaming routes: public discovery/playback info + streamer/admin controls."""
 
-import asyncio
 import time
 import uuid
 
@@ -14,11 +13,11 @@ from core.exceptions import ForbiddenException, NotFoundException
 from core.security.deps import get_current_user
 from core.security.guards import require_admin
 from models.user import User
-from modules.communities.service.follows import count_followers_map
 from modules.communities.service.queries import get_community, search_communities
 from modules.communities.service.roles import can_moderate
 from modules.streaming.schemas import DiscoverItem, LiveStreamOut, StreamHealthOut
 from modules.streaming.service import monitor
+from modules.streaming.service.discover import build_discover_items
 from modules.streaming.service.mediamtx import (
     kick_publisher,
     path_details,
@@ -45,41 +44,8 @@ async def discover(
     db: AsyncSession = Depends(get_db),
 ) -> list[DiscoverItem]:
     """Public browse grid — live channels first (by viewers), then the rest."""
-    live_ids = set(await list_live_community_ids())
-    viewers_map: dict[str, int] = {}
-    started_map: dict[str, str | None] = {}
-    if live_ids:
-        ordered = list(live_ids)
-        counts = await asyncio.gather(*(viewer_count(cid) for cid in ordered))
-        starts = await asyncio.gather(*(monitor.started_at(cid) for cid in ordered))
-        viewers_map = dict(zip(ordered, counts, strict=True))
-        started_map = {
-            cid: monitor.iso(s) if s is not None else None
-            for cid, s in zip(ordered, starts, strict=True)
-        }
-
     communities = await search_communities(db, q, limit=limit, offset=offset)
-    ids = [c.id for c in communities]
-    followers_map = await count_followers_map(db, ids)
-
-    items = [
-        DiscoverItem(
-            community_id=str(c.id),
-            name=c.name,
-            slug=c.slug,
-            description=c.description,
-            avatar_url=c.avatar_url,
-            banner_url=c.banner_url,
-            stream_title=c.stream_title,
-            is_live=str(c.id) in live_ids,
-            viewers=viewers_map.get(str(c.id), 0),
-            started_at=started_map.get(str(c.id)),
-            follower_count=followers_map.get(c.id, 0),
-            hls_url=hls_url(str(c.id)) if str(c.id) in live_ids else None,
-            webrtc_url=webrtc_url(str(c.id)) if str(c.id) in live_ids else None,
-        )
-        for c in communities
-    ]
+    items = await build_discover_items(db, communities)
     # Live first, most viewers first; offline keeps created_at desc order.
     items.sort(key=lambda i: (not i.is_live, -i.viewers))
     return items

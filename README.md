@@ -72,10 +72,10 @@ Every flow, with its acceptance criteria and the screen it belongs to, is in
 | F15    | Channel profile: about, links, banner, announcements, followers                            | Built                                       |
 | F16    | Recording comments                                                                         | Built                                       |
 
-Tests: `make test` runs 147 backend tests (accounts and tokens, channels, streams, chat
+Tests: `make test` runs 151 backend tests (accounts and tokens, channels, streams, chat
 rules, polls, emotes, notifications, identity, the channel page, recording comments,
 migrations, operability) against an embedded Postgres, and one more test starts two real
-server processes against one Redis. `pnpm e2e` runs 6 Playwright tests against the real
+server processes against one Redis. `pnpm e2e` runs 11 Playwright tests against the real
 stack with an ffmpeg test-pattern publisher. CI runs all of it
 ([docs/SCOPE.md](docs/SCOPE.md) has the milestones).
 

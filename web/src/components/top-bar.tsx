@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Radio, Search } from "lucide-react";
-import { buttonClass } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button-styles";
 import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
-import { SearchBox } from "@/components/search-box";
+import { GlobalSearch } from "@/components/search/global-search";
 import { UserMenu } from "@/components/user-menu";
 import { useMe } from "@/lib/session";
 import { cn } from "@/lib/cn";
@@ -17,15 +17,19 @@ const navLink = (active: boolean) =>
     active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
   );
 
-/** Brand, Following / Browse, search, then the bell and avatar (or sign-in for guests). */
+const SECTIONS = [
+  { href: "/live", label: "Live" },
+  { href: "/channels", label: "Channels" },
+  { href: "/recordings", label: "Recordings" },
+];
+
+/** Brand, section links, the search box (on every page), then the bell and avatar (or sign-in for guests). */
 export function TopBar() {
   const { data: user } = useMe();
   const pathname = usePathname();
-  const following = useSearchParams().get("tab") === "following";
   const onAuthPage = ["/login", "/register", "/forgot-password", "/reset-password"].some((p) =>
     pathname?.startsWith(p),
   );
-  const onHome = pathname === "/" || pathname === "/search";
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
@@ -37,28 +41,11 @@ export function TopBar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 sm:flex" aria-label="Primary">
-          {user && (
-            <Link
-              href="/?tab=following"
-              className={navLink(onHome && following)}
-              aria-current={onHome && following ? "page" : undefined}
-            >
-              Following
-            </Link>
-          )}
-          <Link
-            href="/"
-            className={navLink(onHome && !following)}
-            aria-current={onHome && !following ? "page" : undefined}
-          >
-            Browse
-          </Link>
-        </nav>
+        <SectionNav className="hidden sm:flex" />
 
-        <SearchBox />
+        <GlobalSearch className="hidden w-full max-w-[420px] flex-1 sm:block" />
 
-        <div className="ml-auto flex items-center gap-3 sm:ml-0">
+        <div className="ml-auto flex items-center gap-3">
           <Link
             href="/search"
             aria-label="Search channels"
@@ -88,6 +75,41 @@ export function TopBar() {
           )}
         </div>
       </PageContainer>
+      <SectionNav className="flex gap-1 overflow-x-auto border-t border-border px-4 py-1 sm:hidden" />
     </header>
+  );
+}
+
+/** Following (signed in), Live, Channels and Recordings; the current one is marked. */
+function SectionNav({ className }: { className: string }) {
+  const { data: user } = useMe();
+  const pathname = usePathname();
+  const following = useSearchParams().get("tab") === "following";
+  const onFollowing = pathname === "/" && following;
+  return (
+    <nav aria-label="Primary" className={cn("items-center gap-1", className)}>
+      {user && (
+        <Link
+          href="/?tab=following"
+          className={navLink(onFollowing)}
+          aria-current={onFollowing ? "page" : undefined}
+        >
+          Following
+        </Link>
+      )}
+      {SECTIONS.map((s) => {
+        const on = pathname === s.href || pathname?.startsWith(`${s.href}/`);
+        return (
+          <Link
+            key={s.href}
+            href={s.href}
+            className={navLink(!!on)}
+            aria-current={on ? "page" : undefined}
+          >
+            {s.label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { ChannelView } from "@/components/channel/channel-view";
 import { NotFoundContent } from "@/components/not-found-content";
-import { SearchResults } from "@/components/search-results";
+import { SearchPage } from "@/components/search/search-page";
 import { EndedPanel } from "@/components/channel/ended-panel";
 import { HomeClient } from "@/components/home-client";
 import { StudioFrame } from "@/components/studio/studio-frame";
@@ -54,6 +54,11 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
   qc.setQueryData(sessionKeys.me, guest ? null : fixtureUser);
   qc.setQueryData(["followed"], fixtureFollowed);
   qc.setQueryData(["discover", ""], fixtureChannels);
+  qc.setQueryData(["search", "radio", 8], {
+    query: "radio",
+    channels: fixtureChannels.slice(0, 4),
+    recordings: fixtureRecordings.slice(0, 3),
+  });
   qc.setQueryData(["followers", "c-1"], []);
   qc.setQueryData(webKeys.follow("c-1"), { following: !guest });
   qc.setQueryData(webKeys.recordings("c-1"), fixtureChannelRecordings);
@@ -68,7 +73,7 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
   if (screen === "search")
     return (
       <main>
-        <SearchResults initial={fixtureChannels} q="radio" />
+        <SearchPage query="radio" />
       </main>
     );
 

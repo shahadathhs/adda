@@ -8,3 +8,4 @@ export * from "./endpoints/channel-page";
 export * from "./endpoints/streaming";
 export * from "./endpoints/recordings";
 export * from "./endpoints/admin";
+export * from "./endpoints/browse";

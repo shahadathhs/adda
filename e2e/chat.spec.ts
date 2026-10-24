@@ -86,7 +86,7 @@ test("the channel page works at phone width", async ({ browser }) => {
       await browser.newContext({ viewport: { width: 390, height: 844 } })
     ).newPage();
     await page.goto(`/channel/${channel.slug}`);
-    await expect(page.getByText("LIVE").first()).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText("LIVE", { exact: true }).first()).toBeVisible({ timeout: 60_000 });
     // No horizontal page scroll, and the chat sits under the player.
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

@@ -11,6 +11,7 @@ from core import metrics
 from core.config import settings
 from core.logging import configure as configure_logging
 from modules.auth.router import router as auth_router
+from modules.browse.router import router as browse_router
 from modules.chat.emotes_router import router as emotes_router
 from modules.chat.polls_router import router as polls_router
 from modules.chat.room_router import router as room_router
@@ -149,6 +150,7 @@ async def health() -> dict[str, str]:
 # All HTTP routers mount under the /api prefix; the WebSocket gateway sits
 # at the root (no prefix).
 app.include_router(auth_router, prefix=settings.api_prefix)
+app.include_router(browse_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
 app.include_router(chat_router, prefix=settings.api_prefix)
 app.include_router(identity_router, prefix=settings.api_prefix)
