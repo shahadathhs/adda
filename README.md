@@ -1,447 +1,163 @@
 # adda
 
-A self-hosted, **multi-tenant live-streaming platform** with **real-time
-community chat**. One instance hosts many channels —
-each with its own stream key, live page, chat, and recordings.
+**A self-hosted live-streaming platform for the browser.** Install it on your
+own server, stream from OBS, and viewers watch and chat in realtime while every
+broadcast is recorded. No accounts on someone else's servers, no per-minute
+fees, no cloud.
 
-Three UIs, three deployment targets, one backend:
+> **adda** (আড্ডা) — Bengali for an informal, wide-ranging conversation among
+> friends.
 
-- **Viewer web app** (`apps/web`) — Next.js, deployed with your stack
-- **Desktop console** (`apps/desktop`) — Tauri operator client, downloaded and
-  pointed at your server
-- **Marketing/docs site** (`site/`) — Astro/Starlight, hosted on Vercel
+![adda concept screens](docs/design/overview.png)
 
-Shared TypeScript logic lives in `packages/` (`types` · `api-client` ·
-`shared`) — logic is shared, **UI never is**.
+> **Status: v1 in progress.** The streaming core works. The social layer in the
+> screens above is being built. [What is built, and what is not](#status) is
+> spelled out below. Nothing here has been released yet.
 
-> **adda** (আড্ডা /ˈ_add_ːa/) — Bengali for an informal, wide-ranging conversation
-> among friends.
+## What you get
 
----
+- **Live streaming:** publish from OBS over RTMP; viewers watch over HLS in the
+  browser, with a viewer count and an automatic reconnect.
+- **Realtime chat** on every channel, with replies, @mentions, reactions,
+  custom emotes, a pinned message and live polls.
+- **Follows and a notification bell** (optional email alerts when a followed
+  channel goes live).
+- **Recordings** of every broadcast, with timestamped comments.
+- **Channel pages** with about text, links, announcements, badges and
+  moderators.
+- **Moderation:** delete, time out, ban, slow mode, followers-only.
+- **Identity mode:** accounts chat under their name or as "Anonymous". The
+  server still records the account, and moderators can see who is behind a
+  message.
+- **One command to install**, automatic HTTPS, and every secret generated for
+  you.
 
-## Features
+Guests can watch and read chat. Everything interactive needs an account, so
+every action in the database belongs to someone.
 
-### Authentication & Security
-
-- **JWT-based auth** with rotating **refresh tokens** (30-day, hashed at rest,
-  reuse detection revokes the session) + 1-day access tokens; the frontend
-  refreshes transparently on 401
-- **Passwordless OTP login** (6-digit code via email, Redis-backed)
-- **Two-factor authentication** (2FA) — enable/disable/verify lifecycle
-- **Password reset** flow with signed JWT tokens
-- **System roles** — `user`, `admin`, `superadmin` (enum-based RBAC)
-- **Profile management** — update display name, bio, avatar; set/change password
-
-### Communities
-
-- Create communities with unique slugs, banners, descriptions
-- **Public & private** communities (private requires admin approval to join)
-- **Member management** — promote/demote roles (owner → admin → moderator →
-  streamer → member → guest), kick members
-- **Join request workflow** for private communities (request → approve/deny)
-- **Suspend/unsuspend** communities (admin only)
-- Auto-created **default channels** on community creation (`general`,
-  `announcements`, `live`)
-
-### Channels & Messaging
-
-- **Community channels** within each community (`text`, `announcement`, `live`)
-- **Permission-controlled** — restricted channels require explicit read/write grants
-- **Real-time chat** via WebSocket (reactions, replies, edits)
-- **Message persistence** — channel messages are stored in PostgreSQL with cursor
-  pagination
-- Channel CRUD (default channels are deletion-protected)
-
-### Live Streaming
-
-- **RTMP ingest → HLS playback** via [mediamtx](https://github.com/bluenviron/mediamtx)
-- **Per-community stream keys** with instant rotation (kicks active publisher)
-- **Publish-auth webhook** — mediamtx calls back to backend to validate stream key
-- **Discover/browse page** — live-first grid with viewer counts and search
-- **Stream titles & health** — what's live now, viewers, uptime, codecs
-- **Follows** — follow channels, personal Following rail with live indicators
-- **Instant live/offline push** — background monitor publishes `stream_status`
-  over WebSocket to subscribed clients
-- **Auto-start HLS player** when a stream goes live
-- **Admin force-stop** — kick a publisher from the dashboard
-- OBS/Streamlabs ready — just paste the stream URL
-
-### Recordings
-
-- Automatic recording of live streams (stored locally on disk)
-- List, play, and delete recordings per community
-- Admin can manage all recordings across communities
-
-### Real-time Infrastructure
-
-- **WebSocket gateway** with typed protocol (client ↔ server contract in sync)
-- **Redis pub/sub fan-out** for multi-instance scaling
-- **Presence tracking** via Redis sets
-- Auto-reconnect with exponential backoff (frontend)
-- Channel-namespace routing: `community:<id>`, `community:<id>:chat`,
-  `community:<id>:presence`, `channel:<uuid>`, `user:<id>`
-
-### Creator Console (Desktop)
-
-- **Dedicated operator client** — dense, dark, keyboard-first desktop app
-  (not a wrapped website): Dashboard (stats + active streams), Streams
-  (live monitor, viewer counts, force-stop), Communities (members, kick,
-  stream-key reveal/rotate, suspend, delete), Users (roles, suspend,
-  password reset, delete), Recordings (play/download/delete), Chat
-  moderation, Settings
-- **⌘K command palette**, ⌘1–⌘7 view switching, `⌘/` shortcut help
-- **Native notifications** the moment any channel goes live
-- Window state + last view remembered across launches; update-available
-  check against GitHub releases
-- **For every kind of user**: sign in and see _your_ channels (owner/
-  moderator/streamer roles) with per-channel tools; system admins
-  additionally get the Platform section (users, all communities, live
-  monitor, all recordings)
-
-### Desktop Console (Tauri v2)
-
-- **Operator client** — its own app (own UI, dense + dark + keyboard-first),
-  not a wrapped website: dashboard, live monitor with force-stop, community
-  management (members, stream keys), users, recordings, chat moderation
-- **⌘K command palette**, ⌘1–⌘7 view switching, native notifications when a
-  stream goes live (`stream_status` WebSocket events)
-- **Runtime-configurable server** — first-run connect screen, changeable in
-  Settings; signs in with an operator account (admin/superadmin)
-- Shares only logic (`@adda/*` packages) with the web app — never UI
-- Linux `.deb`/`.AppImage` buildable via Docker (no local Rust needed);
-  macOS/Windows installers build natively
-
-### Docs & Marketing Site (Astro + Starlight → Vercel)
-
-- Splash landing with hero CTAs and feature tour
-- Full guides: quickstart, self-hosting (TLS/proxy/persistence/scaling),
-  going live with OBS, desktop console, administration
-- Reference: configuration (every env var) + API/WebSocket overview, FAQ
-- Zero-JS static output, SEO-ready, sitemap + search included
-
----
-
-## Tech Stack
-
-| Layer               | Technology                                                                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Viewer web**      | Next.js 15 (App Router, SSR channel pages) · React 19 · TanStack Query · Tailwind CSS · hls.js              |
-| **Desktop console** | Tauri v2 operator client (own dense UI, ⌘K palette, native notifications)                                   |
-| **Backend**         | FastAPI · async SQLAlchemy 2.0 · asyncpg · Pydantic v2 · PyJWT + cryptography · bcrypt · aiosmtplib · httpx |
-| **Database**        | PostgreSQL 16 (async) · Redis 7 (pub/sub + presence + OTP)                                                  |
-| **Streaming**       | mediamtx (RTMP ingest → HLS/WebRTC playback)                                                                |
-| **Realtime**        | WebSocket gateway with Redis fan-out                                                                        |
-| **Infra**           | Docker Compose (single-command full stack)                                                                  |
-| **Tooling**         | uv (Python) · pnpm (JS) · Ruff + Pyright · ESLint · Husky · CI                                              |
-
----
-
-## Architecture
+## How it works
 
 ```
-   Vercel (product site)      Streamer's server                     Streamer's laptop
-┌───────────────────┐   ┌───────────────────────────────────┐   ┌─────────────────────┐
-│ site/             │   │ apps/web  Next.js viewer (:5173)  │   │ apps/desktop        │
-│ Astro + Starlight │   │   SSR browse + channel pages      │   │ Tauri console       │
-│ marketing + docs  │   │ backend/  FastAPI (:7001)         │◄──│ operator client     │
-└───────────────────┘   │   REST /api · WebSocket /ws      │   │ (runtime server URL)│
-                        │ postgres 16 · redis 7            │   └─────────────────────┘
-                        │ mediamtx :1935/:8888/:8889/:9997 │
-                        └───────────────────────────────────┘
-                              ▲
-                              └── @adda/types · @adda/api-client · @adda/shared (packages/)
+OBS ──RTMP──▶ mediamtx ──auth webhook──▶ backend (FastAPI) ◀──▶ Postgres
+                 │                            │   ▲
+                 └──HLS──▶ viewers' browsers  │   └── Redis (pub/sub, presence,
+                                              │        rate limits, poll tallies)
+                     web (Next.js) ◀──REST + WebSocket──┘
+                     Caddy: HTTPS in front of everything
 ```
 
-### Backend module map
+- **backend/**: FastAPI, async SQLAlchemy, Alembic. Features live in
+  `modules/<feature>/` with a thin router and a `service/` package.
+- **web/**: Next.js App Router app for viewers and streamers (SSR for browse and
+  channel pages).
+- **infra/**: mediamtx and Caddy configuration.
+- **site/**: the marketing and documentation site (deployed separately).
 
-```
-backend/
-├── main.py                  App entry — router registration, startup seed, CORS
-├── core/                    Shared infrastructure
-│   ├── config.py            Pydantic Settings (env-driven)
-│   ├── database.py          Async SQLAlchemy engine + session factory
-│   ├── redis_client.py      Async Redis client
-│   ├── exceptions.py        Typed API exception hierarchy (400–503)
-│   ├── seed.py              Idempotent startup seeding
-│   ├── otp.py               Redis-backed OTP (generate/verify)
-│   ├── email.py             Async SMTP sender
-│   ├── auth_emails.py       HTML email templates (OTP, 2FA)
-│   └── security/
-│       ├── jwt.py           HS256 access token create/decode
-│       ├── password.py      bcrypt hash/verify
-│       ├── tokens.py        Signed password-reset tokens
-│       ├── deps.py          get_current_user (HTTP + WS)
-│       └── guards.py        require_admin / require_superadmin
-├── models/                  Shared SQLAlchemy 2.0 models
-│   ├── user.py              User + SystemRole enum
-│   ├── community.py         Community (+ stream_title)
-│   ├── membership.py        Membership + CommunityRole enum
-│   ├── channel.py           Channel
-│   ├── channel_member.py    ChannelMember (per-channel access grants)
-│   ├── message.py           Message (persisted chat)
-│   ├── join_request.py      JoinRequest (private community workflow)
-│   ├── follow.py            Follow (user × community)
-│   └── refresh_token.py     RefreshToken (hashed, revocable sessions)
-├── modules/                 Feature modules (one folder per domain)
-│   ├── auth/                Register, login, JWT, 2FA, OTP, password reset
-│   ├── communities/         CRUD, slugs, follows, stream keys, membership (+ admin_router)
-│   ├── channels/            Channel CRUD, messages, per-channel permissions
-│   ├── streaming/           Discover, live status, health, monitor, mediamtx webhook
-│   ├── recordings/          VOD list/serve/delete (+ admin_router)
-│   ├── stats/               Dashboard aggregate counts
-│   ├── users/               Admin user management (+ admin_router)
-│   └── realtime/            WS gateway + Redis pub/sub + presence
-└── alembic/                 11 migrations
-```
+## Status
 
-### Web app structure
+Honest status of each flow. The full list, with acceptance criteria and the
+screen each one belongs to, is in [docs/FLOWS.md](docs/FLOWS.md).
 
-```
-apps/web/src/                # Next.js 15 App Router viewer (workspace member)
-├── app/                     # file-based routes
-│   ├── page.tsx             Browse (SSR: live-first grid, search, Following rail)
-│   ├── channel/[slug]/      Channel page (SSR + OG metadata, player, chat, setup)
-│   ├── community/[id]/      Legacy UUID links → channel view
-│   ├── login/ register/ reset-password/   (password · 2FA · OTP)
-│   ├── settings/            Profile, password, 2FA
-│   └── layout.tsx providers.tsx globals.css
-├── components/              ui kit, LivePlayer (hls.js), ChatRail, ChannelView…
-└── lib/                     session + data hooks (TanStack Query), SSR fetch helper
+| Flow   | What                                                                                                                          | Status                                            |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| F0     | One-command install, HTTPS, generated secrets                                                                                 | Built; clean-server timing not yet verified       |
+| F1     | Register, login, rotating refresh tokens, change and reset password                                                           | Built; reset email needs SMTP                     |
+| F2     | Home, channel pages (SSR), HLS player, viewer counts                                                                          | Built; search and the new home layout in progress |
+| F3     | Create channel, stream key, rotate key, edit, delete                                                                          | Built; edit and delete flows to verify            |
+| F4     | Go live, offline detection, force-stop                                                                                        | Built                                             |
+| F5     | Chat: history, send, delete                                                                                                   | Partial; moderation and rate limits planned       |
+| F6     | Follows                                                                                                                       | Built                                             |
+| F7     | Recordings and thumbnails                                                                                                     | Built; download and processing state to verify    |
+| F8     | Admin API                                                                                                                     | Partial                                           |
+| F9–F16 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode, channel profiles, recording comments | Planned ([chat design](docs/CHAT.md))             |
 
-apps/desktop/src/            # operator console (own design system — no shared UI)
-├── views/                   dashboard · streams · communities · users ·
-│                            recordings · chat · settings (+ boot screens)
-├── ui/                      dense console primitives (button/table/panel/…)
-└── lib/                     session, admin data hooks, notifications, update check
-```
+There are **no automated tests yet**; adding them is the first milestone
+([docs/SCOPE.md](docs/SCOPE.md)).
 
----
+## Not in v1
 
-## Getting Started
+No desktop or mobile apps, no direct messages, no communities with multiple
+rooms, no light theme, no admin web UI (admin actions are an API), no
+transcoding or clips, and no WebRTC playback (HLS only). See
+[docs/SCOPE.md](docs/SCOPE.md) for the reasoning.
 
-### Install on a server (one command)
+## Install (on a server)
 
-Get a server (any 2 GB VPS with Ubuntu/Debian), point your domain's DNS
-A record at it, then run **one command** as root:
+You need a Linux server with a domain pointing at it and ports 80, 443 and 1935
+open. Run this as root:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/adda-v3/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh
 ```
 
-That's the whole install. The script asks two questions — **your
-domain** and an **admin email** — and does everything else:
+It asks for your domain and admin email, installs Docker if needed, generates
+every secret, starts the stack with automatic HTTPS, and prints the admin
+password once. Then:
 
-- installs Docker + Compose if they're missing
-- downloads the source (no git needed)
-- waits with you until your domain's DNS resolves
-- generates the Postgres password, JWT secret, and admin password
-- starts the stack behind Caddy with automatic HTTPS
-- prints your login exactly once
+1. Sign in with the admin email, and create your channel.
+2. Open **Studio → Setup**, copy the server URL and stream key into OBS
+   (Settings → Stream → Custom).
+3. Press **Start Streaming**.
 
-```text
-adda is live:  https://adda.example.com
-  admin login:  you@example.com
-  password:     <generated — shown once, change after first sign-in>
-  OBS stream URL:  rtmp://adda.example.com/live
-```
+Email (password reset links, optional live alerts) is off until you add the
+`SMTP_*` values to `/opt/adda/.env`.
 
-Postgres, Redis, and the streaming internals are never exposed to the
-internet — only HTTPS (80/443) and RTMP (1935). To update later:
-`cd /opt/adda && docker compose --profile prod up -d --build`.
+## Develop locally
 
-### Prerequisites
-
-- **Docker** + **Docker Compose v2**
-- **[uv](https://docs.astral.sh/uv/)** — Python package manager
-  (`curl -LsSf https://astral.sh/uv/install.sh | sh`) — dev only
-- **Node.js 20+** + **pnpm** (`corepack enable`) — only for local web dev
-
-### Quick start (local Docker)
+Needs Docker, [uv](https://docs.astral.sh/uv/) and
+[pnpm](https://pnpm.io/) (Node 22).
 
 ```bash
-make setup       # creates .env files, installs deps, starts Postgres, runs migrations
-make up          # builds and starts the full stack with dev ports (no HTTPS)
+make setup          # .env files, directories, dependencies, database
+make infra          # Postgres + Redis + mediamtx in Docker
+make dev            # backend on :7001 and web on :5173, with hot reload
 ```
 
-Open **http://localhost:5173**.
+Or run everything in containers with `make up`.
 
-**Seeded accounts** (dev only — `SEED_TEST_USERS=true` via the dev overlay):
+| Service                            | Port                      |
+| ---------------------------------- | ------------------------- |
+| Web                                | 5173                      |
+| Backend                            | 7001                      |
+| Postgres / Redis                   | 5432 / 6379               |
+| mediamtx RTMP / HLS / WebRTC / API | 1935 / 8888 / 8889 / 9997 |
 
-| User  | Email               | Password      | Role       |
-| ----- | ------------------- | ------------- | ---------- |
-| admin | `admin@example.com` | `admin12345`  | superadmin |
-| alice | `alice@example.com` | `password123` | member     |
-| bob   | `bob@example.com`   | `password123` | member     |
-
-> Production stacks made by `install.sh` seed **only** the admin, with a
-> generated password. `SEED_TEST_USERS` defaults to false.
-
-### Local development (hot reload)
+Quality gates (all run in CI):
 
 ```bash
-make setup                       # one-time setup
-make up postgres redis mediamtx  # start infra in Docker
-make dev                         # backend (uvicorn --reload) + web (next dev) concurrently
+make lint           # ruff + oxlint + prettier
+make typecheck      # pyright
+pnpm typecheck      # tsc
+pnpm check:design   # banned UI patterns from DESIGN.md
+make check          # everything, including the builds
 ```
 
-Or run individually:
+## Design
 
-```bash
-make backend     # uvicorn --reload on :7001
-make web         # next dev server on :5173
-```
+The visual system is in [DESIGN.md](DESIGN.md): dark ink surfaces, one marigold
+accent, a separate red that is only ever used for live states, mono numerals,
+and a strict radius and motion scale. Concept renders of all 23 screens are in
+[docs/design/](docs/design/SCREENS.md); regenerate them with
+`node scripts/render-design.mjs`.
 
-### Desktop app (Tauri v2)
+## Documentation
 
-```bash
-make desktop-dev     # run the app in dev mode (needs Rust: brew install rust)
-make desktop-build   # native installers (.dmg on macOS, .exe on Windows)
-make desktop         # Linux .deb/.AppImage via Docker — no Rust needed → ./dist-desktop/
-```
+| Doc                                              | Contents                                                |
+| ------------------------------------------------ | ------------------------------------------------------- |
+| [docs/SCOPE.md](docs/SCOPE.md)                   | Goal, scope, non-goals, milestones                      |
+| [docs/FLOWS.md](docs/FLOWS.md)                   | Acceptance criteria per flow and the screen-to-test map |
+| [docs/CHAT.md](docs/CHAT.md)                     | Chat backend design: data model, wire protocol, rules   |
+| [docs/design/SCREENS.md](docs/design/SCREENS.md) | The concept screens                                     |
+| [DESIGN.md](DESIGN.md)                           | Design system                                           |
+| [AGENTS.md](AGENTS.md)                           | Conventions for contributors and coding agents          |
 
-On first launch the app asks for your server address (default
-`http://localhost:7001` for a local stack) — it remembers it afterwards.
+## Contributing
 
-### Releasing desktop installers
-
-Releases are triggered by the code that lands on **main**: when a push to
-main contains a version that hasn't been released yet, CI builds the
-installers and publishes the release (tag included) automatically.
-
-```bash
-make release v=0.2.0   # bump + commit + push (on any branch)
-# then merge that branch into main → CI releases v0.2.0
-```
-
-macOS, Windows, and Linux installers land on the GitHub releases page a few
-minutes after the merge. Binaries are currently unsigned (macOS Gatekeeper /
-Windows SmartScreen will prompt on first open).
-
----
-
-## Going Live (Streaming)
-
-Streams are secured by a **per-community stream key**.
-
-1. Open your channel page → **Stream setup (OBS)** card (channel owners)
-2. Copy the **Stream URL** (includes `?key=…`)
-3. In OBS → **Settings → Stream**:
-   - **Service:** Custom
-   - **Server:** paste the Stream URL
-   - **Stream Key:** _(leave empty)_
-4. Click **Start Streaming**
-
-Set a **stream title** in the same card — it shows on your channel page and
-the browse grid while live. Viewers get the HLS player automatically; admins
-can also force-stop or manage streams from the desktop console. After the
-stream ends, the recording appears under Recordings.
-
-> Rotating the stream key instantly kicks the active OBS connection.
-
----
-
-## Commands
-
-```bash
-make help              # list all targets
-
-# Docker (full stack)
-make up                # build + start all services (detached)
-make down              # stop + remove containers
-make logs              # tail all logs
-make ps                # list running containers
-
-# Local dev
-make dev               # backend + web together
-make backend           # uvicorn --reload on :7001
-make web               # next dev server on :5173
-
-# Desktop app
-make desktop-dev       # run desktop app in dev mode (needs Rust)
-make desktop-build     # native installers (macOS/Windows)
-make desktop           # Linux installers via Docker → ./dist-desktop/
-
-# Docs / marketing site
-make site-dev          # docs site dev server → http://localhost:4321
-make site-build        # static build → site/dist/
-
-# Database
-make migrate                       # apply Alembic migrations
-make migration m="add posts table" # generate a new migration
-make reset-migrate                 # drop all tables, re-apply from scratch
-make reset                         # full factory reset (containers + volumes + recordings)
-
-# Quality gates
-make check             # everything: pyright + ruff + lint + web/desktop/site builds
-
-# Cleanup
-make clean             # remove containers + Docker volumes (keeps recordings)
-```
-
----
-
-## Ports
-
-| Service         | Port |
-| --------------- | ---- |
-| Web (Next.js)   | 5173 |
-| Backend API     | 7001 |
-| PostgreSQL      | 5432 |
-| Redis           | 6379 |
-| mediamtx RTMP   | 1935 |
-| mediamtx HLS    | 8888 |
-| mediamtx WebRTC | 8889 |
-| mediamtx API    | 9997 |
-
----
-
-## Project Layout
-
-```
-adda/
-├── Makefile                 all common commands
-├── compose.yaml             Docker Compose (5 services)
-├── .env.example             root env template
-├── .github/workflows/ CI: backend (ruff+pyright), web/desktop/site lint+build,
-│                          console installers via tauri-action
-├── apps/
-│   ├── web/                 Viewer web app (Next.js 15, SSR browse + channel pages)
-│   │   └── src/app/         App Router pages + components + lib
-│   └── desktop/             Operator console (React + Tauri v2, own UI)
-│       ├── src/             views/ + ui/ (dense console design system)
-│       └── src-tauri/       Tauri shell + notification plugin
-├── packages/                Shared TS logic (never UI)
-│   ├── types/               DTOs mirroring Pydantic schemas (@adda/types)
-│   ├── api-client/          request + auth + WS client + endpoints (@adda/api-client)
-│   └── shared/              runtime server config + zod schemas (@adda/shared)
-├── backend/                 FastAPI app (uv, Python 3.12)
-│   ├── main.py              app entry, router registration, startup seed
-│   ├── core/                shared infra (config, database, redis, security/, seed)
-│   ├── models/              9 SQLAlchemy models
-│   ├── modules/             8 feature modules
-│   └── alembic/             11 migrations
-├── site/                    Astro + Starlight marketing/docs site (→ Vercel)
-├── mediamtx/                mediamtx config (Dockerfile-baked) + recording retention
-└── recordings/              stream recordings (gitignored, bind-mounted)
-```
-
----
-
-## Roadmap
-
-**Shipped:** authentication (JWT + refresh tokens + 2FA + OTP +
-password reset), communities (CRUD + slugs + follows + join requests + private
-communities), channels (permissions + message persistence), live streaming
-(RTMP → HLS via mediamtx, per-community keys, discover, stream titles & health,
-instant live/offline push), recordings (auto-record + VOD playback), real-time
-infrastructure (WebSocket + Redis pub/sub + presence), Next.js viewer with SSR
-channel pages, desktop operator console (Tauri v2), Astro docs/marketing site.
-
-**Next:** profile pages, posts/announcements, notifications, discovery/search,
-media gallery, file sharing, events, DMs.
-
----
+Conventional commits are enforced by a git hook. Start with
+[AGENTS.md](AGENTS.md) for the layout and rules, and keep the WebSocket
+contract (`backend/modules/realtime/protocol.py` and
+`web/src/lib/types/realtime.ts`) in sync.
 
 ## License
 
-MIT
+To be added before the first release.

@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────────────────────────────────
 # adda — one-command installer for non-technical users.
 #
-#   curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/adda-v3/scripts/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh
 #
 # Run it on a fresh server as root (or with sudo). It:
 #   1. asks for your domain and admin email
@@ -16,7 +16,7 @@
 set -eu
 
 REPO_URL="${ADDA_REPO:-https://github.com/shahadathhs/adda}"
-REPO_BRANCH="${ADDA_BRANCH:-adda-v3}"
+REPO_BRANCH="${ADDA_BRANCH:-dev}"
 INSTALL_DIR="${ADDA_DIR:-/opt/adda}"
 
 say()  { printf '\033[1;33madda\033[0m %s\n' "$1"; }

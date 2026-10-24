@@ -22,7 +22,7 @@ SSH into the server (your VPS provider shows you how — one command) and
 paste:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/adda-v3/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh
 ```
 
 You will be asked exactly two questions:

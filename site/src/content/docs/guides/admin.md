@@ -1,66 +1,59 @@
 ---
 title: Administration
-description: The admin dashboard — users, communities, live streams, recordings.
+description: Running your instance — the seeded admin, and the admin API for users, streams and recordings.
 ---
 
-Every deployment has three system roles:
+adda v1 has **no admin web interface**. Everything an operator needs is in a
+small, documented admin API, so it works from a terminal or a script. Streamers
+manage their own channels in the web app's Studio.
+
+## Roles
 
 | Role         | Powers                                                       |
 | ------------ | ------------------------------------------------------------ |
-| `user`       | Normal member — uses the app                                 |
-| `admin`      | Full admin dashboard access                                  |
+| `user`       | Normal account: watches, chats, can create a channel         |
+| `admin`      | Can use every `/api/admin/…` endpoint                        |
 | `superadmin` | Everything an admin can do (intended for the instance owner) |
 
-The seeded `admin@example.com` account is a superadmin. Promote others from
-**Admin → Users**.
+The installer seeds one superadmin from the email you gave it and prints the
+password once. Change it in **Settings** after your first sign-in.
 
-## Getting to the dashboard
+## Using the admin API
 
-Sign in with an admin account — you'll land on **/admin/overview**
-automatically (admins don't see the regular app except Settings). The
-collapsible sidebar has five sections:
+Sign in to get a token, then send it as a bearer token:
 
-### Overview
+```bash
+TOKEN=$(curl -s https://your.domain/api/auth/login \
+  -H 'content-type: application/json' \
+  -d '{"email":"you@example.com","password":"…"}' | jq -r .access_token)
 
-Platform stats at a glance: total users, communities, and live streams.
+curl -s https://your.domain/api/admin/stats -H "authorization: Bearer $TOKEN"
+```
 
-### Users
+| Method   | Path                                   | What it does                          |
+| -------- | -------------------------------------- | ------------------------------------- |
+| `GET`    | `/api/admin/stats`                     | Totals: users, channels, live streams |
+| `GET`    | `/api/admin/users?q=`                  | Search users                          |
+| `PATCH`  | `/api/admin/users/{id}`                | Change role, suspend or reactivate    |
+| `POST`   | `/api/admin/users/{id}/reset-password` | Set a new password for someone        |
+| `DELETE` | `/api/admin/users/{id}`                | Delete an account                     |
+| `GET`    | `/api/admin/communities`               | List every channel                    |
+| `PATCH`  | `/api/admin/communities/{id}`          | Edit or suspend a channel             |
+| `DELETE` | `/api/admin/communities/{id}`          | Delete a channel                      |
+| `GET`    | `/api/admin/live`                      | Active streams with viewer counts     |
+| `POST`   | `/api/admin/communities/{id}/stop`     | Force-stop a stream                   |
+| `GET`    | `/api/admin/recordings`                | List recordings                       |
+| `DELETE` | `/api/admin/recordings`                | Delete a recording                    |
 
-Search users, promote/demote system roles, suspend/reactivate, trigger a
-password reset, or delete accounts.
+"Community" is the API's internal name for a channel. Suspending a user blocks
+sign-in; suspending a channel hides it from public listings.
 
-### Communities
-
-Manage **every** channel on the instance — even ones you don't own:
-
-- Edit name/description, toggle private
-- **Suspend** a community (hidden from public listings, instantly)
-- View members, kick members
-- View/rotate the community's stream key
-- **Stop stream** — force-disconnect the active publisher
-
-### Live
-
-Active streams with viewer counts and a **force-stop** button per stream.
-Useful when moderation has to happen _now_.
-
-### Recordings
-
-Browse every recording across all channels, filter by community, play, or
-delete from disk.
-
-## Moderation model
-
-- **System level** (dashboard): suspend users, suspend communities, stop
-  streams, delete recordings.
-- **Community level**: each community's owner and admins manage members,
-  roles (`owner → admin → moderator → streamer → member → guest`), join
-  requests for private communities, and their own channel's messages.
+If email is not configured, a forgotten password is fixed with the
+`reset-password` endpoint above.
 
 ## Stream security recap
 
-- Publishing requires the per-community stream key (validated by the mediamtx
-  auth webhook on every connect).
-- Rotating a key kicks the live publisher instantly.
-- The RTMP path encodes the community, so keys can't be crossed between
-  channels.
+- Publishing requires the channel's stream key, checked by the mediamtx auth
+  webhook on every connect.
+- Rotating a key disconnects the live publisher immediately.
+- The RTMP path encodes the channel, so keys cannot be crossed between channels.

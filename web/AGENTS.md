@@ -1,6 +1,6 @@
-# web — Agent Instructions (viewer app)
+# web — Agent Instructions (viewer and studio app)
 
-Next.js 15 App Router viewer app. Inherits `/DESIGN.md` — read it before
+Next.js 15 App Router app for viewers and streamers. Inherits `/DESIGN.md` — read it before
 any UI work. This file adds web-specific hard rules. Conflicts resolve in
 favor of `/DESIGN.md`.
 

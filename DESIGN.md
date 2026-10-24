@@ -4,7 +4,7 @@ The single source of truth for how adda looks and feels. Every surface
 implements this system; per-app `AGENTS.md` files add surface-specific
 hard rules.
 
-**Surfaces — one product, three densities:**
+**Surfaces — one product, two densities:**
 
 | Surface          | Location | Density               | Type                    |
 | ---------------- | -------- | --------------------- | ----------------------- |
@@ -77,24 +77,24 @@ The five non-default decisions everything else derives from:
 Layering goes **dark → less dark** as surfaces elevate; text runs the
 inverse. This is the ink-ladder pattern, not slate-gray flatness.
 
-| Token     | Web value | Desktop value | Role                          |
-| --------- | --------- | ------------- | ----------------------------- |
-| `bg`      | `#0c0d10` | `#0b0d10`     | page background               |
-| `panel`   | `#14161b` | `#12151a`     | cards, sidebars, chat         |
-| `panel-2` | `#1c1f26` | `#171b22`     | hover fills, secondary panels |
-| `input`   | `#262a33` | —             | inputs, search fields         |
-| `line`    | `#262a33` | `#232833`     | borders, dividers             |
+| Token     | Value     | Role                          |
+| --------- | --------- | ----------------------------- |
+| `bg`      | `#0c0d10` | page background               |
+| `panel`   | `#14161b` | cards, sidebars, chat         |
+| `panel-2` | `#1c1f26` | hover fills, secondary panels |
+| `input`   | `#262a33` | inputs, search fields         |
+| `line`    | `#262a33` | borders, dividers             |
 
 Never use pure `#000` or pure `#fff` as surfaces. Never place alpha
 borders on top of each other — draw each border once, solid.
 
 ### Text
 
-| Token       | Web       | Desktop   | Role                     |
-| ----------- | --------- | --------- | ------------------------ |
-| `fg`        | `#edeef2` | `#e7ebf2` | primary text             |
-| `fg-muted`  | `#9aa1af` | `#8b94a3` | secondary text, metadata |
-| `fg-subtle` | `#676e7c` | —         | timestamps, captions     |
+| Token       | Value     | Role                     |
+| ----------- | --------- | ------------------------ |
+| `fg`        | `#edeef2` | primary text             |
+| `fg-muted`  | `#9aa1af` | secondary text, metadata |
+| `fg-subtle` | `#676e7c` | timestamps, captions     |
 
 ### Accent — marigold
 
@@ -154,8 +154,8 @@ The site is public-facing brand, so it carries the identity hardest:
 
 ## 4. Typography
 
-Web and site ship one webfont (display); desktop ships none (native feel).
-The site self-hosts Space Grotesk as woff2 (no third-party font CDN).
+Web and site ship one webfont (display). Both self-host Space Grotesk as
+woff2 (no third-party font CDN).
 
 | Role                          | Face                                                  | Notes                                       |
 | ----------------------------- | ----------------------------------------------------- | ------------------------------------------- |
@@ -174,9 +174,6 @@ The site self-hosts Space Grotesk as woff2 (no third-party font CDN).
 | body      | 14/20     | 400    | 0        |
 | secondary | 13/18     | 400    | 0        |
 | caption   | 12/16     | 500    | 0.01em   |
-
-Desktop base is 13px with the same proportions; scale down one step
-(h2 → 15px, body → 13px, caption → 11px).
 
 Rules:
 
@@ -204,17 +201,18 @@ Rules:
 
 ### Spacing
 
-4px base grid. Web: 8 / 12 / 16 / 24 (component → section).
-Desktop: 4 / 8 / 12 / 16. Page gutters: 24 web, 12 desktop.
+4px base grid: 8 / 12 / 16 / 24 (component → section). Page gutters: 24px on
+desktop widths, 16px on mobile.
 
 ### Fixed chrome
 
-| Surface         | Web                       | Desktop          |
-| --------------- | ------------------------- | ---------------- |
-| Top bar         | 56px                      | 36px (titlebar)  |
-| Chat panel      | 320–340px, collapsible    | per-tab layout   |
-| Control heights | 32px buttons, 36px inputs | 24–26px controls |
-| Icon buttons    | 32px                      | 24px             |
+| Element         | Size                                          |
+| --------------- | --------------------------------------------- |
+| Top bar         | 56px (48px on mobile)                         |
+| Chat panel      | 340px beside the player; below it on mobile   |
+| Control heights | 32px buttons, 36px inputs, 26px small buttons |
+| Icon buttons    | 32px                                          |
+| Touch targets   | at least 24 x 24px; prefer 36–40px on mobile  |
 
 ### Elevation
 
@@ -337,11 +335,8 @@ arriving.
     `@starting-style` for entries, `transition-behavior: allow-discrete`
     for exits, View Transitions API). Add a spring library only if
     choreography genuinely exceeds CSS — justify it in the PR.
-  - **Desktop (Tauri):** same CSS springs; SPA so no view transitions —
-    keep panels to transform/opacity for a native window feel.
-  - **Site (Astro 5):** `<ClientRouter />` for cross-document view
-    transitions; scroll-driven CSS animations with IntersectionObserver
-    fallback.
+  - **Site (Next.js):** View Transitions for page changes;
+    scroll-driven CSS animations with an IntersectionObserver fallback.
 
 ---
 
@@ -369,7 +364,7 @@ arriving.
 | danger    | `danger`                                      | white (red passes with white)       |
 | on-live   | n/a — never accent a live state with marigold |                                     |
 
-Height 32px web / 26px desktop; 13px 600 label; radius-sm.
+Height 32px (26px small); 13px 600 label; radius-sm.
 
 ### Chat
 
@@ -387,6 +382,67 @@ no bubbles.
 
 One line of `fg-muted`, no illustration zoo, at most one ghost action.
 
+### Chat anatomy (screens 02, 07, M2)
+
+A message is one line group, no bubbles: optional **reply preview** (12px
+`fg-subtle`, reply glyph, "Replying to **name** …"), then **badges**, name,
+text. Reaction **chips** sit under the message.
+
+- **Badges:** 10px 600 uppercase, radius-xs. `owner` = `accent-subtle` fill with
+  marigold text; `mod` = green tint with `ok` text; `follower` = `panel-2` with
+  `fg-muted`. Never `live` red.
+- **Anonymous:** the name is "Anonymous" in `fg-muted`, no badges, no colour.
+- **Mention:** the `@name` is marigold; the whole row for the mentioned account
+  gets an `accent-subtle` background.
+- **Reaction chip:** 20px high, 1px `line` border, emoji + mono count. One the
+  viewer added: marigold border and `accent-subtle` fill.
+- **Emotes:** inline, 20px, vertically centred on the text.
+- **Pinned message:** a `panel-2` block under the chat header, pin glyph and
+  "Pinned by name", 12px text.
+- **Poll:** a bordered block in the rail. Each option is a 30px row with a
+  `accent-subtle` bar filled to its share and a mono percentage; the viewer's
+  vote has a marigold border. Footer: mono vote count and time left.
+- **Composer:** one 36px field with emoji and send icons, then a 12px line
+  "Chatting as **name** · go anonymous". A guest sees the sign-in panel instead.
+
+### Forms and settings
+
+- **Field:** 36px, `input` border, radius-md; focus is a marigold border plus a
+  2px marigold-alpha ring; error is a `danger` border and a `danger` 12px help
+  line. Labels are 12px 600 `fg-muted` above the field.
+- **Toggle:** 36 x 20px, off = `input` track and `fg-muted` knob, on = marigold
+  track with an ink knob.
+- **Segmented control:** bordered, the selected segment is `panel-2` with `fg`.
+- **Panel:** `panel` fill, 1px `line`, radius-md, 16px padding. Danger zone
+  panels use a `danger`-alpha border.
+- **Stream key and URLs:** a mono "keybox" with copy and reveal icons.
+- **Table:** 11px uppercase `fg-muted` headers, 13px rows, 1px `line` rules.
+
+### Banners and system states
+
+- **Banner:** `panel-2` fill, 1px `line`, 13px text, an icon, one action at most.
+  `warn` and `danger` variants colour only the border and, for `warn`, the text.
+- **Stream ended** (screen 20): the player area dims to a near-black overlay with
+  "Thanks for watching", stats in mono, recording progress as a thin marigold
+  bar, then follow and alerts buttons. The chat stays open.
+- **Reconnecting** (screen 21): the player is covered by a dark overlay with a
+  marigold spinner and the retry countdown; chat shows a `warn` banner, dims
+  its messages and disables the composer while keeping the draft.
+- **Not found** (screen 19): a plain headline, one sentence, a search field,
+  and live channels as a way out.
+
+### Notifications (screen 11)
+
+A 400px popover under the bell. Unread rows use `accent-subtle` and a marigold
+dot; each row has an avatar, one sentence with the actor in 600, and a mono
+timestamp with the kind. Footer link to settings.
+
+### Timeline markers (screen 04)
+
+The seek bar is a 6px `input` track with a marigold fill and a 14px marigold
+handle. Comment markers are 3px `fg` ticks. A comment's timestamp is a mono chip
+(`accent-subtle` fill, marigold text) that seeks when clicked.
+
 ---
 
 ## 8. Anti-slop checklist
@@ -403,18 +459,24 @@ Run before shipping any UI change:
 - [ ] Motion uses the spring tiers; only `transform`/`opacity` animate
 - [ ] Recognizably adda with the logo covered (any surface)
 - [ ] One exported component per file
+- [ ] Every data view has loading, empty, error and (realtime) reconnecting states
+- [ ] `pnpm check:design` is clean
 - [ ] Looks like adda, not like a v0 output — if you can't tell, redo it
 
 ---
 
 ## 9. Agent quick reference
 
+Concept renders of every screen are in `docs/design/` ([SCREENS.md](docs/design/SCREENS.md));
+match them, and regenerate them with `node scripts/render-design.mjs` when a
+screen's design changes.
+
 ```yaml
-bg: "#0c0d10" # web / "#0b0d10" desktop
-panel: "#14161b" # web / "#12151a" desktop
-panel2: "#1c1f26" # web / "#171b22" desktop
+bg: "#0c0d10"
+panel: "#14161b"
+panel2: "#1c1f26"
 input: "#262a33"
-line: "#262a33" # web / "#232833" desktop
+line: "#262a33"
 
 accent: "#f5a623" # marigold — actions, links, focus
 accent_hover: "#e29500"
@@ -427,8 +489,8 @@ danger: "#ef4444"
 ok: "#2fbf71"
 warn: "#e0a33e"
 
-fg: "#edeef2" # web / "#e7ebf2" desktop
-fg_muted: "#9aa1af" # web / "#8b94a3" desktop
+fg: "#edeef2"
+fg_muted: "#9aa1af"
 fg_subtle: "#676e7c"
 
 font_display: "Space Grotesk" # headings, wordmark (web)

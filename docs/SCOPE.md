@@ -181,8 +181,8 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
       to `infra/`; `apps/web` flattened to `web/` and the `@adda/*` packages
       folded into `web/src/lib/` (single client, so no shared-package layer)
 - [x] Concept screens for every flow ([design/SCREENS.md](design/SCREENS.md))
-- [ ] Docs updated from the screens: SCOPE, FLOWS, CHAT, DESIGN, README, site
-      (in progress)
+- [x] Docs updated from the screens: SCOPE, FLOWS, CHAT, DESIGN, README, AGENTS;
+      existing site pages made truthful (full site rebuild is M7)
 
 ### M1 — Foundations
 
@@ -246,4 +246,5 @@ moderation and rate limits. Contract first: protocol types in both
 
 - [ ] Governance files (`LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`,
       `CODE_OF_CONDUCT.md`)
+- [ ] Point the install script and docs at `main` (they use `dev` until then)
 - [ ] Tag `v1.0.0`

@@ -34,8 +34,8 @@ docker compose restart backend   # re-seeds the superadmin from .env
 ```
 
 :::caution
-Deleting a superadmin cascades to communities they own. Prefer password-reset
-email in real deployments.
+Deleting a superadmin cascades to channels they own. Prefer the admin API's
+reset-password endpoint, or reset emails once SMTP is set up.
 :::
 
 ## Where are recordings stored?
@@ -45,7 +45,7 @@ backend). Back that folder up; recordings are not stored in Postgres.
 
 ## Can one instance host many streamers?
 
-Yes — that's the point. Every community gets its own stream key and RTMP path
+Yes — that's the point. Every channel gets its own stream key and RTMP path
 (`community/<id>`), and the Browse page shows everything live across the
 instance. Two streamers can be live at the same time; only your server's
 uplink bounds it.

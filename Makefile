@@ -97,7 +97,7 @@ dev: ## Run backend (:7001) + web (:5173) with hot reload — needs `make infra`
 backend: ## Run backend dev server on :7001 (uvicorn --reload)
 	@cd $(BACKEND_DIR) && $(UV) uvicorn main:app --reload --port 7001
 
-web: ## Run web dev server on :5173 (vite)
+web: ## Run web dev server on :5173 (next dev)
 	@cd $(FRONTEND_DIR) && $(PNPM) dev
 
 # ── Release ───────────────────────────────────────────────────────────

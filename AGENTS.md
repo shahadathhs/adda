@@ -2,6 +2,22 @@
 
 A self-hosted, web-only live-streaming platform with realtime chat. Scope and
 milestones live in `docs/SCOPE.md`.
+
+## Docs map (read before building a feature)
+
+| Doc                      | Use it for                                                       |
+| ------------------------ | ---------------------------------------------------------------- |
+| `docs/SCOPE.md`          | Goal, non-goals, who can do what, milestones                     |
+| `docs/FLOWS.md`          | Acceptance criteria per flow (F0–F16) and the screen-to-test map |
+| `docs/CHAT.md`           | Chat backend: data model, wire protocol, rules, build order      |
+| `docs/design/SCREENS.md` | The concept screens to match (`docs/design/screens/*.png`)       |
+| `DESIGN.md`              | Tokens, type, motion, component patterns, anti-slop checklist    |
+
+**Definition of done for a feature:** its flow's acceptance criteria in
+`docs/FLOWS.md` hold, they are covered by tests (pytest for the API and
+WebSocket, Playwright for the browser), the screen matches its concept render
+including loading, empty, error and reconnecting states, and docs that describe
+the behaviour are updated in the same commit.
 pnpm monorepo: FastAPI backend (`backend/`) + Next.js viewer/studio web app
 (`web/`) + mediamtx streaming server + Astro/Starlight docs site
 (`site/`).
@@ -112,7 +128,12 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   `exceptions.py`. The shared `models/` package and `alembic/` sit at the
   backend root. Features live in `modules/<feature>/` — one folder per feature
   (`auth`, `users`, `communities`, `streaming`, `recordings`, `stats`,
-  `realtime`).
+  `realtime`; `chat` and `notifications` are added per `docs/CHAT.md`).
+  "Community" is the internal name for a streamer's channel; the UI, docs and
+  public text say "channel".
+- **Every write needs an account.** Guests are read-only, enforced in the
+  backend (REST and WebSocket), never only in the UI. Anonymous chat hides the
+  author from viewers only; the account is always recorded.
 - **Per-module shape:** `router.py` for public routes (+ `admin_router.py` for
   `/admin/*` routes), `webhook.py` for external webhooks, `schemas.py` for
   Pydantic DTOs, and a `service/` package of short focused files (e.g.

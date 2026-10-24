@@ -9,9 +9,9 @@
 	<h2 id="why-adda">Why adda?</h2>
 	<ul>
 		<li>
-			<strong>Multi-tenant by design.</strong> One server hosts many channels.
-			Every community gets its own stream key, live page, chat, and recordings —
-			no need to run a copy per streamer.
+			<strong>Many channels, one server.</strong> Every channel gets its own
+			stream key, live page, chat, and recordings — no need to run a copy per
+			streamer.
 		</li>
 		<li>
 			<strong>Own your stack.</strong> Postgres for data, Redis for realtime
@@ -42,12 +42,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr><td>Streaming</td><td>RTMP ingest → HLS + WebRTC playback, viewer counts, stream health, titles</td></tr>
+			<tr><td>Streaming</td><td>RTMP ingest → HLS playback, viewer counts, stream health, titles</td></tr>
 			<tr><td>Chat</td><td>Realtime WebSocket chat, presence, persisted channel history</td></tr>
-			<tr><td>Direct messages</td><td>Private 1:1 threads with unread tracking and blocking</td></tr>
-			<tr><td>Communities</td><td>Public/private channels, roles, join requests, followers</td></tr>
 			<tr><td>Recordings</td><td>Automatic recording of every stream, in-app playback, admin management</td></tr>
-			<tr><td>Admin</td><td>Users, communities, live monitor with force-stop, recordings, stats</td></tr>
+			<tr><td>Operate</td><td>Seeded admin; users, force-stop, recordings and stats through an admin API</td></tr>
 			<tr><td>Auth</td><td>Password + JWT, refresh rotation, password reset</td></tr>
 		</tbody>
 	</table>
