@@ -4,7 +4,6 @@ import { RouteTabs } from "@/components/ui/route-tabs";
 const TABS = [
   { href: "/settings", label: "Profile" },
   { href: "/settings/notifications", label: "Notifications" },
-  { href: "/settings/password", label: "Password" },
 ];
 
 /** Account chrome: title, section tabs, then the page, the same shape as the studio. */

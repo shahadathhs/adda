@@ -69,8 +69,8 @@ per screen in `screens/`.
 - **Marketing site:** designed separately once the app screens are agreed.
 - **Motion:** the live pulse, going-live and chat motion are specified in
   DESIGN.md section 6, not shown in stills.
-- **Password settings tab** and **follower list page:** plain variants of
-  patterns already shown (form card, follower rows).
+- **Follower list page:** a plain variant of a pattern already shown
+  (follower rows). Change password sits under the settings profile tab.
 
 ## What the screens imply (feeds the docs update)
 
