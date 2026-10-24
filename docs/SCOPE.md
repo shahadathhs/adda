@@ -8,6 +8,38 @@ This document replaces `MVP1.md`. It defines what v1 is, what it is not, and
 the order of work to finish it. v1 is a _completed_ product with a small,
 closed scope — not a full platform.
 
+## Goal
+
+**adda is a self-hosted live-streaming platform for the browser, built for
+people who run their own server.** Install it with one command, stream from
+OBS, and viewers watch and chat in realtime while every broadcast is
+recorded. It is small enough for one host and finished enough to trust.
+
+**Audience: self-hosters.** The person who runs adda is the primary user. So
+install, upgrade, backup and operation matter as much as the viewer pages,
+and the docs are written for someone running this on their own VPS.
+
+**Social, but small.** One host is no reason for a lifeless site. adda keeps a
+few social features that make a channel feel alive — chat, follows and a short
+list of lightweight extras decided in the features pass — and leaves out the
+heavy ones (DMs, communities, groups).
+
+**Success looks like:**
+
+1. A stranger goes from `git clone` to a live stream in under 10 minutes by
+   following the docs.
+2. Every flow below works end to end, including its error states, and has an
+   automated test.
+3. The marketing site shows the product convincingly without a live server:
+   real screenshots, a short walkthrough and measured numbers.
+4. The repo reads as maintained: CI green, docs match the code, tagged
+   `v1.0.0`.
+
+**Non-goals:** a hosted service (no accounts on our servers, no billing),
+desktop or mobile apps, multi-tenant communities, DMs, and competing on scale
+with large platforms. There is no deadline; scope is what is listed here, done
+well.
+
 ## Product
 
 > Your own live-streaming site. Install it, paste a stream key into OBS, go
@@ -27,7 +59,7 @@ recorded walkthrough, the architecture, and measured numbers.
 | ID  | Flow               | Summary                                                                                                   |
 | --- | ------------------ | --------------------------------------------------------------------------------------------------------- |
 | F0  | Install            | `./scripts/install.sh` → secrets generated, stack up behind Caddy with HTTPS, admin created               |
-| F1  | Auth               | Register, login, rotating refresh tokens, logout, change/reset password, profile                          |
+| F1  | Accounts           | Register, login, rotating refresh tokens, logout, change password, profile (password recovery: see below) |
 | F2  | Discover and watch | Live-first browse grid, channel page (SSR + OG metadata), HLS player with reconnect, viewer count         |
 | F3  | Channel lifecycle  | Create channel, reveal/copy stream key + RTMP URL, rotate key (kicks publisher), edit, delete             |
 | F4  | Go live            | OBS publishes → publish-auth webhook → live pushed over WebSocket → offline within seconds on stop        |
@@ -35,6 +67,26 @@ recorded walkthrough, the architecture, and measured numbers.
 | F6  | Follows            | Follow/unfollow, followers tab, following rail with live indicators                                       |
 | F7  | Recordings         | Stream end → recording + thumbnail on the channel page → play in page, download                           |
 | F8  | Operate            | Seeded admin account; force-stop, suspend and delete through the documented admin API (no admin UI in v1) |
+| F9  | Guests             | Watch and chat without an account; pick a display name for the session; rate-limited                      |
+| F10 | Chat extras        | Replies, @mentions (highlighted for the person mentioned), message reactions, pinned message              |
+| F11 | Emotes             | Streamer uploads emotes for their channel; chat renders `:name:`                                          |
+| F12 | Polls              | Streamer starts a poll; viewers vote; live results; closes and keeps the result                           |
+| F13 | Notifications      | In-app bell only: followed channel goes live, you were mentioned, someone replied. No email, no SMTP      |
+| F14 | Channel profile    | About text, links, follower count, badges (owner, mod, follower since), channel announcements             |
+| F15 | Recording comments | Timestamped comments on a past broadcast; click a timestamp to seek                                       |
+
+### Who can do what
+
+| Capability                                    | Guest | Account |
+| --------------------------------------------- | ----- | ------- |
+| Browse, watch, read chat and polls            | yes   | yes     |
+| Chat, react, vote in polls (per-session)      | yes   | yes     |
+| Follow channels, notification bell            | no    | yes     |
+| Create a channel, stream, upload emotes       | no    | yes     |
+| Comment on recordings, be @mentioned reliably | no    | yes     |
+
+Guests are anonymous by design. Accounts exist for identity and ownership;
+how an account holder appears in chat (named or anonymous) is a per-user choice.
 
 ## Out of scope for v1
 
@@ -47,13 +99,14 @@ built" table.
 - Community hierarchy: multi-channel communities, join requests, memberships
 - OTP login, TOTP 2FA, set-password flow, email verification
 - Social login
-- Reactions, replies, message edits, emotes
+- Message edits
+- Email of any kind (no SMTP): no reset emails, no email notifications
 - Low-latency WebRTC playback (HLS only)
 - Clips, transcoding ladders, VOD chapters
 - Multi-node deployment documentation
 
-This code is **not deleted**. It moves to an `archive/v3-full` branch so
-`main` shows only the finished product.
+This code is **not deleted**: it remains in git history (everything before
+commit `b51fa50`) if it is ever needed again.
 
 ## Quality bar
 
