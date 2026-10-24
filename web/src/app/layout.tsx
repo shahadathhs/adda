@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppShell } from "@/components/app-shell";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "700"],
+// Self-hosted: no request to a font CDN, so the app builds and runs offline.
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk-var.woff2",
+  weight: "500 700",
   variable: "--font-space-grotesk",
   display: "swap",
 });

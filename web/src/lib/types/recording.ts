@@ -15,3 +15,11 @@ export interface RecordingFeedItem {
   community_name: string;
   community_slug: string;
 }
+
+export interface RecordingComment {
+  id: string;
+  at_seconds: number;
+  body: string;
+  author: import("./chat").ChatAuthor;
+  created_at: string;
+}

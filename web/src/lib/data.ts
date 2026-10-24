@@ -2,8 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  chatChannel,
-  chatHistory,
   communityChannel,
   discoverChannels,
   followCommunity,
@@ -14,7 +12,7 @@ import {
   streamStatus,
   unfollowCommunity,
 } from "@/lib/api";
-import type { ChatMessage, Community, Recording, StreamStatusPayload } from "@/lib/types";
+import type { Community, Recording, StreamStatusPayload } from "@/lib/types";
 import { apiBaseUrl } from "@/lib/config";
 import { useEffect, useState } from "react";
 
@@ -121,81 +119,6 @@ export function useRecordings(id: string, enabled: boolean) {
     queryFn: () => recordings(id),
     enabled,
   });
-}
-
-/** A channel's chat: recent history from the API, then live messages over the WebSocket. */
-export function useCommunityChat(communityId: string) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [online, setOnline] = useState(0);
-  const [connected, setConnected] = useState(() => socket.connected);
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<{ code: string; message: string } | null>(null);
-
-  useEffect(() => {
-    const channel = chatChannel(communityId);
-    let cancelled = false;
-
-    // Merge by id so a message that arrives live while history loads is never doubled.
-    const merge = (prev: ChatMessage[], incoming: ChatMessage[]) => {
-      const seen = new Set(prev.map((m) => m.id));
-      return [...prev, ...incoming.filter((m) => !seen.has(m.id))]
-        .sort((a, b) => a.created_at.localeCompare(b.created_at))
-        .slice(-200);
-    };
-
-    const loadHistory = () =>
-      chatHistory(communityId)
-        .then((page) => {
-          if (cancelled) return;
-          const history: ChatMessage[] = page.map((m) => ({ ...m, channel }));
-          setMessages((prev) => merge(prev, history));
-        })
-        .catch(() => undefined)
-        .finally(() => !cancelled && setLoaded(true));
-    void loadHistory();
-
-    socket.connect();
-    socket.subscribe(channel);
-    let wasDown = false;
-    const offStatus = socket.onStatus((up) => {
-      setConnected(up);
-      // Catch up on whatever was missed while the socket was down.
-      if (up && wasDown) void loadHistory();
-      wasDown = !up;
-    });
-    const off = socket.on((msg) => {
-      if (msg.type === "error" && msg.data) {
-        setError(msg.data as { code: string; message: string });
-        return;
-      }
-      if (msg.channel !== channel) return;
-      if (msg.type === "chat_message") {
-        setMessages((prev) => merge(prev, [msg.data as unknown as ChatMessage]));
-      } else if (msg.type === "presence") {
-        const data = msg.data as { online_count?: number } | undefined;
-        if (data?.online_count != null) setOnline(data.online_count);
-      }
-    });
-    return () => {
-      cancelled = true;
-      off();
-      offStatus();
-      socket.unsubscribe(channel);
-    };
-  }, [communityId]);
-
-  return {
-    messages,
-    online,
-    connected,
-    loaded,
-    error,
-    clearError: () => setError(null),
-    send: (content: string) => {
-      setError(null);
-      socket.sendChat(chatChannel(communityId), content);
-    },
-  };
 }
 
 /** Instant live/offline transitions for a channel page. */

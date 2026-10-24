@@ -1,28 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
-  <!-- Gradient -->
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#7c3aed"/>
-      <stop offset="0.5" stop-color="#a855f7"/>
-      <stop offset="1" stop-color="#ec4899"/>
-    </linearGradient>
-  </defs>
-  <!-- Rounded background -->
-  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
-  <!-- Community nodes — three circles connected by lines (the "adda" gathering concept) -->
-  <g fill="none" stroke="white" stroke-width="8" stroke-linecap="round" opacity="0.95">
-    <line x1="72" y1="100" x2="128" y2="168"/>
-    <line x1="184" y1="100" x2="128" y2="168"/>
-    <line x1="72" y1="100" x2="184" y2="100"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none" role="img" aria-label="adda">
+  <rect width="256" height="256" rx="40" fill="#0c0d10"/>
+  <g stroke="#f5a623" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M70.9 185.1C40.9 155.1 40.9 100.9 70.9 70.9"/>
+    <path d="M98.6 157.4C84 142.8 84 113.2 98.6 98.6"/>
+    <path d="M157.4 98.6C172 113.2 172 142.8 157.4 157.4"/>
+    <path d="M185.1 70.9C215.1 100.9 215.1 155.1 185.1 185.1"/>
   </g>
-  <!-- Stream pulse ring around center node -->
-  <circle cx="128" cy="168" r="20" fill="white"/>
-  <circle cx="128" cy="168" r="32" fill="none" stroke="white" stroke-width="3" opacity="0.5"/>
-  <!-- Top-left node -->
-  <circle cx="72" cy="100" r="14" fill="white" opacity="0.9"/>
-  <!-- Top-right node -->
-  <circle cx="184" cy="100" r="14" fill="white" opacity="0.9"/>
-  <!-- Wordmark -->
-  <text x="128" y="216" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif"
-        font-size="28" font-weight="800" fill="white" letter-spacing="2">adda</text>
+  <circle cx="128" cy="128" r="18" fill="#f5a623"/>
 </svg>

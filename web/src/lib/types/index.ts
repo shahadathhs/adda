@@ -5,3 +5,4 @@ export * from "./streaming";
 export * from "./recording";
 export * from "./admin";
 export * from "./realtime";
+export * from "./notification";

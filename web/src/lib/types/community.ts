@@ -10,6 +10,7 @@ export interface Community {
   owner_id: string;
   follower_count: number;
   is_live: boolean;
+  links?: ChannelLink[];
   /** The requesting user's role on this channel: owner or moderator (filled by /mine). */
   my_role?: "owner" | "moderator" | null;
 }
@@ -24,4 +25,17 @@ export interface Follower {
   username: string;
   display_name: string;
   avatar_url: string | null;
+  since?: string | null;
+}
+
+export interface ChannelLink {
+  label: string;
+  url: string;
+}
+
+export interface Announcement {
+  id: string;
+  body: string;
+  pinned: boolean;
+  created_at: string;
 }

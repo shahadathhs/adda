@@ -35,6 +35,13 @@
   --ok: #2fbf71;
   --warn: #e0a33e;
 
+  /* Chart family: chat name colours and data only, never UI chrome (DESIGN.md §3) */
+  --chart-1: #f5a623;
+  --chart-2: #4cc38a;
+  --chart-3: #5aa9e6;
+  --chart-4: #d67ab1;
+  --chart-5: #e0a33e;
+
   /* Lines */
   --border: #262a33;
   --input: #262a33;

@@ -104,8 +104,9 @@ export class ApiError extends Error {
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const doFetch = async (): Promise<Response> => {
     const token = getToken();
+    // Multipart bodies set their own Content-Type (with the boundary).
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       ...(options.headers as Record<string, string> | undefined),
     };
     if (token) {
@@ -131,7 +132,10 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     let detail = resp.statusText;
     try {
       const body = await resp.json();
-      detail = body.detail ?? detail;
+      // FastAPI validation errors are a list; show the first message.
+      detail = Array.isArray(body.detail)
+        ? (body.detail[0]?.msg ?? detail)
+        : (body.detail ?? detail);
     } catch {
       /* ignore */
     }

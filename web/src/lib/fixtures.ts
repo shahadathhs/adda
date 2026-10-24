@@ -145,7 +145,12 @@ const author = (
   badges,
 });
 
-const line = (n: number, a: ReturnType<typeof author>, content: string): ChatMessage => ({
+const line = (
+  n: number,
+  a: ReturnType<typeof author>,
+  content: string,
+  extra: Partial<ChatMessage> = {},
+): ChatMessage => ({
   id: `m-${n}`,
   channel: "community/c-1/chat",
   community_id: "c-1",
@@ -153,18 +158,65 @@ const line = (n: number, a: ReturnType<typeof author>, content: string): ChatMes
   content,
   created_at: `2026-10-24T18:${10 + n}:00Z`,
   reply_to: null,
+  reply: null,
+  mentions: [],
+  reactions: {},
+  ...extra,
 });
 
 export const fixtureChat: ChatMessage[] = [
   line(1, author("u1", "joy_k"), "is that a Philips? the dial looks right"),
-  line(2, author("u2", "imran"), "we need a close-up of the transformer"),
+  line(2, author("u2", "imran"), "we need a close-up of the transformer", {
+    reactions: { "👍": 7 }, // design-ok: user reaction content
+  }),
   line(3, author("u3", "mehedi", ["follower"]), "that hum is the filter cap, 100%"),
-  line(4, author("u4", "tania_r"), "new here, loving the pace"),
-  line(5, author("o", "nila_workshop", ["owner"]), "Welcome Tania! Chai is mandatory in here."),
+  line(4, author("u4", "tania_r"), "new here, loving the pace :chai:", {
+    reactions: { "👍": 4, "☕": 2 }, // design-ok: user reaction content
+    my_reactions: ["☕"],
+  }),
+  line(5, author("o", "nila_workshop", ["owner"]), "Welcome Tania! Chai is mandatory in here.", {
+    reply_to: "m-4",
+    reply: {
+      id: "m-4",
+      deleted: false,
+      content: "new here, loving the pace",
+      author: author("u4", "tania_r"),
+    },
+  }),
   line(6, author(null, ""), "can you show the schematic again?"),
-  line(7, author("u5", "sadia", ["moderator", "follower"]), "she covered it at 02:40"),
+  line(
+    7,
+    author("u5", "sadia", ["moderator", "follower"]),
+    "@rafi you asked about the 6V6 earlier, she covered it at 02:40",
+    {
+      mentions: ["u-rafi"],
+    },
+  ),
   line(8, author("u-rafi", "rafi"), "thanks both, rewinding now"),
 ];
+
+export const fixturePoll = {
+  id: "p-1",
+  community_id: "c-1",
+  question: "What should we fix first?",
+  status: "open" as const,
+  closes_at: new Date(Date.now() + 2 * 60_000 + 10_000).toISOString(),
+  total: 186,
+  my_vote: null,
+  options: [
+    { id: "o1", label: "Left-channel hum", votes: 108, percent: 58 },
+    { id: "o2", label: "Dial lamp", votes: 50, percent: 27 },
+    { id: "o3", label: "Tuning cord", votes: 28, percent: 15 },
+  ],
+};
+
+export const fixturePinned = {
+  author: author("o", "nila_workshop", ["owner"]),
+  content:
+    "Today: new power supply, then the left-channel hum. Stream key leaks go to the mods, not chat.",
+};
+
+export const fixtureEmotes = [{ name: "chai", url: "/emote-chai.svg" }];
 
 export const fixtureCreds = {
   stream_url: "rtmp://live.nilaworkshop.example:1935/community/c-1?key=8f3a1c9d27b64e05a1d9c3e7",
@@ -203,4 +255,5 @@ export const fixtureFollowers = ["tania_r", "tanvir", "imran", "joy_k"].map((u, 
   username: u,
   display_name: u,
   avatar_url: null,
+  since: "2026-10-01T00:00:00Z",
 }));

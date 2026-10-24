@@ -22,6 +22,9 @@ import {
   fixtureChannelRecordings,
   fixtureChannels,
   fixtureChat,
+  fixtureEmotes,
+  fixturePinned,
+  fixturePoll,
   fixtureCreds,
   fixtureFollowers,
   fixtureHealth,
@@ -126,14 +129,24 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
           community={fixtureCommunity(live)}
           chat={
             <ChatPanel
+              communityId="c-1"
               name="nila_workshop"
-              messages={fixtureChat}
-              online={312}
-              connected={!screen.includes("lost")}
-              loaded
-              error={null}
-              clearError={noop}
-              send={noop}
+              chat={{
+                messages: fixtureChat,
+                online: 312,
+                connected: !screen.includes("lost"),
+                loaded: true,
+                error: null,
+                clearError: noop,
+                restriction: null,
+                pinned: live ? (fixturePinned as never) : null,
+                poll: live ? fixturePoll : null,
+                settings: { slow_mode_seconds: 0, followers_only: false },
+                emotes: fixtureEmotes,
+                send: noop,
+                react: noop,
+                vote: noop,
+              }}
             />
           }
         />

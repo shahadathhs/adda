@@ -11,6 +11,7 @@ import { useStudioChannel } from "@/lib/studio";
 const TABS = [
   { href: "/studio", label: "Setup" },
   { href: "/studio/live", label: "Live" },
+  { href: "/studio/emotes", label: "Emotes" },
   { href: "/studio/channel", label: "Channel page" },
   { href: "/studio/moderators", label: "Moderators" },
 ];

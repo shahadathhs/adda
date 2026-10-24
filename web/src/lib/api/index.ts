@@ -3,6 +3,8 @@ export * from "./ws";
 export * from "./endpoints/auth";
 export * from "./endpoints/communities";
 export * from "./endpoints/chat";
+export * from "./endpoints/notifications";
+export * from "./endpoints/channel-page";
 export * from "./endpoints/streaming";
 export * from "./endpoints/recordings";
 export * from "./endpoints/admin";

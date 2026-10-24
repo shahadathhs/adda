@@ -6,6 +6,9 @@ import { streamHealth } from "@/lib/api";
 import { hlsBaseUrl } from "@/lib/config";
 import { useStudioChannel } from "@/lib/studio";
 import { LivePlayer } from "@/components/live-player";
+import { ChatModerationCard } from "@/components/studio/chat-moderation-card";
+import { PinnedCard } from "@/components/studio/pinned-card";
+import { PollForm } from "@/components/studio/poll-form";
 import { ChatRail } from "@/components/chat-rail";
 import { StatTile } from "@/components/studio/stat-tile";
 
@@ -57,12 +60,19 @@ export function LivePage() {
           <StatTile label="Audio" value={health?.audio_codec ?? "…"} />
         </div>
       </div>
-      <section
-        aria-label="Live chat"
-        className="h-[560px] overflow-hidden rounded-md border border-border bg-card"
-      >
-        <ChatRail communityId={channel.id} name={channel.name} />
-      </section>
+      <div className="min-w-0 space-y-6 lg:col-start-1">
+        <PollForm communityId={channel.id} />
+        <PinnedCard communityId={channel.id} />
+      </div>
+      <div className="space-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <ChatModerationCard communityId={channel.id} />
+        <section
+          aria-label="Live chat"
+          className="h-[560px] overflow-hidden rounded-md border border-border bg-card"
+        >
+          <ChatRail communityId={channel.id} name={channel.name} />
+        </section>
+      </div>
     </div>
   );
 }

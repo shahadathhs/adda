@@ -23,7 +23,7 @@ export function StreamThumb({
     if (el?.complete && el.naturalWidth === 0) setFailed(true);
   }, []);
   return (
-    <div className={cn("relative aspect-video w-full overflow-hidden bg-[#171b22]", className)}>
+    <div className={cn("relative aspect-video w-full overflow-hidden bg-card", className)}>
       {failed ? (
         <div className="flex h-full w-full items-center justify-center" aria-hidden="true">
           <span className="font-display text-4xl font-bold text-muted-foreground/25">

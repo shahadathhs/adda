@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Community } from "@/lib/types";
 import { UserAvatar } from "@/components/ui/primitives";
 import { Elapsed } from "@/components/elapsed";
@@ -22,12 +23,23 @@ export function ChannelHeader({
       />
       <div className="min-w-0 flex-1">
         <h1 className="line-clamp-2 font-display text-xl font-semibold leading-7 tracking-tight text-foreground">
-          {(isLive && community.stream_title) || community.name}
+          {isLive && community.stream_title ? (
+            community.stream_title
+          ) : (
+            <Link href={`/channel/${community.slug}/profile`} className="hover:underline">
+              {community.name}
+            </Link>
+          )}
         </h1>
         <p className="text-[13px] text-muted-foreground">
           {isLive && (
             <>
-              <span className="font-semibold text-foreground">{community.name}</span>
+              <Link
+                href={`/channel/${community.slug}/profile`}
+                className="font-semibold text-foreground hover:underline"
+              >
+                {community.name}
+              </Link>
               {" · "}
             </>
           )}
