@@ -1,19 +1,10 @@
 import uuid
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.channel_moderator import ChannelModerator
 from models.community import Community
-from models.membership import CommunityRole, Membership
-
-# Roles with creator/moderator powers inside a channel — the audience of the
-# studio.
-ELEVATED_ROLES = {
-    CommunityRole.owner,
-    CommunityRole.admin,
-    CommunityRole.moderator,
-    CommunityRole.streamer,
-}
 
 
 async def get_community(db: AsyncSession, community_id: uuid.UUID) -> Community | None:
@@ -64,50 +55,17 @@ async def search_communities(
     return list(result.scalars().all())
 
 
-async def count_members(db: AsyncSession, community_id: uuid.UUID) -> int:
-    result = await db.execute(
-        select(func.count()).select_from(Membership).where(Membership.community_id == community_id)
-    )
-    return int(result.scalar() or 0)
-
-
-async def count_members_map(
-    db: AsyncSession, community_ids: list[uuid.UUID]
-) -> dict[uuid.UUID, int]:
-    """Member counts for many communities in one query (for grids)."""
-    if not community_ids:
-        return {}
-    result = await db.execute(
-        select(Membership.community_id, func.count())
-        .where(Membership.community_id.in_(community_ids))
-        .group_by(Membership.community_id)
-    )
-    return {cid: int(n) for cid, n in result.all()}
-
-
-async def get_member_role(
-    db: AsyncSession, community_id: uuid.UUID, user_id: uuid.UUID
-) -> CommunityRole | None:
-    result = await db.execute(
-        select(Membership.role).where(
-            Membership.community_id == community_id, Membership.user_id == user_id
-        )
-    )
-    return result.scalar_one_or_none()
-
-
-async def list_my_communities(
-    db: AsyncSession, user_id: uuid.UUID
-) -> list[tuple[Community, CommunityRole]]:
-    """Communities where the user holds an elevated (creator/moderator) role."""
-    result = await db.execute(
-        select(Community, Membership.role)
-        .join(Membership, Membership.community_id == Community.id)
-        .where(
-            Membership.user_id == user_id,
-            Membership.role.in_(ELEVATED_ROLES),
-            Community.is_suspended.is_(False),
-        )
+async def list_my_communities(db: AsyncSession, user_id: uuid.UUID) -> list[tuple[Community, str]]:
+    """Channels the user owns or moderates, each with their role."""
+    owned = await db.execute(
+        select(Community)
+        .where(Community.owner_id == user_id, Community.is_suspended.is_(False))
         .order_by(Community.created_at.desc())
     )
-    return [(community, role) for community, role in result.all()]
+    moderated = await db.execute(
+        select(Community)
+        .join(ChannelModerator, ChannelModerator.community_id == Community.id)
+        .where(ChannelModerator.user_id == user_id, Community.is_suspended.is_(False))
+        .order_by(Community.created_at.desc())
+    )
+    return [(c, "owner") for c in owned.scalars()] + [(c, "moderator") for c in moderated.scalars()]

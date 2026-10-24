@@ -1,23 +1,16 @@
 from models.base import Base
-from models.channel import Channel
-from models.channel_member import ChannelMember
+from models.channel_moderator import ChannelModerator
 from models.community import Community
 from models.follow import Follow
-from models.join_request import JoinRequest
-from models.membership import CommunityRole, Membership
 from models.message import Message
 from models.refresh_token import RefreshToken
 from models.user import User
 
 __all__ = [
     "Base",
-    "Channel",
-    "ChannelMember",
+    "ChannelModerator",
     "Community",
-    "CommunityRole",
     "Follow",
-    "JoinRequest",
-    "Membership",
     "Message",
     "RefreshToken",
     "User",

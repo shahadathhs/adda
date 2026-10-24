@@ -9,13 +9,13 @@ import { Card } from "@/components/ui/card";
 import { TextTabs } from "@/components/page-tabs";
 import { StudioLive } from "@/components/studio-live";
 import { StreamSetupCard } from "@/components/stream-setup-card";
-import { MemberManager } from "@/components/member-manager";
+import { ModeratorManager } from "@/components/moderator-manager";
 import { RecordingCard } from "@/components/recording-card";
 
 const SECTIONS = [
   { id: "live", label: "Live" },
   { id: "setup", label: "Setup" },
-  { id: "members", label: "Members" },
+  { id: "moderators", label: "Moderators" },
   { id: "recordings", label: "Recordings" },
 ];
 
@@ -47,7 +47,7 @@ export function StudioClient() {
           No channels yet
         </p>
         <p className="max-w-sm text-sm text-muted-foreground">
-          Create your first channel from the home page — then manage streams, members, and
+          Create your first channel from the home page — then manage streams, moderators, and
           recordings right here.
         </p>
         <Link href="/">
@@ -85,9 +85,9 @@ export function StudioClient() {
       <div>
         {section === "live" && <StudioLive communityId={channel.id} />}
         {section === "setup" && <StreamSetupCard community={channel} />}
-        {section === "members" && (
+        {section === "moderators" && (
           <Card className="p-4">
-            <MemberManager communityId={channel.id} />
+            <ModeratorManager communityId={channel.id} />
           </Card>
         )}
         {section === "recordings" && <StudioRecordings channel={channel} />}

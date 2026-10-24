@@ -37,8 +37,7 @@ export function ChannelCard({ c }: { c: DiscoverChannel }) {
         <div className="min-w-0 flex-1 pb-0.5">
           <h3 className="truncate text-sm font-semibold text-foreground">{c.name}</h3>
           <p className="text-xs text-muted-foreground">
-            <span className="font-num">{c.follower_count}</span> followers ·{" "}
-            <span className="font-num">{c.member_count}</span> members
+            <span className="font-num">{c.follower_count}</span> followers
           </p>
         </div>
       </div>

@@ -8,36 +8,15 @@ export interface Community {
   is_private: boolean;
   stream_title: string | null;
   owner_id: string;
-  member_count: number;
   follower_count: number;
   is_live: boolean;
-  /** The requesting user's role on this channel (filled by /mine). */
-  my_role?: string | null;
+  /** The requesting user's role on this channel: owner or moderator (filled by /mine). */
+  my_role?: "owner" | "moderator" | null;
 }
 
 export interface StreamCredentials {
   stream_url: string;
   stream_key: string;
-}
-
-export interface MemberOut {
-  user_id: string;
-  username: string;
-  display_name: string;
-  avatar_url: string | null;
-  bio: string | null;
-  role: string;
-  joined_at: string;
-}
-
-export interface JoinRequestOut {
-  id: string;
-  user_id: string;
-  username: string;
-  display_name: string;
-  avatar_url: string | null;
-  status: string;
-  created_at: string;
 }
 
 export interface Follower {

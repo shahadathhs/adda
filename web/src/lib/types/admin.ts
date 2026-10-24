@@ -19,18 +19,10 @@ export interface AdminCommunity {
   name: string;
   slug: string;
   owner_id: string;
-  member_count: number;
+  follower_count: number;
   is_live: boolean;
   is_suspended: boolean;
   created_at: string;
-}
-
-export interface AdminMember {
-  user_id: string;
-  username: string;
-  display_name: string;
-  role: string;
-  joined_at: string;
 }
 
 export interface LiveStream {

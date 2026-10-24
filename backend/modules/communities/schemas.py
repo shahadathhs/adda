@@ -35,10 +35,9 @@ class CommunityOut(BaseModel):
     is_private: bool
     stream_title: str | None = None
     owner_id: str
-    member_count: int = 0
     follower_count: int = 0
     is_live: bool = False
-    # The requesting user's role in this community (filled by /mine).
+    # The requesting user's role on this channel: "owner" or "moderator" (filled by /mine).
     my_role: str | None = None
 
 
@@ -49,29 +48,17 @@ class StreamCredentialsOut(BaseModel):
     stream_key: str
 
 
-# ── Members ───────────────────────────────────────────────────────────
-class MemberOut(BaseModel):
+# ── Moderators ────────────────────────────────────────────────────────
+class ModeratorOut(BaseModel):
     user_id: uuid.UUID
     username: str
     display_name: str
     avatar_url: str | None = None
-    bio: str | None = None
-    role: str
-    joined_at: datetime
+    since: datetime
 
 
-class RoleUpdateBody(BaseModel):
-    role: str  # admin, moderator, streamer, member, guest
-
-
-class JoinRequestOut(BaseModel):
-    id: uuid.UUID
+class AddModeratorBody(BaseModel):
     user_id: uuid.UUID
-    username: str
-    display_name: str
-    avatar_url: str | None = None
-    status: str
-    created_at: datetime
 
 
 # ── Admin community management ────────────────────────────────────────
@@ -82,7 +69,7 @@ class AdminCommunityOut(BaseModel):
     name: str
     slug: str
     owner_id: uuid.UUID
-    member_count: int = 0
+    follower_count: int = 0
     is_live: bool = False
     is_suspended: bool = False
     created_at: datetime

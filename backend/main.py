@@ -1,11 +1,13 @@
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
 from modules.auth.router import router as auth_router
-from modules.channels.router import router as channels_router
+from modules.chat.router import router as chat_router
 from modules.communities.admin_router import router as communities_admin_router
 from modules.communities.router import router as communities_router
 from modules.realtime.gateway import router as ws_router
@@ -19,7 +21,27 @@ from modules.users.router import router as users_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    """Start background work on boot; stop it cleanly on shutdown."""
+    from core.seed import seed_db
+    from modules.realtime.manager import manager
+    from modules.streaming.service import monitor
+
+    await seed_db()
+    await manager.start()
+    monitor.start()
+    logging.getLogger("adda").info("Backend startup complete. Debug=%s", settings.debug)
+    try:
+        yield
+    finally:
+        await monitor.stop()
+        await manager.stop()
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.app_name,
     docs_url="/docs" if settings.debug else None,
     redoc_url=None,
@@ -36,23 +58,6 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def startup() -> None:
-    from core.seed import seed_db
-
-    await seed_db()
-
-    from modules.realtime.manager import manager
-
-    await manager.start()
-
-    from modules.streaming.service import monitor
-
-    monitor.start()
-
-    logging.getLogger("adda").info("Backend startup complete. Debug=%s", settings.debug)
-
-
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok", "app": settings.app_name}
@@ -63,7 +68,7 @@ async def health() -> dict[str, str]:
 # at the root (no prefix).
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
-app.include_router(channels_router, prefix=settings.api_prefix)
+app.include_router(chat_router, prefix=settings.api_prefix)
 app.include_router(communities_admin_router, prefix=settings.api_prefix)
 app.include_router(users_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)

@@ -186,12 +186,14 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
 
 ### M1 — Foundations
 
-- [ ] pytest harness with a test database and Redis; CI runs it
-- [ ] Auth and token-rotation tests
-- [ ] Stream webhook and lifecycle tests
-- [ ] Messages keyed by channel (`community_id`); remove the text-room
-      `channels` table and the memberships/join-request surface
-- [ ] Replace `@app.on_event("startup")` with a lifespan handler
+- [x] pytest harness: embedded Postgres, real migrations, in-memory Redis; CI runs it
+- [x] Auth and token-rotation tests (found and fixed: suspended users' access
+      tokens kept working, reset links were reusable, follow was not idempotent)
+- [x] Stream webhook and lifecycle tests
+- [x] Messages keyed by channel (`community_id`); text-room `channels`,
+      memberships and join requests removed; moderators added; chat history
+      is persisted and the web chat loads it
+- [x] `@app.on_event("startup")` replaced by a lifespan handler
 
 ### M2 — Realtime chat platform (F5, F9–F12)
 

@@ -5,7 +5,7 @@ from models.base import Base
 
 
 class SystemRole:
-    """Platform-level roles (separate from per-community CommunityRole)."""
+    """Platform-level roles (channel roles live on Community / ChannelModerator)."""
 
     USER = "user"
     ADMIN = "admin"
@@ -26,7 +26,8 @@ class User(Base):
     bio: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # Platform-level role: "user", "admin", or "superadmin".
-    # This is separate from per-community roles (CommunityRole on Membership).
+    # Channel roles (owner, moderator) are separate: see Community.owner_id and
+    # ChannelModerator.
     system_role: Mapped[str] = mapped_column(
         String(20), default=SystemRole.USER, server_default=text("'user'")
     )

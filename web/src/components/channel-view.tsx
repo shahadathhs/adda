@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Heart } from "lucide-react";
-import { toast } from "sonner";
-import { joinCommunity, listFollowers, listMembers } from "@/lib/api";
+import { listFollowers } from "@/lib/api";
 import { hlsBaseUrl } from "@/lib/config";
 import type { Community } from "@/lib/types";
 import { useFollow, useSetFollowed, useStreamEvents, useStreamStatus, webKeys } from "@/lib/data";
@@ -31,11 +30,6 @@ export function ChannelView({ community }: { community: Community }) {
   const { data: status } = useStreamStatus(community.id);
   const { data: followState } = useFollow(community.id, !!user);
   const { follow, unfollow } = useSetFollowed(community.id);
-  const { data: members = [] } = useQuery({
-    queryKey: ["members", community.id],
-    queryFn: () => listMembers(community.id),
-  });
-
   const { data: followers = [] } = useQuery({
     queryKey: ["followers", community.id],
     queryFn: () => listFollowers(community.id),
@@ -43,15 +37,7 @@ export function ChannelView({ community }: { community: Community }) {
 
   const isLive = status?.is_live ?? community.is_live;
   const viewers = status?.viewers ?? 0;
-  const isMember = members.some((m) => m.user_id === user?.id);
   const isFollowing = followState?.following ?? false;
-
-  const joinMut = useMutation({
-    mutationFn: () => joinCommunity(community.id),
-    onSuccess: (data) =>
-      toast.success(data.status === "pending" ? "Join request sent." : "Joined!"),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to join"),
-  });
 
   const hlsUrl = `${hlsBaseUrl()}/community/${community.id}/index.m3u8`;
 
@@ -99,8 +85,8 @@ export function ChannelView({ community }: { community: Community }) {
               )
             )}
             <p className="mt-1 text-xs text-muted-foreground">
-              @{community.slug} · <span className="font-num">{community.member_count}</span> members
-              · <span className="font-num">{community.follower_count}</span> followers
+              @{community.slug} · <span className="font-num">{community.follower_count}</span>{" "}
+              followers
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -116,16 +102,6 @@ export function ChannelView({ community }: { community: Community }) {
                   aria-hidden="true"
                 />
                 {isFollowing ? "Following" : "Follow"}
-              </Button>
-            )}
-            {user && !isMember && (
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={joinMut.isPending}
-                onClick={() => joinMut.mutate()}
-              >
-                {community.is_private ? "Request to join" : "Join"}
               </Button>
             )}
           </div>
@@ -151,9 +127,6 @@ export function ChannelView({ community }: { community: Community }) {
               {community.description || "No description yet."}
             </p>
             <div className="flex flex-wrap gap-5 border-t border-border pt-3 text-xs text-muted-foreground">
-              <span>
-                <span className="font-num text-foreground">{community.member_count}</span> members
-              </span>
               <span>
                 <span className="font-num text-foreground">{community.follower_count}</span>{" "}
                 followers

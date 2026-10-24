@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import secrets
 import uuid
-from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
-
-if TYPE_CHECKING:
-    from models.membership import Membership
 
 
 def new_stream_key() -> str:
@@ -42,15 +38,7 @@ class Community(Base):
         index=True,
     )
 
-    members: Mapped[list[Membership]] = relationship(
-        "Membership",
-        back_populates="community",
-        cascade="all, delete-orphan",
-    )
-
-    def to_public_dict(
-        self, member_count: int = 0, is_live: bool = False, follower_count: int = 0
-    ) -> dict:
+    def to_public_dict(self, is_live: bool = False, follower_count: int = 0) -> dict:
         return {
             "id": str(self.id),
             "name": self.name,
@@ -61,7 +49,6 @@ class Community(Base):
             "is_private": self.is_private,
             "stream_title": self.stream_title,
             "owner_id": str(self.owner_id),
-            "member_count": member_count,
             "follower_count": follower_count,
             "is_live": is_live,
         }

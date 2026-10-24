@@ -4,18 +4,19 @@ Authenticates via a `token` query param, then processes the typed protocol from
 `modules/realtime/protocol.py`. Chat messages are persisted to the database AND
 broadcast through Redis (see `manager.py`) for multi-instance fan-out.
 
-WS channel naming for DB-backed channels:  ``channel:<uuid>``
-The gateway parses the UUID, saves a Message row, and broadcasts with the DB id.
+Chat topic for a channel: ``community/<uuid>/chat``. The gateway only parses and
+routes; validation and persistence live in `modules/chat/service/messages.py`.
 """
 
+import re
 import uuid
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from core.database import async_session_factory
 from core.security.deps import get_current_user_ws
-from models.message import Message as MessageModel
+from modules.chat.service.messages import MessageRejected, create_message, wire_payload
+from modules.communities.service.queries import get_community
 from modules.realtime.constants import AUTH_ERROR_WS_CODE
 from modules.realtime.manager import Connection, manager
 from modules.realtime.protocol import IncomingMessage, outgoing
@@ -27,14 +28,41 @@ def _connection_id() -> str:
     return f"conn-{uuid.uuid4().hex[:12]}"
 
 
-def _parse_channel_uuid(channel: str) -> uuid.UUID | None:
-    """Extract the channel UUID from a WS topic like ``channel:<uuid>``."""
-    if not channel.startswith("channel:"):
-        return None
+_CHAT_TOPIC = re.compile(r"^community/([0-9a-fA-F-]{36})/chat$")
+
+
+async def _handle_chat(conn: Connection, user, msg: IncomingMessage) -> None:
+    """Persist a chat message and broadcast it, or tell the sender why not."""
+    assert msg.channel is not None and msg.data is not None
+    match = _CHAT_TOPIC.match(msg.channel)
     try:
-        return uuid.UUID(channel.removeprefix("channel:"))
+        community_id = uuid.UUID(match.group(1)) if match else None
     except ValueError:
-        return None
+        community_id = None
+    if community_id is None:
+        await manager.send_to(
+            conn, outgoing("error", data={"code": "invalid_channel", "message": "Unknown chat"})
+        )
+        return
+
+    async with async_session_factory() as db:
+        if await get_community(db, community_id) is None:
+            await manager.send_to(
+                conn, outgoing("error", data={"code": "not_found", "message": "Channel not found"})
+            )
+            return
+        try:
+            row = await create_message(
+                db, community_id, user, msg.data.get("content", ""), msg.data.get("reply_to")
+            )
+        except MessageRejected as exc:
+            await manager.send_to(
+                conn, outgoing("error", data={"code": exc.code, "message": exc.message})
+            )
+            return
+        payload = wire_payload(row, user, msg.channel)
+
+    await manager.broadcast(msg.channel, outgoing("chat_message", msg.channel, payload))
 
 
 @router.websocket("/ws")
@@ -86,50 +114,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await manager.announce_presence(msg.channel)
 
             elif msg.type == "chat_message" and msg.channel and msg.data:
-                content = str(msg.data.get("content", "")).strip()
-                if not content:
-                    continue
-
-                channel_uuid = _parse_channel_uuid(msg.channel)
-                reply_to = msg.data.get("reply_to")
-
-                if channel_uuid is not None:
-                    # DB-backed channel — persist then broadcast.
-                    async with async_session_factory() as db:
-                        row = MessageModel(
-                            channel_id=channel_uuid,
-                            user_id=uuid.UUID(conn.user_id),
-                            content=content,
-                            reply_to_id=uuid.UUID(reply_to) if reply_to else None,
-                        )
-                        db.add(row)
-                        await db.commit()
-                        await db.refresh(row)
-                        payload = {
-                            "id": str(row.id),
-                            "channel_id": str(channel_uuid),
-                            "channel": msg.channel,
-                            "user_id": conn.user_id,
-                            "username": conn.username,
-                            "display_name": conn.display_name,
-                            "content": content,
-                            "created_at": row.created_at.isoformat(),
-                            "reply_to": reply_to,
-                        }
-                else:
-                    # Global community chat — ephemeral broadcast (any authed user).
-                    payload = {
-                        "id": f"m-{uuid.uuid4().hex[:16]}",
-                        "channel": msg.channel,
-                        "user_id": conn.user_id,
-                        "username": conn.username,
-                        "display_name": conn.display_name,
-                        "content": content,
-                        "created_at": datetime.now(UTC).isoformat(),
-                        "reply_to": reply_to,
-                    }
-
-                await manager.broadcast(msg.channel, outgoing("chat_message", msg.channel, payload))
+                await _handle_chat(conn, user, msg)
 
     except WebSocketDisconnect:
         pass

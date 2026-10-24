@@ -1,6 +1,5 @@
 import type {
   AdminCommunity,
-  AdminMember,
   AdminStats,
   AdminUser,
   LiveStream,
@@ -46,14 +45,6 @@ export const adminUpdateCommunity = (
   request<AdminCommunity>(`/api/admin/communities/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
-  });
-
-export const adminCommunityMembers = (id: string) =>
-  request<AdminMember[]>(`/api/admin/communities/${id}/members`);
-
-export const adminKickMember = (communityId: string, userId: string) =>
-  request<void>(`/api/admin/communities/${communityId}/members/${userId}`, {
-    method: "DELETE",
   });
 
 export const adminCommunityStreamKey = (id: string) =>

@@ -2,16 +2,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.channel import Channel
 from models.community import Community
-from models.membership import CommunityRole, Membership
 from modules.communities.schemas import CommunityCreate, CommunityUpdate
-
-DEFAULT_CHANNELS = [
-    ("general", "General", "text", 0),
-    ("announcements", "Announcements", "announcement", 1),
-    ("live", "Live Chat", "text", 2),
-]
 
 
 async def create_community(
@@ -27,29 +19,6 @@ async def create_community(
         owner_id=owner_id,
     )
     db.add(community)
-    await db.flush()
-
-    # Owner is automatically an owner-role member.
-    db.add(
-        Membership(
-            user_id=owner_id,
-            community_id=community.id,
-            role=CommunityRole.owner,
-        )
-    )
-
-    # Default channels created with every community.
-    for slug, name, ctype, position in DEFAULT_CHANNELS:
-        db.add(
-            Channel(
-                community_id=community.id,
-                name=name,
-                slug=slug,
-                type=ctype,
-                position=position,
-            )
-        )
-
     await db.commit()
     await db.refresh(community)
     return community

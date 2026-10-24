@@ -16,7 +16,6 @@ export interface DiscoverChannel {
   stream_title: string | null;
   is_live: boolean;
   viewers: number;
-  member_count: number;
   follower_count: number;
   hls_url: string | null;
   webrtc_url: string | null;

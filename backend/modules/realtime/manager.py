@@ -13,6 +13,7 @@ online — the right shape for horizontal scaling later.
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 from dataclasses import dataclass, field
@@ -49,6 +50,14 @@ class ConnectionManager:
     async def start(self) -> None:
         if self._listener_task is None:
             self._listener_task = asyncio.create_task(self._redis_listener())
+
+    async def stop(self) -> None:
+        """Cancel the Redis listener (called on shutdown)."""
+        if self._listener_task is not None:
+            self._listener_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._listener_task
+            self._listener_task = None
 
     def register(self, conn: Connection) -> None:
         self.connections[conn.id] = conn

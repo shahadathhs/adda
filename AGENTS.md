@@ -107,6 +107,10 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   import sorting).
 - Run type checking after every backend change: `cd backend && uv run pyright`.
   No new warnings in changed files.
+- Run the backend tests after every backend change: `make test` (or
+  `cd backend && uv run pytest`). They need no Docker: the harness starts an
+  embedded Postgres, applies the real Alembic migrations, and uses an
+  in-memory Redis. New behaviour ships with tests in `backend/tests/`.
 - Run web lint/build after web or package changes:
   `pnpm lint && pnpm typecheck && pnpm -C web build`.
 - Run `pnpm -C site build` after docs-site changes.
@@ -127,8 +131,9 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   `redis_client.py`, `seed.py`, `security/` (jwt/password/deps/guards),
   `exceptions.py`. The shared `models/` package and `alembic/` sit at the
   backend root. Features live in `modules/<feature>/` — one folder per feature
-  (`auth`, `users`, `communities`, `streaming`, `recordings`, `stats`,
-  `realtime`; `chat` and `notifications` are added per `docs/CHAT.md`).
+  (`auth`, `users`, `communities`, `chat`, `streaming`, `recordings`, `stats`,
+  `realtime`; `notifications` is added per `docs/CHAT.md`). Channel roles:
+  the owner is `Community.owner_id`; moderators are `ChannelModerator` rows.
   "Community" is the internal name for a streamer's channel; the UI, docs and
   public text say "channel".
 - **Every write needs an account.** Guests are read-only, enforced in the

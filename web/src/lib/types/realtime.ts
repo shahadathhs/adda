@@ -1,6 +1,7 @@
 export interface ChatMessage {
   id: string;
   channel: string;
+  community_id: string;
   user_id: string;
   username: string;
   display_name: string;

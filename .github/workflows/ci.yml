@@ -38,6 +38,10 @@ jobs:
       - name: Pyright
         run: uv run pyright
 
+      # Embedded Postgres (pgserver) + fakeredis: no service containers needed.
+      - name: Tests
+        run: uv run pytest -q
+
   web:
     name: Web (lint + build)
     runs-on: ubuntu-latest

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   chatChannel,
+  chatHistory,
   communityChannel,
   discoverChannels,
   followCommunity,
@@ -122,7 +123,7 @@ export function useRecordings(id: string, enabled: boolean) {
   });
 }
 
-/** Ephemeral live chat for a community (WS-only, no persistence). */
+/** A channel's chat: recent history from the API, then live messages over the WebSocket. */
 export function useCommunityChat(communityId: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [online, setOnline] = useState(0);
@@ -131,18 +132,47 @@ export function useCommunityChat(communityId: string) {
   useEffect(() => {
     const channel = chatChannel(communityId);
     topic.current = channel;
+    let cancelled = false;
+
+    // Merge by id so a message that arrives live while history loads is never doubled.
+    const merge = (prev: ChatMessage[], incoming: ChatMessage[]) => {
+      const seen = new Set(prev.map((m) => m.id));
+      return [...prev, ...incoming.filter((m) => !seen.has(m.id))]
+        .sort((a, b) => a.created_at.localeCompare(b.created_at))
+        .slice(-200);
+    };
+
+    chatHistory(communityId)
+      .then((page) => {
+        if (cancelled) return;
+        const history: ChatMessage[] = page.map((m) => ({
+          id: m.id,
+          channel,
+          community_id: m.community_id,
+          user_id: m.user_id,
+          username: m.username,
+          display_name: m.display_name,
+          content: m.content,
+          created_at: m.created_at,
+          reply_to: m.reply_to_id,
+        }));
+        setMessages((prev) => merge(prev, history));
+      })
+      .catch(() => undefined);
+
     socket.connect();
     socket.subscribe(channel);
     const off = socket.on((msg) => {
       if (msg.channel !== channel) return;
       if (msg.type === "chat_message") {
-        setMessages((prev) => [...prev.slice(-199), msg.data as unknown as ChatMessage]);
+        setMessages((prev) => merge(prev, [msg.data as unknown as ChatMessage]));
       } else if (msg.type === "presence") {
         const data = msg.data as { online_count?: number } | undefined;
         if (data?.online_count != null) setOnline(data.online_count);
       }
     });
     return () => {
+      cancelled = true;
       off();
       socket.unsubscribe(channel);
     };

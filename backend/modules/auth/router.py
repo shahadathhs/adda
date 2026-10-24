@@ -15,7 +15,7 @@ from core.exceptions import (
 )
 from core.security.deps import get_current_user
 from core.security.password import verify_password
-from core.security.tokens import create_reset_token, verify_reset_token
+from core.security.tokens import create_reset_token, reset_token_matches, reset_token_subject
 from models.user import User
 from modules.auth.schemas import (
     ChangePasswordRequest,
@@ -125,7 +125,7 @@ async def change_password(
 async def forgot_password(data: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
     user = await get_user_by_email(db, str(data.email))
     if user is not None:
-        token = create_reset_token(str(user.id))
+        token = create_reset_token(user)
         link = f"{settings.password_reset_url}?token={token}"
         if settings.smtp_host:
             await send_password_reset_email(user.email, link)
@@ -136,11 +136,13 @@ async def forgot_password(data: ForgotPasswordRequest, db: AsyncSession = Depend
 
 @router.post("/reset-password")
 async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
-    user_id = verify_reset_token(data.token)
-    if user_id is None:
+    subject = reset_token_subject(data.token)
+    if subject is None:
         raise BadRequestException("Invalid or expired reset token")
+    user_id, fingerprint = subject
     user = await db.get(User, uuid.UUID(user_id))
-    if user is None:
+    # A used link no longer matches: the password it was issued for is gone.
+    if user is None or not reset_token_matches(fingerprint, user):
         raise BadRequestException("Invalid or expired reset token")
     await set_password(db, user, data.password)
     return {"message": "Your password has been reset."}

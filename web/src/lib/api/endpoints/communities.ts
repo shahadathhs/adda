@@ -1,15 +1,9 @@
-import type {
-  Community,
-  Follower,
-  JoinRequestOut,
-  MemberOut,
-  StreamCredentials,
-} from "@/lib/types";
+import type { Community, Follower, Moderator, StreamCredentials } from "@/lib/types";
 import { request } from "../client";
 
 export const listCommunities = () => request<Community[]>("/api/communities");
 
-/** Channels where the current user holds a creator/moderator role. */
+/** Channels the current user owns or moderates. */
 export const listMine = () => request<Community[]>("/api/communities/mine");
 
 export const getCommunity = (id: string) => request<Community>(`/api/communities/${id}`);
@@ -45,39 +39,17 @@ export const unfollowCommunity = (id: string) =>
 
 export const listFollowed = () => request<Community[]>("/api/communities/followed/by-me");
 
-export const joinCommunity = (id: string) =>
-  request<{ status: string }>(`/api/communities/${id}/members`, {
+export const listModerators = (id: string) =>
+  request<Moderator[]>(`/api/communities/${id}/moderators`);
+
+export const addModerator = (id: string, userId: string) =>
+  request<Moderator>(`/api/communities/${id}/moderators`, {
     method: "POST",
+    body: JSON.stringify({ user_id: userId }),
   });
 
-export const leaveCommunity = (id: string) =>
-  request<void>(`/api/communities/${id}/members`, { method: "DELETE" });
-
-export const listMembers = (id: string) => request<MemberOut[]>(`/api/communities/${id}/members`);
-
-export const updateMemberRole = (id: string, userId: string, role: string) =>
-  request<MemberOut>(`/api/communities/${id}/members/${userId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ role }),
-  });
-
-export const kickMember = (id: string, userId: string) =>
-  request<void>(`/api/communities/${id}/members/${userId}`, {
-    method: "DELETE",
-  });
-
-export const listJoinRequests = (id: string) =>
-  request<JoinRequestOut[]>(`/api/communities/${id}/join-requests`);
-
-export const approveJoinRequest = (id: string, requestId: string) =>
-  request<MemberOut>(`/api/communities/${id}/join-requests/${requestId}/approve`, {
-    method: "POST",
-  });
-
-export const denyJoinRequest = (id: string, requestId: string) =>
-  request<void>(`/api/communities/${id}/join-requests/${requestId}/deny`, {
-    method: "POST",
-  });
+export const removeModerator = (id: string, userId: string) =>
+  request<void>(`/api/communities/${id}/moderators/${userId}`, { method: "DELETE" });
 
 export const listFollowers = (id: string) =>
   request<Follower[]>(`/api/communities/${id}/followers`);

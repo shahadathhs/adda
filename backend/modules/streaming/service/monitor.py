@@ -7,6 +7,7 @@ recorded in Redis and used by the health endpoint for uptime.
 """
 
 import asyncio
+import contextlib
 import logging
 import time
 from datetime import UTC, datetime
@@ -86,6 +87,16 @@ async def _run() -> None:
         except Exception:
             log.exception("stream monitor tick failed")
         await asyncio.sleep(POLL_SECONDS)
+
+
+async def stop() -> None:
+    """Cancel the monitor loop (called on shutdown)."""
+    global _task
+    if _task is not None and not _task.done():
+        _task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await _task
+    _task = None
 
 
 def start() -> None:

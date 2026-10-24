@@ -58,20 +58,23 @@ OBS ──RTMP──▶ mediamtx ──auth webhook──▶ backend (FastAPI) �
 Honest status of each flow. The full list, with acceptance criteria and the
 screen each one belongs to, is in [docs/FLOWS.md](docs/FLOWS.md).
 
-| Flow   | What                                                                                                                          | Status                                            |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| F0     | One-command install, HTTPS, generated secrets                                                                                 | Built; clean-server timing not yet verified       |
-| F1     | Register, login, rotating refresh tokens, change and reset password                                                           | Built; reset email needs SMTP                     |
-| F2     | Home, channel pages (SSR), HLS player, viewer counts                                                                          | Built; search and the new home layout in progress |
-| F3     | Create channel, stream key, rotate key, edit, delete                                                                          | Built; edit and delete flows to verify            |
-| F4     | Go live, offline detection, force-stop                                                                                        | Built                                             |
-| F5     | Chat: history, send, delete                                                                                                   | Partial; moderation and rate limits planned       |
-| F6     | Follows                                                                                                                       | Built                                             |
-| F7     | Recordings and thumbnails                                                                                                     | Built; download and processing state to verify    |
-| F8     | Admin API                                                                                                                     | Partial                                           |
-| F9–F16 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode, channel profiles, recording comments | Planned ([chat design](docs/CHAT.md))             |
+| Flow   | What                                                                                                                          | Status                                                     |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| F0     | One-command install, HTTPS, generated secrets                                                                                 | Built; clean-server timing not yet verified                |
+| F1     | Register, login, rotating refresh tokens, change and reset password                                                           | Built; reset email needs SMTP                              |
+| F2     | Home, channel pages (SSR), HLS player, viewer counts                                                                          | Built; search and the new home layout in progress          |
+| F3     | Create channel, stream key, rotate key, edit, delete                                                                          | Built; edit and delete flows to verify                     |
+| F4     | Go live, offline detection, force-stop                                                                                        | Built                                                      |
+| F5     | Chat: persisted history, send, delete, moderators                                                                             | Partial; timeouts, bans, slow mode and rate limits planned |
+| F6     | Follows                                                                                                                       | Built                                                      |
+| F7     | Recordings and thumbnails                                                                                                     | Built; download and processing state to verify             |
+| F8     | Admin API                                                                                                                     | Partial                                                    |
+| F9–F16 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode, channel profiles, recording comments | Planned ([chat design](docs/CHAT.md))                      |
 
-There are **no automated tests yet**; adding them is the first milestone
+Backend tests run with `make test` (75 so far: accounts and token rotation,
+channel lifecycle, follows, moderators, chat history and live chat over a real
+WebSocket, the stream publish webhook, and the data migration). Chat, notifications
+and the browser end-to-end tests come with their milestones
 ([docs/SCOPE.md](docs/SCOPE.md)).
 
 ## Not in v1
@@ -108,8 +111,7 @@ Needs Docker, [uv](https://docs.astral.sh/uv/) and
 [pnpm](https://pnpm.io/) (Node 22).
 
 ```bash
-make setup          # .env files, directories, dependencies, database
-make infra          # Postgres + Redis + mediamtx in Docker
+make setup          # .env files, dependencies, Postgres + Redis + mediamtx in Docker, migrations
 make dev            # backend on :7001 and web on :5173, with hot reload
 ```
 

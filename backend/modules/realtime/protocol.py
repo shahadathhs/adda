@@ -1,13 +1,12 @@
 """WebSocket message protocol — THE shared contract between backend and frontend.
 
-This must stay in sync with `frontend/src/lib/ws.ts`. When adding a realtime
+This must stay in sync with `web/src/lib/types/realtime.ts`. When adding a realtime
 feature, add the message type here first, then handle it on both sides.
 
 Channels are namespaced strings, e.g.:
-    community:<id>            — community-wide events (stream_status, posts)
-    community:<id>:chat       — live chat
-    community:<id>:presence   — who's online
-    user:<id>                 — personal notifications
+    community/<id>            — channel-wide events (stream_status)
+    community/<id>/chat       — live chat (persisted)
+    user/<id>                 — personal notifications
 """
 
 from typing import Any, Literal

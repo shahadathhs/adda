@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from core.exceptions import UnauthorizedException
+from core.exceptions import ForbiddenException, UnauthorizedException
 from core.security.jwt import decode_access_token
 from models.user import User
 
@@ -33,6 +33,8 @@ async def get_current_user(
     user = result.scalar_one_or_none()
     if user is None:
         raise _credentials_error()
+    if not user.is_active:
+        raise ForbiddenException("Account suspended")
     return user
 
 
@@ -45,4 +47,5 @@ async def get_current_user_ws(token: str) -> User | None:
         return None
     async with async_session_factory() as db:
         result = await db.execute(select(User).where(User.id == uuid.UUID(user_id)))
-        return result.scalar_one_or_none()
+        user = result.scalar_one_or_none()
+        return user if user is not None and user.is_active else None

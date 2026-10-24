@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     # App
     app_name: str = "adda"
     debug: bool = False
+    # Log every SQL statement. Very noisy, so it is separate from `debug`.
+    sql_echo: bool = False
     api_prefix: str = "/api"
 
     # Database

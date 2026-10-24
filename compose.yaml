@@ -1,13 +1,16 @@
-# ── adda — production-safe base stack ────────────────────────────────
+# ── adda — the one compose file ──────────────────────────────────────
 # Only two things touch the internet: Caddy (80/443, automatic HTTPS)
-# and RTMP ingest (1935). Postgres, Redis, the mediamtx API, HLS, the
-# backend, and the web app are internal-only.
+# and RTMP ingest (1935). Every other published port is bound to
+# 127.0.0.1, so it is reachable from the machine itself (local
+# development, `psql`, debugging) and never from outside it.
 #
-#   Production:  ./install.sh   (or: docker compose --profile prod up -d --build)
-#   Local dev:   docker compose -f compose.yaml -f compose.dev.yaml up
+#   Production:  ./scripts/install.sh   (or: docker compose --profile prod up -d --build)
+#   Local dev:   make up                (the Makefile supplies the dev values)
 #
-# Use install.sh for a real domain — it generates every secret and
-# writes .env for you. See .env.example for the full variable list.
+# Defaults here are production-safe: debug off, no test users, https URLs.
+# Local development overrides them through the Makefile (DEV_ENV), never by
+# editing this file. install.sh generates every secret and writes .env;
+# see .env.example for the full variable list.
 
 services:
   postgres:
@@ -17,6 +20,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-adda}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (install.sh generates it)}
       POSTGRES_DB: ${POSTGRES_DB:-adda}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -29,6 +34,8 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -43,7 +50,9 @@ services:
     environment:
       MTX_AUTHHTTPADDRESS: ${MTX_AUTH_ADDRESS:-http://backend:7001/api/streams/auth}
     ports:
-      - "${RTMP_PORT:-1935}:1935" # RTMP ingest — OBS streams here
+      - "${RTMP_PORT:-1935}:1935" # RTMP ingest — OBS streams here (public)
+      - "127.0.0.1:${HLS_PORT:-8888}:8888" # HLS, local only (Caddy proxies it in production)
+      - "127.0.0.1:${MTX_API_PORT:-9997}:9997" # mediamtx control API, local only
     volumes:
       - ./recordings:/media
 
@@ -75,6 +84,8 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-adda <noreply@${ADDA_DOMAIN:-localhost}>}
       SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-7001}:7001"
     volumes:
       - ./recordings:/recordings
       - ./thumbs:/thumbs
@@ -107,6 +118,8 @@ services:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://${ADDA_DOMAIN:-localhost}}
         NEXT_PUBLIC_HLS_BASE_URL: ${NEXT_PUBLIC_HLS_BASE_URL:-https://${ADDA_DOMAIN:-localhost}/hls}
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:5173"
     environment:
       # Server-side (RSC) fetches go over the docker network.
       API_SSR_URL: http://backend:7001

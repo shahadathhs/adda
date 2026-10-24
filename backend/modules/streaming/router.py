@@ -13,15 +13,10 @@ from core.database import get_db
 from core.exceptions import ForbiddenException, NotFoundException
 from core.security.deps import get_current_user
 from core.security.guards import require_admin
-from models.membership import CommunityRole
-from models.user import SystemRole, User
+from models.user import User
 from modules.communities.service.follows import count_followers_map
-from modules.communities.service.queries import (
-    count_members_map,
-    get_community,
-    get_member_role,
-    search_communities,
-)
+from modules.communities.service.queries import get_community, search_communities
+from modules.communities.service.roles import can_moderate
 from modules.streaming.schemas import DiscoverItem, LiveStreamOut, StreamHealthOut
 from modules.streaming.service import monitor
 from modules.streaming.service.mediamtx import kick_publisher, path_details, viewer_count
@@ -53,7 +48,6 @@ async def discover(
 
     communities = await search_communities(db, q, limit=limit, offset=offset)
     ids = [c.id for c in communities]
-    members_map = await count_members_map(db, ids)
     followers_map = await count_followers_map(db, ids)
 
     items = [
@@ -67,7 +61,6 @@ async def discover(
             stream_title=c.stream_title,
             is_live=str(c.id) in live_ids,
             viewers=viewers_map.get(str(c.id), 0),
-            member_count=members_map.get(c.id, 0),
             follower_count=followers_map.get(c.id, 0),
             hls_url=hls_url(str(c.id)) if str(c.id) in live_ids else None,
             webrtc_url=webrtc_url(str(c.id)) if str(c.id) in live_ids else None,
@@ -132,18 +125,12 @@ async def stream_thumbnail(community_id: uuid.UUID):
 async def _require_channel_mod(
     community_id: uuid.UUID, current_user: User, db: AsyncSession
 ) -> None:
-    """Raise unless the user moderates this channel (or is system staff)."""
-    if current_user.system_role in SystemRole.STAFF:
-        return
-    role = await get_member_role(db, community_id, current_user.id)
-    allowed = {
-        CommunityRole.owner,
-        CommunityRole.admin,
-        CommunityRole.moderator,
-        CommunityRole.streamer,
-    }
-    if role not in allowed:
-        raise ForbiddenException("Only channel moderators and streamers can manage this stream")
+    """Raise unless the user owns or moderates this channel (or is system staff)."""
+    community = await get_community(db, community_id)
+    if community is None:
+        raise NotFoundException("Community not found")
+    if not await can_moderate(db, community, current_user):
+        raise ForbiddenException("Only the channel owner and moderators can see stream health")
 
 
 @router.get("/communities/{community_id}/health", response_model=StreamHealthOut)

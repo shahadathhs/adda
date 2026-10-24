@@ -19,26 +19,28 @@ Other flows: register, change password, password reset (email link).
 
 ### Communities / channels
 
-| Method   | Path                                      | Auth    |
-| -------- | ----------------------------------------- | ------- |
-| `GET`    | `/api/communities?q=&limit=&offset=`      | public  |
-| `GET`    | `/api/communities/{id}`                   | public  |
-| `POST`   | `/api/communities`                        | user    |
-| `PATCH`  | `/api/communities/{id}`                   | owner   |
-| `DELETE` | `/api/communities/{id}`                   | owner   |
-| `GET`    | `/api/communities/{id}/stream-key`        | owner   |
-| `POST`   | `/api/communities/{id}/stream-key/rotate` | owner   |
-| `GET`    | `/api/communities/{id}/follow`            | user    |
-| `POST`   | `/api/communities/{id}/follow`            | user    |
-| `DELETE` | `/api/communities/{id}/follow`            | user    |
-| `GET`    | `/api/communities/followed/by-me`         | user    |
-| `GET`    | `/api/communities/{id}/members`           | public  |
-| `POST`   | `/api/communities/{id}/members`           | user    |
-| `PATCH`  | `/api/communities/{id}/members/{user_id}` | c-admin |
-| `DELETE` | `/api/communities/{id}/members/{user_id}` | c-admin |
+| Method   | Path                                      | Auth                     |
+| -------- | ----------------------------------------- | ------------------------ |
+| `GET`    | `/api/communities?q=&limit=&offset=`      | public                   |
+| `GET`    | `/api/communities/{id}`                   | public                   |
+| `POST`   | `/api/communities`                        | user                     |
+| `PATCH`  | `/api/communities/{id}`                   | owner                    |
+| `DELETE` | `/api/communities/{id}`                   | owner                    |
+| `GET`    | `/api/communities/{id}/stream-key`        | owner                    |
+| `POST`   | `/api/communities/{id}/stream-key/rotate` | owner                    |
+| `GET`    | `/api/communities/{id}/follow`            | user                     |
+| `POST`   | `/api/communities/{id}/follow`            | user                     |
+| `DELETE` | `/api/communities/{id}/follow`            | user                     |
+| `GET`    | `/api/communities/followed/by-me`         | user                     |
+| `GET`    | `/api/communities/{id}/moderators`        | public                   |
+| `POST`   | `/api/communities/{id}/moderators`        | owner                    |
+| `DELETE` | `/api/communities/{id}/moderators/{uid}`  | owner                    |
+| `GET`    | `/api/communities/{id}/messages`          | public                   |
+| `DELETE` | `/api/communities/{id}/messages/{mid}`    | author, owner, moderator |
 
-Channels: CRUD under `/api/communities/{id}/channels/…` plus
-`GET /api/channels/{channel_id}/messages` (cursor-paginated).
+"Community" is the API's internal name for a channel. Chat history is
+cursor-paginated and newest first: `?limit=` (1–100) and `?before=<message id>`.
+Only followers of a channel can be made moderators.
 
 ### Streaming
 
@@ -89,11 +91,9 @@ Connect to **`/ws?token=<access_token>`**. Messages are JSON with a `type`.
 **Channel namespaces**
 
 ```
-community/<id>            — community events (stream_status)
-community/<id>/chat       — live chat
-community/<id>/presence   — who's online
-channel:<uuid>            — persisted channel chat
-user:<id>                 — personal notifications
+community/<id>            — channel events (stream_status)
+community/<id>/chat       — live chat (persisted, 300 characters max)
+user/<id>                 — personal notifications
 ```
 
 The contract is defined in `backend/modules/realtime/protocol.py` and mirrored
