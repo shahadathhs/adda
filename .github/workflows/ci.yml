@@ -136,7 +136,11 @@ jobs:
           make env
           make up
           for url in http://localhost:7001/ready http://localhost:5173; do
-            curl --retry 60 --retry-delay 2 --retry-connrefused -fsS -o /dev/null "$url"
+            for i in $(seq 1 60); do
+              curl -fsS -o /dev/null "$url" && break
+              [ "$i" = 60 ] && { echo "$url never became ready"; exit 1; }
+              sleep 2
+            done
           done
 
       - name: Run the tests
