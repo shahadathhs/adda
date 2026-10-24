@@ -5,59 +5,62 @@ Concept renders of the web app, in the dark theme (adda is dark-first; see
 frames are flat placeholders for real captures, names and numbers are
 invented, and spacing will be tuned when the screens are built.
 
-Regenerate every PNG with `node scripts/render-design.mjs` (headless Chrome;
-set `CHROME_BIN` if it is not at the macOS default path). Sources are in
-`docs/design/src/` — shared components in `components.mjs`, styles in
-`ui.css` (the real tokens), one module per screen in `screens/`.
+Overview sheet: [overview.png](overview.png). Individual screens:
+`screens/NN-name.png` (desktop 1440 px wide, mobile 390 x 844).
 
-Desktop screens render at 1440 px wide. Individual files: `screens/NN-name.png`.
+Regenerate everything with `node scripts/render-design.mjs` (headless Chrome;
+set `CHROME_BIN` if it is not at the macOS default path), or pass screen ids
+to render only those. Sources are in `docs/design/src/`: shared components in
+`components.mjs` and `shells.mjs`, the real tokens in `ui.css`, and one module
+per screen in `screens/`.
 
 ## Viewer
 
-| #   | Screen              | Purpose and states                                                                       | Status   |
-| --- | ------------------- | ---------------------------------------------------------------------------------------- | -------- |
-| 01  | Home                | Featured live channel, following rail, live grid, recent recordings                      | rendered |
-| 02  | Channel, live       | Player, chat with replies/mentions/reactions/emotes, pinned message, live poll, identity | rendered |
-| 03  | Channel, offline    | Offline panel, latest recording, recordings list, follow and alerts                      | planned  |
-| 04  | Recording playback  | Player with timeline markers, timestamped comments, click a time to seek                 | planned  |
-| 05  | Channel profile     | About, links, badges, announcements, followers                                           | planned  |
-| 06  | Browse and search   | Search results, empty result, filter live only                                           | planned  |
-| 07  | Guest, channel live | Read-only chat; "Sign in to chat" instead of the composer; poll shown, vote disabled     | planned  |
+| #   | Screen              | Purpose and states                                                                         |
+| --- | ------------------- | ------------------------------------------------------------------------------------------ |
+| 01  | Home                | Featured live channel, following rail, live grid, recent recordings                        |
+| 02  | Channel, live       | Player, chat with replies, mentions, reactions, emotes, pinned message, poll, identity     |
+| 03  | Channel, offline    | Offline panel with follow and alerts, recordings list, about and announcements             |
+| 04  | Recording playback  | Player with comment markers on the timeline, timestamped comments, comment at current time |
+| 05  | Channel profile     | Banner, badges, about, links, announcements, followers with "follower since"               |
+| 06  | Browse and search   | Search results, live and offline channel cards, result filters                             |
+| 07  | Guest, channel live | Read-only chat, poll results without voting, sign in to follow and chat                    |
 
 ## Account
 
-| #   | Screen                  | Purpose and states                                                           | Status  |
-| --- | ----------------------- | ---------------------------------------------------------------------------- | ------- |
-| 08  | Sign in                 | Email and password, forgot-password link                                     | planned |
-| 09  | Create account          | Username, email, password, error states                                      | planned |
-| 10  | Reset password          | Request link, check-your-inbox, set new password, expired link               | planned |
-| 11  | Notifications           | Bell open: went live, mentioned, replied, unread dot                         | planned |
-| 12  | Settings, profile       | Display name, bio, avatar, identity mode (named or anonymous)                | planned |
-| 13  | Settings, notifications | Per-channel alerts, email alerts opt-in (shown only when SMTP is configured) | planned |
+| #   | Screen                  | Purpose and states                                                             |
+| --- | ----------------------- | ------------------------------------------------------------------------------ |
+| 08  | Sign in                 | Email and password, forgot-password link, "watch without an account" note      |
+| 09  | Create account          | Username, display name, email, password, taken-username error                  |
+| 10  | Reset password          | Request, check your inbox, new password, expired link, email not configured    |
+| 11  | Notifications           | Bell open: went live, mentioned, replied, comment on a recording; unread state |
+| 12  | Settings, profile       | Picture, display name, username, bio, identity mode (named or anonymous)       |
+| 13  | Settings, notifications | In-app toggles, optional email alerts with per-channel bell and email controls |
 
 ## Studio (streamers)
 
-| #   | Screen               | Purpose and states                                             | Status  |
-| --- | -------------------- | -------------------------------------------------------------- | ------- |
-| 14  | Studio, set up       | Create channel, stream key and RTMP URL, OBS steps, rotate key | planned |
-| 15  | Studio, live control | Connection health, viewers, start poll, pin message, mod list  | planned |
-| 16  | Studio, emotes       | Upload, name, preview, remove emotes                           | planned |
-| 17  | Studio, channel page | Edit title, about, links, announcements                        | planned |
+| #   | Screen               | Purpose and states                                                              |
+| --- | -------------------- | ------------------------------------------------------------------------------- |
+| 14  | Studio, setup        | RTMP URL, hidden stream key, rotate key, four OBS steps, waiting-for-encoder    |
+| 15  | Studio, live         | Stream health, start a poll, pin a message, slow mode, recent mod actions, chat |
+| 16  | Studio, emotes       | Emote grid with usage, upload with name and limits, live preview                |
+| 17  | Studio, channel page | Details, links, banner, announcements with pin, delete with typed confirmation  |
+| 18  | Studio, moderators   | Moderators, timeouts and bans with lift, add a moderator from followers         |
 
 ## System states
 
-| #   | Screen          | Purpose and states                                                       | Status  |
-| --- | --------------- | ------------------------------------------------------------------------ | ------- |
-| 18  | Not found       | Dead channel link                                                        | planned |
-| 19  | Stream ended    | Live page after the broadcast stops: recording is processing, follow CTA | planned |
-| 20  | Connection lost | Chat reconnecting with backoff, player reconnecting                      | planned |
+| #   | Screen          | Purpose and states                                                      |
+| --- | --------------- | ----------------------------------------------------------------------- |
+| 19  | Not found       | Dead channel link, search, live channels as a way out                   |
+| 20  | Stream ended    | Peak viewers, recording progress, follow and alerts, chat stays open    |
+| 21  | Connection lost | Player and chat reconnecting with backoff, draft kept, sending disabled |
 
 ## Mobile (390 x 844)
 
-| #   | Screen        | Purpose and states                        | Status  |
-| --- | ------------- | ----------------------------------------- | ------- |
-| M1  | Home          | Single-column live list, following strip  | planned |
-| M2  | Channel, live | Player on top, chat below, poll collapsed | planned |
+| #   | Screen        | Purpose and states                                           |
+| --- | ------------- | ------------------------------------------------------------ |
+| M1  | Home          | Following strip with live rings, single-column live list     |
+| M2  | Channel, live | Player on top, chat below, pinned message and poll collapsed |
 
 ## Not in this set
 
@@ -66,6 +69,18 @@ Desktop screens render at 1440 px wide. Individual files: `screens/NN-name.png`.
 - **Marketing site:** designed separately once the app screens are agreed.
 - **Motion:** the live pulse, going-live and chat motion are specified in
   DESIGN.md section 6, not shown in stills.
+- **Password settings tab** and **follower list page:** plain variants of
+  patterns already shown (form card, follower rows).
+
+## What the screens imply (feeds the docs update)
+
+- **Chat:** badges (owner, mod, follower), replies, mentions, reactions,
+  emotes, pinned message, poll, identity mode, slow mode, timeouts, reconnect.
+- **Recordings:** timestamped comments, download, processing progress.
+- **Channels:** about, links, banner, announcements with pin, followers with
+  join date, moderators, bans, emotes, delete with typed confirmation.
+- **Accounts:** guests are read-only; identity mode; notification preferences
+  with optional email; email-link password reset with a no-SMTP fallback.
 
 ## Open design issue
 

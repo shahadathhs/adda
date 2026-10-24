@@ -463,3 +463,221 @@ svg {
 .opt.mine {
   border-color: rgba(245, 166, 35, 0.6);
 }
+
+/* forms */
+label.l {
+  display: block;
+  font: 600 12px/16px inherit;
+  color: var(--fg-muted);
+  margin-bottom: 6px;
+}
+.in {
+  height: 36px;
+  border: 1px solid var(--input);
+  background: rgba(38, 42, 51, 0.5);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  color: var(--fg);
+  gap: 8px;
+}
+.in.ph {
+  color: var(--fg-subtle);
+}
+.in.err {
+  border-color: var(--danger);
+}
+.in.focus {
+  border-color: var(--accent);
+  outline: 2px solid rgba(245, 166, 35, 0.35);
+  outline-offset: 0;
+}
+.help {
+  font-size: 12px;
+  color: var(--fg-subtle);
+  margin-top: 6px;
+}
+.help.err {
+  color: var(--danger);
+}
+.toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--input);
+  position: relative;
+  flex-shrink: 0;
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--fg-muted);
+}
+.toggle.on {
+  background: var(--accent);
+}
+.toggle.on::after {
+  left: 18px;
+  background: var(--accent-fg);
+}
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 2px;
+  gap: 2px;
+}
+.seg span {
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+.seg span.on {
+  background: var(--panel-2);
+  color: var(--fg);
+}
+.panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sep {
+  height: 1px;
+  background: var(--line);
+  margin: 16px 0;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th {
+  text-align: left;
+  font: 600 11px/16px inherit;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.pill.on {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.menu {
+  position: absolute;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.notif {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.notif.unread {
+  background: var(--accent-subtle);
+}
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--panel-2);
+  font-size: 13px;
+}
+.banner.warn {
+  border-color: rgba(224, 163, 62, 0.5);
+  color: var(--warn);
+}
+.banner.err {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+.tag {
+  font: 500 12px/16px inherit;
+  color: var(--fg-muted);
+}
+.check {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--input);
+  display: grid;
+  place-items: center;
+}
+.check.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+.mono {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.keybox {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tick {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
+}
+.dim {
+  opacity: 0.55;
+}
+.cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.cover svg.scene {
+  width: 100%;
+  height: 100%;
+}

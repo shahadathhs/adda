@@ -45,3 +45,44 @@ for (const f of files) {
   );
   console.log(`rendered ${id}.png (${s.w}x${s.h})`);
 }
+
+// Contact sheet of every screen (only when rendering the whole set).
+if (!only.length) {
+  const shots = readdirSync(OUT)
+    .filter((f) => f.endsWith(".png") && f !== "overview.png")
+    .sort();
+  const tiles = shots
+    .map(
+      (f) =>
+        `<figure><div class="box"><img src="${pathToFileURL(join(OUT, f)).href}"></div><figcaption>${f.replace(/\.png$/, "")}</figcaption></figure>`,
+    )
+    .join("");
+  const cols = 4;
+  const rows = Math.ceil(shots.length / cols);
+  const w = 1900;
+  const h = 80 + rows * 312;
+  const sheet = `<!doctype html><meta charset="utf-8"><style>
+    body{margin:0;background:#0c0d10;color:#9aa1af;font:12px -apple-system,system-ui,sans-serif;padding:24px;width:${w - 48}px}
+    h1{font:700 18px/1 sans-serif;color:#edeef2;margin:0 0 18px}
+    .g{display:grid;grid-template-columns:repeat(${cols},1fr);gap:16px}
+    .box{height:275px;background:#14161b;border:1px solid #262a33;border-radius:6px;display:grid;place-items:center;overflow:hidden}
+    img{height:275px;width:100%;object-fit:contain}figure{margin:0}figcaption{margin-top:6px;font-family:ui-monospace,monospace}
+  </style><h1>adda: concept screens</h1><div class="g">${tiles}</div>`;
+  const sheetPath = join(work, "overview.html");
+  writeFileSync(sheetPath, sheet);
+  execFileSync(
+    CHROME,
+    [
+      "--headless=new",
+      "--disable-gpu",
+      "--hide-scrollbars",
+      "--force-device-scale-factor=1",
+      `--window-size=${w},${h}`,
+      "--virtual-time-budget=4000",
+      `--screenshot=${join(ROOT, "docs/design/overview.png")}`,
+      pathToFileURL(sheetPath).href,
+    ],
+    { stdio: "ignore" },
+  );
+  console.log("rendered overview.png");
+}
