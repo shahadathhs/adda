@@ -2,21 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useMe } from "@/lib/session";
+import { isSigningOut, useMe } from "@/lib/session";
 import { SiteFooter } from "@/components/site-footer";
 import { PageContainer } from "@/components/page-container";
 import { TopBar } from "@/components/top-bar";
 
-const AUTH_PREFIXES = ["/login", "/register", "/reset-password", "/forgot-password"];
-
-/** App chrome: the top bar over the page, then the footer. Auth pages render bare. */
+/** App chrome: the top bar over the page, then the footer. */
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  if (AUTH_PREFIXES.some((p) => pathname?.startsWith(p))) return <>{children}</>;
-
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar />
@@ -34,7 +29,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   const checked = useRef(false);
 
   useEffect(() => {
-    if (!isPending && !user && !checked.current) {
+    if (!isPending && !user && !checked.current && !isSigningOut()) {
       checked.current = true;
       router.replace("/login");
     }

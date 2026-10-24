@@ -77,7 +77,7 @@ export function UserMenu() {
               className={item}
               onClick={() => {
                 setOpen(false);
-                logout.mutate(undefined, { onSuccess: () => router.push("/login") });
+                logout.mutate(undefined, { onSuccess: () => router.push("/") });
               }}
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />

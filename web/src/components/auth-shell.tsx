@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Check, Radio } from "lucide-react";
+import { Check } from "lucide-react";
 import { AuthPreview } from "@/components/auth-preview";
 
 const claims = [
@@ -10,20 +9,13 @@ const claims = [
   "Self-hosted: your server, your data",
 ];
 
-/** Two columns: what adda is (with the live channel, if any) beside the form. */
+/** Two columns inside the page width: what adda is (with the live channel, if any) beside the form. */
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-[560px_1fr]">
-      <aside className="hidden flex-col justify-between border-r border-border bg-card p-10 lg:flex">
-        <Link href="/" className="flex items-center gap-2" aria-label="adda home">
-          <Radio className="h-[26px] w-[26px] text-primary" aria-hidden="true" />
-          <span className="font-display text-[22px] font-bold tracking-tight text-foreground">
-            adda
-          </span>
-        </Link>
-
-        <div>
-          <AuthPreview />
+    <div className="grid gap-6 px-4 py-8 sm:px-6 lg:min-h-[calc(100vh-9rem)] lg:grid-cols-[480px_1fr]">
+      <aside className="hidden flex-col justify-between rounded-lg border border-border bg-card p-8 lg:flex">
+        <AuthPreview />
+        <div className="mt-auto">
           <h2 className="max-w-[420px] font-display text-[28px] font-bold leading-8 tracking-tight text-foreground">
             Your own live-streaming site. Watch, chat, and keep every broadcast.
           </h2>
@@ -35,22 +27,15 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
               </li>
             ))}
           </ul>
+          <p className="mt-8 text-xs text-muted-foreground/80">
+            adda runs on the host&apos;s own server.
+          </p>
         </div>
-
-        <p className="text-xs text-muted-foreground/80">adda runs on the host&apos;s own server.</p>
       </aside>
 
-      <div className="flex min-h-screen flex-col">
-        <div className="flex items-center justify-between p-5 lg:hidden">
-          <Link href="/" className="flex items-center gap-2" aria-label="adda home">
-            <Radio className="h-5 w-5 text-primary" aria-hidden="true" />
-            <span className="font-display text-lg font-bold text-foreground">adda</span>
-          </Link>
-        </div>
-        <main className="flex flex-1 items-center justify-center px-6 py-10">
-          <div className="w-full max-w-[360px]">{children}</div>
-        </main>
-      </div>
+      <main className="flex items-center justify-center py-6">
+        <div className="w-full max-w-[360px]">{children}</div>
+      </main>
     </div>
   );
 }

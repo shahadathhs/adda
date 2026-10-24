@@ -34,4 +34,9 @@ test("a user sets a picture and a status, and clears the status", async ({ page 
   await expect(page.getByText("Status cleared")).toBeVisible();
   await page.getByRole("button", { name: "Account menu" }).click();
   await expect(page.getByRole("menu").getByText("Back at 6")).toHaveCount(0);
+
+  // Signing out lands on the home page, not the sign-in form.
+  await page.getByRole("menuitem", { name: "Sign out" }).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
 });

@@ -4,6 +4,10 @@ import type { Token, User } from "@/lib/types";
 
 export const sessionKeys = { me: ["session", "me"] as const };
 
+/** True while a sign-out is in flight, so a protected page does not redirect to /login on its way home. */
+let signingOut = false;
+export const isSigningOut = () => signingOut;
+
 const hasBrowserToken = () => typeof window !== "undefined" && !!getToken();
 
 export function useMe() {
@@ -47,6 +51,7 @@ export function useLogout() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async () => {
+      signingOut = true;
       const refresh = localStorage.getItem("adda_refresh_token");
       if (refresh) {
         try {
@@ -62,6 +67,7 @@ export function useLogout() {
     // just silently recreates its query). Explicitly nulling the session
     // query forces the notification that flips the app to the login screen.
     onSettled: () => {
+      setTimeout(() => (signingOut = false), 1000);
       socket.disconnect();
       qc.removeQueries();
       qc.setQueryData(sessionKeys.me, null);
