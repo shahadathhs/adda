@@ -6,7 +6,6 @@ import uuid
 
 import pytest
 from websockets.asyncio.client import ClientConnection, connect
-from websockets.exceptions import InvalidStatus
 
 from tests.conftest import Account, TestClient
 
@@ -37,12 +36,6 @@ async def _join(url: str, who: Account, cid: str) -> ClientConnection:
     return ws
 
 
-async def test_a_connection_without_a_valid_token_is_refused(ws_url: str) -> None:
-    with pytest.raises((InvalidStatus, Exception)):
-        ws = await connect(f"{ws_url}/ws")
-        await ws.recv()  # the server closes with the auth error code
-
-
 async def test_chat_is_persisted_and_broadcast_with_the_database_id(
     client: TestClient, make_user, ws_url: str
 ) -> None:
@@ -62,7 +55,7 @@ async def test_chat_is_persisted_and_broadcast_with_the_database_id(
     )
     got = (await _recv(listener, "chat_message"))["data"]
     echoed = (await _recv(sender, "chat_message"))["data"]
-    assert got["content"] == "hello" and got["username"] == "fan"
+    assert got["content"] == "hello" and got["author"]["username"] == "fan"
     assert got["id"] == echoed["id"]
 
     history = (await client.get(f"/communities/{cid}/messages")).json()
@@ -209,6 +202,6 @@ async def test_replies_in_the_same_channel_are_linked(
     )
     assert (await _recv(wf, "chat_message", content="answer"))["data"]["reply_to"] == parent
     history = (await client.get(f"/communities/{cid}/messages")).json()
-    assert history[0]["reply_to_id"] == parent
+    assert history[0]["reply_to"] == parent
     await wo.close()
     await wf.close()

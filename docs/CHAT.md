@@ -191,8 +191,9 @@ duplicates.
 1. Migration: messages by channel, drop text rooms, drop memberships (done:
    `d9a3f1c2b7e4`; also adds `channel_moderators`, soft delete and the
    300-character limit).
-2. Contract: all new types in `protocol.py` and `realtime.ts`.
-3. Messages, identity, badges, history; guest rejection.
+2. Contract: all new types in `protocol.py` and `realtime.ts` (author and
+   error codes done; the rest land with their feature).
+3. Messages, identity, badges, history; guest rejection (done).
 4. Replies, mentions, notifications plumbing.
 5. Reactions, pins.
 6. Emotes.

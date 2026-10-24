@@ -140,6 +140,33 @@
 }
 
 @layer base {
+  /* Every clickable control shows the pointer; disabled ones do not. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="radio"]:not(:disabled),
+  [role="tab"]:not(:disabled),
+  [role="switch"]:not(:disabled),
+  [role="menuitem"]:not([aria-disabled="true"]),
+  summary,
+  select:not(:disabled),
+  input:is(
+      [type="submit"],
+      [type="button"],
+      [type="reset"],
+      [type="checkbox"],
+      [type="radio"],
+      [type="file"]
+    ):not(:disabled),
+  label[for] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input:is([type="submit"], [type="button"], [type="reset"]):disabled {
+    cursor: not-allowed;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
 from modules.auth.router import router as auth_router
+from modules.chat.router import identity_router as identity_router
 from modules.chat.router import router as chat_router
 from modules.communities.admin_router import router as communities_admin_router
 from modules.communities.router import router as communities_router
@@ -69,6 +70,7 @@ async def health() -> dict[str, str]:
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(communities_router, prefix=settings.api_prefix)
 app.include_router(chat_router, prefix=settings.api_prefix)
+app.include_router(identity_router, prefix=settings.api_prefix)
 app.include_router(communities_admin_router, prefix=settings.api_prefix)
 app.include_router(users_router, prefix=settings.api_prefix)
 app.include_router(streaming_router, prefix=settings.api_prefix)

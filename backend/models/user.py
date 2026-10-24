@@ -31,6 +31,10 @@ class User(Base):
     system_role: Mapped[str] = mapped_column(
         String(20), default=SystemRole.USER, server_default=text("'user'")
     )
+    # How this account appears in chat: "named" or "anonymous" (see IdentityMode).
+    identity_mode: Mapped[str] = mapped_column(
+        String(10), default="named", server_default=text("'named'")
+    )
     # Suspended accounts cannot log in (admin moderation lever).
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=text("true"))
 

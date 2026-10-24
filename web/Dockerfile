@@ -15,6 +15,7 @@ ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
     NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm install --frozen-lockfile --filter adda-web...
+COPY tsconfig.base.json ./
 COPY web ./web
 RUN pnpm --filter adda-web build
 

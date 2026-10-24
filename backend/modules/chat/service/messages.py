@@ -6,8 +6,11 @@ from datetime import UTC, datetime
 from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.community import Community
 from models.message import Message
 from models.user import User
+from modules.chat.service.badges import badges_for
+from modules.chat.service.identity import public_author
 
 MAX_LENGTH = 300
 
@@ -52,7 +55,13 @@ async def create_message(
             if parent is not None and parent.community_id == community_id:
                 reply_to_id = parent.id
 
-    row = Message(community_id=community_id, user_id=user.id, content=text, reply_to_id=reply_to_id)
+    row = Message(
+        community_id=community_id,
+        user_id=user.id,
+        content=text,
+        display_mode=user.identity_mode,
+        reply_to_id=reply_to_id,
+    )
     db.add(row)
     await db.commit()
     await db.refresh(row)
@@ -90,16 +99,23 @@ async def soft_delete(db: AsyncSession, message: Message, by: User) -> None:
     await db.commit()
 
 
-def wire_payload(message: Message, user: User, channel: str) -> dict:
-    """The `chat_message` payload broadcast to subscribers."""
-    return {
+async def wire_payload(
+    db: AsyncSession, community: Community, message: Message, user: User, channel: str
+) -> dict:
+    """The `chat_message` payload broadcast to subscribers (public author only)."""
+    badges = (await badges_for(db, community, {user.id})).get(user.id, [])
+    return history_payload(message, user, badges, channel)
+
+
+def history_payload(message: Message, user: User, badges: list[str], channel: str | None = None):
+    payload = {
         "id": str(message.id),
-        "channel": channel,
         "community_id": str(message.community_id),
-        "user_id": str(user.id),
-        "username": user.username,
-        "display_name": user.display_name,
+        "author": public_author(user, message.display_mode, badges),
         "content": message.content,
         "created_at": message.created_at.isoformat(),
         "reply_to": str(message.reply_to_id) if message.reply_to_id else None,
     }
+    if channel is not None:
+        payload["channel"] = channel
+    return payload

@@ -24,4 +24,5 @@ RUN uv sync --frozen --no-install-project --no-dev
 COPY . .
 
 EXPOSE 7001
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7001"]
+# Apply pending migrations on every start, then serve (safe to repeat).
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn main:app --host 0.0.0.0 --port 7001"]

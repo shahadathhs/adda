@@ -65,15 +65,15 @@ screen each one belongs to, is in [docs/FLOWS.md](docs/FLOWS.md).
 | F2     | Home, channel pages (SSR), HLS player, viewer counts                                                                          | Built; search and the new home layout in progress          |
 | F3     | Create channel, stream key, rotate key, edit, delete                                                                          | Built; edit and delete flows to verify                     |
 | F4     | Go live, offline detection, force-stop                                                                                        | Built                                                      |
-| F5     | Chat: persisted history, send, delete, moderators                                                                             | Partial; timeouts, bans, slow mode and rate limits planned |
+| F5     | Chat: persisted history, send, delete, moderators, badges                                                                     | Partial; timeouts, bans, slow mode and rate limits planned |
 | F6     | Follows                                                                                                                       | Built                                                      |
 | F7     | Recordings and thumbnails                                                                                                     | Built; download and processing state to verify             |
 | F8     | Admin API                                                                                                                     | Partial                                                    |
 | F9–F16 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode, channel profiles, recording comments | Planned ([chat design](docs/CHAT.md))                      |
 
-Backend tests run with `make test` (75 so far: accounts and token rotation,
+Backend tests run with `make test` (84 so far: accounts and token rotation,
 channel lifecycle, follows, moderators, chat history and live chat over a real
-WebSocket, the stream publish webhook, and the data migration). Chat, notifications
+WebSocket, guests and identity mode, the stream publish webhook, and the data migration). Chat, notifications
 and the browser end-to-end tests come with their milestones
 ([docs/SCOPE.md](docs/SCOPE.md)).
 

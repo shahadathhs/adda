@@ -12,18 +12,27 @@ class AddaSocket {
   private ws: WebSocket | null = null;
   private handlers = new Set<MessageHandler>();
   private channels = new Set<string>();
+  private openedWith: string | null = null;
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private pingTimer: ReturnType<typeof setInterval> | null = null;
+  private statusHandlers = new Set<(connected: boolean) => void>();
   public connected = false;
 
+  /** Connect as the signed-in account, or as a read-only guest when there is no session. */
   connect(): void {
     const token = getToken();
-    if (!token) return;
-    if (this.ws && this.ws.readyState <= WebSocket.OPEN) return;
+    if (this.ws && this.ws.readyState <= WebSocket.OPEN) {
+      // Signed in or out since this socket opened: reopen under the right identity.
+      if (this.openedWith === (token ?? null)) return;
+      this.ws.onclose = null;
+      this.ws.close();
+      this.ws = null;
+      this.setConnected(false);
+    }
 
     // If the access token is about to expire, rotate it before connecting.
-    if (isTokenExpired() && getRefreshToken()) {
+    if (token && isTokenExpired() && getRefreshToken()) {
       void refreshSession().then((ok) => {
         if (ok) this.open();
       });
@@ -34,12 +43,13 @@ class AddaSocket {
 
   private open(): void {
     const token = getToken();
-    if (!token) return;
+    this.openedWith = token ?? null;
 
-    this.ws = new WebSocket(`${wsBaseUrl()}/ws?token=${encodeURIComponent(token)}`);
+    const query = token ? `?token=${encodeURIComponent(token)}` : "";
+    this.ws = new WebSocket(`${wsBaseUrl()}/ws${query}`);
 
     this.ws.onopen = () => {
-      this.connected = true;
+      this.setConnected(true);
       this.reconnectAttempts = 0;
       this.startPing();
       // Re-subscribe to any channels we were on before a reconnect.
@@ -56,7 +66,7 @@ class AddaSocket {
     };
 
     this.ws.onclose = () => {
-      this.connected = false;
+      this.setConnected(false);
       this.stopPing();
       this.scheduleReconnect();
     };
@@ -64,6 +74,17 @@ class AddaSocket {
     this.ws.onerror = () => {
       this.ws?.close();
     };
+  }
+
+  private setConnected(value: boolean): void {
+    this.connected = value;
+    this.statusHandlers.forEach((h) => h(value));
+  }
+
+  /** Notified when the connection opens or drops (for "reconnecting" states). */
+  onStatus(handler: (connected: boolean) => void): () => void {
+    this.statusHandlers.add(handler);
+    return () => this.statusHandlers.delete(handler);
   }
 
   private scheduleReconnect() {
@@ -113,6 +134,7 @@ class AddaSocket {
 
   disconnect(): void {
     this.stopPing();
+    this.openedWith = null;
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.reconnectTimer = null;
     this.ws?.close();

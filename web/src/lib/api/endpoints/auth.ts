@@ -1,4 +1,4 @@
-import type { Token, User } from "@/lib/types";
+import type { IdentityMode, Token, User } from "@/lib/types";
 import { request } from "../client";
 
 export const register = (data: {
@@ -48,6 +48,9 @@ export const updateProfile = (data: {
     method: "PATCH",
     body: JSON.stringify(data),
   });
+
+export const setIdentityMode = (mode: IdentityMode) =>
+  request<User>("/api/me/identity-mode", { method: "PUT", body: JSON.stringify({ mode }) });
 
 export const changePassword = (current_password: string, new_password: string) =>
   request<{ message: string }>("/api/auth/change-password", {

@@ -202,13 +202,16 @@ identity, badges, replies and mentions, reactions, pins, emotes, polls,
 moderation and rate limits. Contract first: protocol types in both
 `protocol.py` and `web/src/lib/types/realtime.ts`.
 
+- [x] Guests connect read-only; every write over the socket is `auth_required`
+- [x] Identity mode, public authors and badges on the wire and in history
+- [ ] Replies and mentions, reactions, pins, emotes, polls, moderation
 - [ ] Each feature has pytest coverage, including guests being rejected
 - [ ] Two-instance test: chat, polls and reactions reach clients on both
 - [ ] Screens 02, 07, M2 built and wired
 
 ### M3 — Accounts and notifications (F1, F13, F14)
 
-- [ ] Identity mode setting and its reveal rule, audited
+- [x] Identity mode setting (chat settings tab) and its audited reveal rule (API)
 - [ ] Notifications: bell, mark read, preferences; optional email with the
       once-per-hour limit; SMTP-off behaviour
 - [ ] Screens 08–13 built and wired

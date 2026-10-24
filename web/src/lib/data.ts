@@ -16,7 +16,7 @@ import {
 } from "@/lib/api";
 import type { ChatMessage, Community, Recording, StreamStatusPayload } from "@/lib/types";
 import { apiBaseUrl } from "@/lib/config";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export const webKeys = {
   discover: (q?: string) => ["discover", q ?? ""] as const,
@@ -127,11 +127,12 @@ export function useRecordings(id: string, enabled: boolean) {
 export function useCommunityChat(communityId: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [online, setOnline] = useState(0);
-  const topic = useRef<string | null>(null);
+  const [connected, setConnected] = useState(() => socket.connected);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<{ code: string; message: string } | null>(null);
 
   useEffect(() => {
     const channel = chatChannel(communityId);
-    topic.current = channel;
     let cancelled = false;
 
     // Merge by id so a message that arrives live while history loads is never doubled.
@@ -142,27 +143,31 @@ export function useCommunityChat(communityId: string) {
         .slice(-200);
     };
 
-    chatHistory(communityId)
-      .then((page) => {
-        if (cancelled) return;
-        const history: ChatMessage[] = page.map((m) => ({
-          id: m.id,
-          channel,
-          community_id: m.community_id,
-          user_id: m.user_id,
-          username: m.username,
-          display_name: m.display_name,
-          content: m.content,
-          created_at: m.created_at,
-          reply_to: m.reply_to_id,
-        }));
-        setMessages((prev) => merge(prev, history));
-      })
-      .catch(() => undefined);
+    const loadHistory = () =>
+      chatHistory(communityId)
+        .then((page) => {
+          if (cancelled) return;
+          const history: ChatMessage[] = page.map((m) => ({ ...m, channel }));
+          setMessages((prev) => merge(prev, history));
+        })
+        .catch(() => undefined)
+        .finally(() => !cancelled && setLoaded(true));
+    void loadHistory();
 
     socket.connect();
     socket.subscribe(channel);
+    let wasDown = false;
+    const offStatus = socket.onStatus((up) => {
+      setConnected(up);
+      // Catch up on whatever was missed while the socket was down.
+      if (up && wasDown) void loadHistory();
+      wasDown = !up;
+    });
     const off = socket.on((msg) => {
+      if (msg.type === "error" && msg.data) {
+        setError(msg.data as { code: string; message: string });
+        return;
+      }
       if (msg.channel !== channel) return;
       if (msg.type === "chat_message") {
         setMessages((prev) => merge(prev, [msg.data as unknown as ChatMessage]));
@@ -174,6 +179,7 @@ export function useCommunityChat(communityId: string) {
     return () => {
       cancelled = true;
       off();
+      offStatus();
       socket.unsubscribe(channel);
     };
   }, [communityId]);
@@ -181,7 +187,14 @@ export function useCommunityChat(communityId: string) {
   return {
     messages,
     online,
-    send: (content: string) => socket.sendChat(chatChannel(communityId), content),
+    connected,
+    loaded,
+    error,
+    clearError: () => setError(null),
+    send: (content: string) => {
+      setError(null);
+      socket.sendChat(chatChannel(communityId), content);
+    },
   };
 }
 

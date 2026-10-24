@@ -3,6 +3,9 @@
 This must stay in sync with `web/src/lib/types/realtime.ts`. When adding a realtime
 feature, add the message type here first, then handle it on both sides.
 
+Connections are accounts (valid `token`) or read-only guests (no token); guests
+can subscribe to channel topics but any write gets `error` `auth_required`.
+
 Channels are namespaced strings, e.g.:
     community/<id>            — channel-wide events (stream_status)
     community/<id>/chat       — live chat (persisted)
@@ -57,29 +60,27 @@ def outgoing(
 
 
 # ── Typed payloads ────────────────────────────────────────────────
+class ChatAuthorPayload(BaseModel):
+    """Public author of a message. Anonymous authors have no id or username."""
+
+    id: str | None
+    username: str | None
+    display_name: str
+    avatar_url: str | None
+    badges: list[str]
+
+
 class ChatMessagePayload(BaseModel):
     """Shape of the `data` field for a `chat_message`."""
 
     id: str
     channel: str
-    user_id: str
-    username: str
-    display_name: str
+    community_id: str
+    author: ChatAuthorPayload
     content: str
     created_at: str  # ISO 8601
     reply_to: str | None = None
 
 
-class PresencePayload(BaseModel):
-    channel: str
-    online_count: int
-    user_ids: list[str]
-
-
-class StreamStatusPayload(BaseModel):
-    """Shape of the `data` field for a `stream_status`."""
-
-    community_id: str
-    is_live: bool
-    viewers: int = 0
-    started_at: str | None = None  # ISO 8601
+# `error` messages carry `data.code`: auth_required, forbidden, invalid_channel,
+# not_found, empty, too_long.

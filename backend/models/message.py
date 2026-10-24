@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Index, String
+from sqlalchemy import DateTime, ForeignKey, Index, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
@@ -23,6 +23,10 @@ class Message(Base):
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     content: Mapped[str] = mapped_column(String(300))
+    # Snapshot of the author's identity mode when sent; the account is always recorded.
+    display_mode: Mapped[str] = mapped_column(
+        String(10), default="named", server_default=text("'named'")
+    )
     reply_to_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("messages.id", ondelete="SET NULL"), nullable=True
     )

@@ -97,7 +97,7 @@ ps: ## List running containers
 infra: env ## Start the infra (postgres + redis + mediamtx) and wait until it is ready
 	$(COMPOSE) up -d --wait postgres redis mediamtx
 
-dev: infra ## Run backend (:7001) + web (:5173) with hot reload (starts postgres, redis, mediamtx first)
+dev: infra migrate ## Run backend (:7001) + web (:5173) with hot reload (starts infra, applies migrations)
 	@trap 'kill 0' EXIT; \
 	(cd $(BACKEND_DIR) && $(UV) uvicorn main:app --reload --port 7001) & \
 	(cd $(FRONTEND_DIR) && $(PNPM) dev)

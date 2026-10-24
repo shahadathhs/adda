@@ -34,7 +34,7 @@ async def test_history_is_public_and_newest_first(client: TestClient, make_user)
     resp = await client.get(f"/communities/{cid}/messages")  # no token: guests can read
     assert resp.status_code == 200
     assert [m["content"] for m in resp.json()] == ["message 2", "message 1", "message 0"]
-    assert resp.json()[0]["username"] == "owner"
+    assert resp.json()[0]["author"]["username"] == "owner"
 
 
 async def test_history_pages_with_a_cursor_without_gaps_or_repeats(

@@ -1,10 +1,11 @@
+import type { ChatAuthor } from "./chat";
+
+/** A live chat message (`chat_message`); same shape as a history message plus its channel. */
 export interface ChatMessage {
   id: string;
   channel: string;
   community_id: string;
-  user_id: string;
-  username: string;
-  display_name: string;
+  author: ChatAuthor;
   content: string;
   created_at: string;
   reply_to: string | null;
@@ -36,3 +37,7 @@ export interface StreamStatusPayload {
   viewers: number;
   started_at: string | null;
 }
+
+/** Codes in the `data.code` of a server `error` message. */
+export type ChatErrorCode =
+  "auth_required" | "forbidden" | "invalid_channel" | "not_found" | "empty" | "too_long";

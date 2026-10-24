@@ -16,6 +16,7 @@ class UserOut(BaseModel):
     avatar_url: str | None = None
     bio: str | None = None
     system_role: str = "user"
+    identity_mode: str = "named"
 
     @field_validator("id", mode="before")
     @classmethod

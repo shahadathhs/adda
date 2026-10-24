@@ -1,7 +1,18 @@
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel
+
+
+class AuthorOut(BaseModel):
+    """The public author of a message. Anonymous authors carry no id or name."""
+
+    id: uuid.UUID | None = None
+    username: str | None = None
+    display_name: str
+    avatar_url: str | None = None
+    badges: list[str] = []
 
 
 class MessageOut(BaseModel):
@@ -9,9 +20,11 @@ class MessageOut(BaseModel):
 
     id: uuid.UUID
     community_id: uuid.UUID
-    user_id: uuid.UUID
-    username: str
-    display_name: str
+    author: AuthorOut
     content: str
-    reply_to_id: uuid.UUID | None = None
+    reply_to: uuid.UUID | None = None
     created_at: datetime
+
+
+class IdentityModeIn(BaseModel):
+    mode: Literal["named", "anonymous"]

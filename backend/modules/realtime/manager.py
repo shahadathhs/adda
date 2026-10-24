@@ -36,6 +36,7 @@ class Connection:
     user_id: str
     username: str
     display_name: str
+    is_guest: bool = False
     channels: set[str] = field(default_factory=set)
 
 
