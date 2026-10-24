@@ -56,15 +56,15 @@ Messages are keyed by the streamer channel (`community_id`). The text-room
 | `message_mentions`        | `message_id`, `user_id`                                                                                                                                   | Unique pair. Drives highlight and bell.                                      |
 | `message_reactions`       | `message_id`, `user_id`, `emoji`                                                                                                                          | Unique triple. Emoji from an allowlist plus channel emotes.                  |
 | `emotes`                  | `community_id`, `name`, `file_key`, `created_by`                                                                                                          | Unique `(community_id, name)`; max 50 per channel.                           |
-| `communities` (additions) | `pinned_message_id`, `slow_mode_seconds`, `followers_only`, `about`, `links` (json), `banner_key`                                                         | Settings the studio edits.                                                   |
+| `communities` (additions) | `pinned_message_id`, `slow_mode_seconds`, `followers_only`, `links` (json); the about text is `description`, the banner is `banner_url`                   | Settings the studio edits.                                                   |
 | `announcements`           | `community_id`, `body`, `pinned`, `created_by`                                                                                                            | Channel page posts (F15).                                                    |
 | `polls`                   | `community_id`, `question`, `created_by`, `closes_at`, `status` (`open`/`closed`)                                                                         | One open poll per channel (partial unique index).                            |
 | `poll_options`            | `poll_id`, `position`, `label`, `votes`                                                                                                                   | `votes` written on close.                                                    |
 | `poll_votes`              | `poll_id`, `user_id`, `option_id`                                                                                                                         | Unique `(poll_id, user_id)`.                                                 |
 | `channel_bans`            | `community_id`, `user_id`, `expires_at`, `reason`, `created_by`                                                                                           | `expires_at` null means permanent.                                           |
 | `mod_actions`             | `community_id`, `actor_id`, `action`, `target_user_id`, `message_id`, `detail`                                                                            | Audit: delete, timeout, ban, lift, pin, reveal.                              |
-| `recording_comments`      | `recording_id`, `user_id`, `at_seconds`, `body`, `display_mode`, `deleted_at`                                                                             | F16; same identity rules as chat.                                            |
-| `notifications`           | `user_id`, `kind`, `payload` (json), `read_at`                                                                                                            | Bell. Kinds: `went_live`, `mention`, `reply`, `recording_comment`.           |
+| `recording_comments`      | `community_id`, `recording_path`, `user_id`, `at_seconds`, `body`, `display_mode`, `deleted_at`                                                           | F16; same identity rules as chat.                                            |
+| `notifications`           | `user_id`, `kind`, `payload` (json), `read_at`                                                                                                            | Bell. Kinds: `went_live`, `mention`, `reply`.                                |
 | `notification_prefs`      | `user_id`, `community_id` (nullable), `bell`, `email`                                                                                                     | Per-channel overrides; `community_id` null is the default.                   |
 | `users` (additions)       | `identity_mode` (`named`/`anonymous`)                                                                                                                     | Chosen in settings (screen 12).                                              |
 
@@ -93,51 +93,62 @@ account cannot be mentioned by name because its name is never shown.
 
 ## Wire protocol
 
-Channel strings keep their current form (`community:<id>:chat`,
-`community:<id>`, `user:<id>`). Types below are added to both
-`protocol.py` and `realtime.ts`.
+Topics are slash-separated: `community/<id>/chat` (chat, poll, pin, reactions),
+`community/<id>` (stream status), `user/<id>` (your own notifications and
+moderation notices; only that account may subscribe). The types live in
+`backend/modules/realtime/protocol.py` and `web/src/lib/types/realtime.ts`.
+
+A connection is an account (`?token=` is valid), a read-only guest (no token) or
+refused (bad token). Guests may subscribe to channel topics and read; any write
+gets an `error` with code `auth_required`.
 
 **Client to server**
 
-| Type                               | Data                        | Rules                                                                    |
-| ---------------------------------- | --------------------------- | ------------------------------------------------------------------------ |
-| `chat_message`                     | `content`, `reply_to?`      | Account only; length, rate limit, ban, slow mode, followers-only checked |
-| `react`                            | `message_id`, `emoji`, `on` | Account only; toggles                                                    |
-| `vote`                             | `poll_id`, `option_id`      | Account only; once per poll                                              |
-| `subscribe`, `unsubscribe`, `ping` | as today                    | Guests may subscribe, never write                                        |
+| Type                               | Data                        | Rules                                                                                                    |
+| ---------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `chat_message`                     | `content`, `reply_to?`      | Account only. Checked in order: ban or timeout, followers-only, slow mode, rate limit, length, duplicate |
+| `react`                            | `message_id`, `emoji`, `on` | Account only; allow-list of 8 emoji; at most 5 distinct per account per message                          |
+| `vote`                             | `poll_id`, `option_id`      | Account only; once per poll; the voter gets their own `poll_update` back                                 |
+| `subscribe`, `unsubscribe`, `ping` | `channel`                   | Guests may subscribe, never write                                                                        |
 
 **Server to client**
 
-| Type                                                         | Meaning                                                                                            |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `chat_message`                                               | New message (public author, `reply_to` preview, `mentions`, `emotes` used)                         |
-| `message_deleted`                                            | Message id; clients render a tombstone where it was replied to                                     |
-| `reaction_update`                                            | `{ message_id, counts }`, batched every 250 ms per message                                         |
-| `pin_update`                                                 | Pinned message (or null)                                                                           |
-| `poll_started`, `poll_update`, `poll_closed`                 | Poll with options; `poll_update` throttled to 2 per second                                         |
-| `chat_settings`                                              | Slow mode and followers-only changed                                                               |
-| `moderation`                                                 | Sent to the affected account only: timed out, banned, lifted, with expiry                          |
-| `presence`, `stream_status`, `notification`, `error`, `pong` | as today; `error.code` includes `auth_required`, `rate_limited`, `banned`, `slow_mode`, `too_long` |
+| Type                                         | Meaning                                                                                                                                                                                                                                                                      |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chat_message`                               | New message: public `author`, `reply` preview, `mentions` (ids), `reactions` (counts)                                                                                                                                                                                        |
+| `message_deleted`                            | `{message_id}`; clients drop it and show a tombstone on replies to it                                                                                                                                                                                                        |
+| `reaction_update`                            | `{message_id, counts}`, coalesced to one per message per 250 ms                                                                                                                                                                                                              |
+| `pin_update`                                 | `{message}` or `{message: null}`                                                                                                                                                                                                                                             |
+| `poll_started`, `poll_update`, `poll_closed` | A poll with `options[{id,label,votes,percent}]`; updates at most twice a second                                                                                                                                                                                              |
+| `chat_settings`                              | `{slow_mode_seconds, followers_only}`                                                                                                                                                                                                                                        |
+| `moderation`                                 | To the affected account only: `{community_id, action: timeout/ban/lift, expires_at}`                                                                                                                                                                                         |
+| `notification`                               | To the account only: a new bell entry                                                                                                                                                                                                                                        |
+| `presence`, `stream_status`, `error`, `pong` | `error.code` is one of `auth_required`, `forbidden`, `invalid_channel`, `not_found`, `empty`, `too_long`, `banned`, `timed_out`, `followers_only`, `slow_mode`, `rate_limited`, `duplicate`, `bad_emoji`, `too_many_reactions`, `poll_closed`, `bad_option`, `already_voted` |
 
-Every server message about chat content carries an `id`, so a reconnecting
-client can ask for `GET /chat/messages?after=<id>` and merge without
-duplicates.
+Chat history answers `GET /communities/{id}/messages?after=<id>` with what was
+sent since that message, so a client that reconnects merges the gap by id
+without reloading the page.
 
 ## REST
 
-| Endpoint                                                  | Purpose                                    |
-| --------------------------------------------------------- | ------------------------------------------ |
-| `GET /communities/{id}/messages?before=&limit=`           | History, cursor pagination, public authors |
-| `GET /chat/messages/{id}/author`                          | Reveal (moderators); audited               |
-| `POST/DELETE /communities/{id}/pin`                       | Pin and unpin (owner, moderator)           |
-| `GET/POST/DELETE /communities/{id}/emotes`                | List, upload (multipart), remove           |
-| `POST /communities/{id}/polls`, `POST /polls/{id}/end`    | Start and end a poll                       |
-| `PUT /communities/{id}/chat-settings`                     | Slow mode, followers-only                  |
-| `GET/POST/DELETE /communities/{id}/bans`                  | Timeouts and bans                          |
-| `GET/POST/DELETE /communities/{id}/moderators`            | Owner manages moderators                   |
-| `GET/POST/DELETE /recordings/{id}/comments`               | F16                                        |
-| `GET /notifications`, `POST /notifications/read`          | Bell                                       |
-| `GET/PUT /me/notification-prefs`, `PUT /me/identity-mode` | Settings                                   |
+| Endpoint                                                        | Who                  | Purpose                                                |
+| --------------------------------------------------------------- | -------------------- | ------------------------------------------------------ |
+| `GET /communities/{id}/messages?before=&after=&limit=`          | anyone               | History, newest first, public authors                  |
+| `DELETE /communities/{id}/messages/{mid}`                       | author, mods         | Soft delete (audited when a moderator does it)         |
+| `GET /communities/{id}/chat-state`                              | anyone               | Settings, pinned message, poll and emotes in one call  |
+| `PUT /communities/{id}/chat-settings`                           | owner, mods          | Slow mode (0, 5, 30 s) and followers-only              |
+| `POST` / `DELETE /communities/{id}/pin`                         | owner, mods          | Pin and unpin                                          |
+| `GET` / `POST /communities/{id}/bans`, `DELETE .../bans/{id}`   | owner, mods          | Timeouts and bans; only the owner acts on a moderator  |
+| `GET /communities/{id}/mod-actions`                             | owner, mods          | Recent moderation log (reveals are not listed)         |
+| `GET /chat/messages/{id}/author`                                | owner, mods, admin   | Reveal an anonymous author; always audited             |
+| `PUT /me/identity-mode`                                         | account              | `named` or `anonymous`                                 |
+| `POST /communities/{id}/polls`, `POST /polls/{id}/end`, `/vote` | mods, mods, accounts | One open poll per channel                              |
+| `GET` / `POST` / `DELETE /communities/{id}/emotes[/{name}]`     | anyone / owner       | PNG, GIF or WebP, 256 KB, 128 x 128 px, 50 per channel |
+| `GET`/`POST`/`DELETE /communities/{id}/announcements`           | anyone / owner       | Channel page posts, pinned first                       |
+| `POST` / `DELETE /communities/{id}/banner`                      | owner                | PNG, JPEG or WebP up to 2 MB                           |
+| `GET` / `POST /recordings/comments`, `DELETE .../{id}`          | anyone / accounts    | Comments at a time in a recording                      |
+| `GET /notifications`, `POST /notifications/read`                | account              | The bell                                               |
+| `GET` / `PUT /me/notification-prefs`                            | account              | Bell and email switches, per channel                   |
 
 ## Rules and limits
 
@@ -188,17 +199,20 @@ duplicates.
 
 ## Build order
 
-1. Migration: messages by channel, drop text rooms, drop memberships (done:
-   `d9a3f1c2b7e4`; also adds `channel_moderators`, soft delete and the
-   300-character limit).
-2. Contract: all new types in `protocol.py` and `realtime.ts` (author and
-   error codes done; the rest land with their feature).
-3. Messages, identity, badges, history; guest rejection (done).
-4. Replies, mentions, notifications plumbing.
-5. Reactions, pins.
-6. Emotes.
-7. Polls.
-8. Moderation and rate limits.
-9. Recording comments.
+All steps are built; each shipped with its pytest coverage and screens.
 
-Each step ships with its pytest coverage and its screens (SCOPE, M2).
+1. Migration: messages by channel, drop text rooms and memberships (`d9a3f1c2b7e4`)
+2. Contract: every type in `protocol.py` and `realtime.ts`
+3. Messages, identity, badges, history; guest rejection
+4. Replies, mentions, notifications
+5. Reactions, pins
+6. Emotes
+7. Polls
+8. Moderation, rate limits, slow mode, followers-only
+9. Recording comments, announcements, channel links and banner
+
+Tests live in `backend/tests/` (`test_chat_rules.py`, `test_polls.py`,
+`test_emotes.py`, `test_notifications.py`, `test_identity_guests.py`,
+`test_channel_page.py`, `test_recording_comments.py`) and `e2e/` (browser).
+`test_two_instances.py` runs two real server processes against one Redis and is
+skipped unless `ADDA_TEST_REDIS_URL` is set.

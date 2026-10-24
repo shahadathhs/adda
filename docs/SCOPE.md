@@ -59,9 +59,9 @@ viewer, streamer, admin — uses the browser.
 install script. There is **no hosted demo**: streaming ingest (RTMP/HLS) needs
 a server that cannot run on Vercel. The public face is the **marketing and docs
 site** (`site/`, on Vercel), which carries the proof: screenshots, a recorded
-walkthrough, the architecture, and measured numbers. The site is being moved
-from Astro to Next.js (docs as MDX); it stays a separate app from `web/` so a
-self-hosted install never ships marketing pages.
+walkthrough, the architecture, and measured numbers. The site is a static
+Next.js app; it stays separate from `web/` so a self-hosted install never ships
+marketing pages.
 
 ## The flows (all must close)
 
@@ -195,83 +195,71 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
       is persisted and the web chat loads it
 - [x] `@app.on_event("startup")` replaced by a lifespan handler
 
-### M2a — Bring the app up to the screens (before the rest of M2)
+### M2a — Bring the app up to the screens
 
-The app must match the concept renders in `docs/design/screens` before more
-features are layered on. Preview any screen with invented data at
-`/design/<screen>` (development only) and compare it with its render; use
-`scripts/shot.sh <route> <out.png> [width] [height]` to capture it.
+The app matches the concept renders in `docs/design/screens`. Preview any screen with
+invented data at `/design/<screen>` (development only) and capture it with
+`scripts/shot.sh <route> <out.png> [width] [height]`.
 
-- [x] App shell: top bar (Following, Browse, search, bell, avatar), guest bar
-- [x] Home (01): following rail, featured live channel, live grid, channels,
-      recordings; empty and loading states
-- [x] Channel live and offline (02, 03, 07, 21): player overlay, title row,
-      tabs, chat column, about column, guest prompt, reconnecting state
-- [x] Browse and search (06) at `/search`, not found (19), stream ended (20)
-- [x] Account: sign in, create account, reset (08–10), profile and password
-      settings (12); notification settings (13) arrive with M3
-- [x] Studio: setup, live, channel page, moderators (14, 15, 17, 18) as routes under
-      `/studio`; polls, pins, slow mode, banner, links, announcements, timeouts
-      and emotes wait for their backends (M2, M4)
-- [x] Mobile home (M1), recording playback (04) without timestamped comments
-- [ ] Channel profile (05): needs banner, links and announcements (M4)
-- [ ] Screenshot comparison for every screen in CI-less form (script + review)
+- [x] App shell, home, channel live and offline, guest, stream ended, reconnecting
+- [x] Browse and search, not found, mobile home
+- [x] Sign in, create account, reset, settings (profile, notifications, password)
+- [x] Studio: setup, live, emotes, channel page, moderators
+- [x] Recording playback with timestamped comments, channel profile
 
 ### M2 — Realtime chat platform (F5, F9–F12)
 
-Backend and web together, in the order of [CHAT.md](CHAT.md): messages and
-identity, badges, replies and mentions, reactions, pins, emotes, polls,
-moderation and rate limits. Contract first: protocol types in both
-`protocol.py` and `web/src/lib/types/realtime.ts`.
-
 - [x] Guests connect read-only; every write over the socket is `auth_required`
 - [x] Identity mode, public authors and badges on the wire and in history
-- [ ] Replies and mentions, reactions, pins, emotes, polls, moderation
-- [ ] Each feature has pytest coverage, including guests being rejected
-- [ ] Two-instance test: chat, polls and reactions reach clients on both
-- [ ] Screens 02, 07, M2 built and wired
+- [x] Replies with previews and tombstones, @mentions, reactions (allow-list, per-message
+      cap, batched updates), pinned message, emotes (sniffed uploads, limits), polls
+      (one open, one vote each, live tallies, closes on time, survives a Redis restart)
+- [x] Moderation: delete, timeout, ban, slow mode, followers-only, rate limit,
+      duplicate drop, audit log; only the owner acts on a moderator
+- [x] pytest for each, including guests rejected
+- [x] Two-instance test: chat, reactions and polls reach clients on both (needs a real
+      Redis; CI provides one)
 
 ### M3 — Accounts and notifications (F1, F13, F14)
 
-- [x] Identity mode setting (chat settings tab) and its audited reveal rule (API)
-- [ ] Notifications: bell, mark read, preferences; optional email with the
-      once-per-hour limit; SMTP-off behaviour
-- [ ] Screens 08–13 built and wired
+- [x] Identity mode setting and its audited reveal rule
+- [x] Notifications: bell, mark read, per-channel preferences; went-live, mention and
+      reply; optional live email at most once an hour per channel; email controls
+      hidden when there is no SMTP
 
 ### M4 — Streamer experience (F3, F4, F7, F15, F16)
 
-- [ ] Studio: setup, live control, emotes, channel page, moderators
-      (screens 14–18)
-- [ ] Channel profile, announcements, followers, badges (05)
-- [ ] Recording comments, processing and ended states (03, 04, 20)
-- [ ] Offline, not found and reconnecting states (19, 21)
+- [x] Studio (screens 14–18), channel page with links, banner, announcements
+- [x] Channel profile with followers and "since"
+- [x] Recording comments, owner can delete a recording, channel deletion removes files
+- [x] Offline, not found, stream ended and reconnecting states
 
 ### M5 — Viewer polish (F2, F6)
 
-- [ ] Home, browse and search, mobile layouts (01, 06, M1)
-- [ ] New logo and favicon in marigold; remove the purple gradient mark
-- [ ] Anti-slop checklist and `pnpm check:design` clean
+- [x] Home, browse and search, mobile layouts
+- [x] New logo and favicon in marigold; the purple mark is gone
+- [x] `pnpm check:design` clean (0 errors, 0 warnings)
 
 ### M6 — Operability and verification (F0, F8)
 
-- [ ] Metrics endpoint, structured logging, health checks
-- [ ] Backup and restore notes, tested
-- [ ] Clean-VPS install in ten minutes, timed; compose smoke test in CI
-- [ ] Playwright end-to-end: register, create channel, go live with an ffmpeg
-      test publisher, watch, chat, poll, react
-- [ ] Latency and fan-out measurements, with the method
+- [x] `/health`, `/ready`, Prometheus `/metrics`, JSON logs
+- [x] Backup and restore scripts and notes, restore verified on a seeded database
+- [x] Playwright end-to-end against the real stack with an ffmpeg publisher: register,
+      create channel, go live, guest watches, chat, poll, stream end; replies, reactions,
+      anonymous mode, timeout; phone width. CI runs it
+- [ ] Clean-VPS install timed (not measured yet)
+- [ ] Glass-to-glass latency and fan-out numbers with the method (not measured yet)
 
 ### M7 — Docs and site
 
-- [ ] `docs/` index and architecture diagram (OBS, mediamtx, backend, Redis,
-      WebSocket, viewers); README rewritten with a built / not built table
-- [ ] Marketing and docs site moved to Next.js (MDX docs), screenshots taken
-      from the real app, measured numbers, honest "not in v1" section
-- [ ] Site deployed on Vercel
+- [x] `docs/ARCHITECTURE.md`, `docs/OPERATIONS.md`, `docs/CHAT.md`; README with a
+      built / not built table
+- [x] Marketing and docs site moved to Next.js (static export), real screenshots,
+      an honest "not in v1" section; engineering docs synced from `/docs`
+- [ ] Site deployed on Vercel (needs your account; `site/vercel.json` is ready)
 
 ### M8 — Release
 
-- [ ] Governance files (`LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`,
-      `CODE_OF_CONDUCT.md`)
+- [x] `LICENSE` (MIT), `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`
 - [ ] Point the install script and docs at `main` (they use `dev` until then)
 - [ ] Tag `v1.0.0`

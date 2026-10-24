@@ -1,82 +1,48 @@
-# site/ — Agent Instructions (marketing + docs)
+# site — Agent Instructions (marketing and docs)
 
-Astro + Starlight marketing and docs site (deploys to Vercel). Inherits
-`/docs/DESIGN.md` — read it before any UI work. The site is the public face of
-the brand, so the design system applies hardest here. Conflicts resolve
-in favor of `/docs/DESIGN.md`.
+A static Next.js (App Router) site, exported with `output: "export"` and deployed to Vercel.
+No server, no hosted demo (the stack needs RTMP and HLS, which a static host cannot run).
+Inherits `/docs/DESIGN.md`: the site carries the identity hardest. Conflicts resolve in
+favour of DESIGN.md.
 
-## Current state
+## Layout
 
-Re-themed (2026-10): `src/styles/theme.css` carries the full identity —
-ink ladder + marigold in dark (primary scope), warm paper in light,
-Space Grotesk self-hosted at `public/fonts/`, purple family remapped to
-ochre, live-red hue fixed. Splash hero uses display type with a staggered
-entrance. When touching UI, extend these tokens — never hardcode colors
-or reintroduce framework defaults.
+```
+site/
+├── content/docs/        the docs, as Markdown with frontmatter (title, description)
+│   └── _generated/      copies of /docs/{ARCHITECTURE,OPERATIONS,CHAT}.md (see below)
+├── content/blog/        posts, dated in the frontmatter
+├── public/              favicon, Space Grotesk (self-hosted woff2), real screenshots (screens/)
+├── scripts/sync-docs.mjs
+└── src/
+    ├── app/             / (landing), /docs/[[...slug]], /blog, sitemap, robots, not-found
+    ├── components/      one exported component per file
+    └── lib/             content loader, docs sidebar (nav.ts), site constants
+```
 
-Known follow-ups (not blockers):
+## Rules
 
-- Expressive-Code block theme still stock — tune to the ink ladder
-- Cross-document view transitions (ClientRouter) deferred — the site
-  stays zero-JS-first; revisit if navigation motion is wanted
-
-## Design implementation
-
-- Re-theme via a `src/styles/theme.css` loaded through
-  `customCss` in `astro.config.mjs`, overriding `--sl-color-*`
-  variables in both light and dark scopes (keep dark as the primary):
-  - `--sl-color-bg` → `#0c0d10` · panels → `#14161b` · borders →
-    `#262a33` (the `/docs/DESIGN.md` §3 surface ladder)
-  - Accent → marigold `#f5a623`; **text/CTAs on accent use ink
-    `#1a1205`, never white**; links use marigold, not purple
-  - Live red `#eb3223` only where copy refers to actual live states
-- Typography: self-host Space Grotesk (woff2, 500/700) for headings,
-  wordmark, and hero; body/UI stays on the system stack; code/config
-  values render in the mono stack. No third-party font CDN.
-- Splash page: one marigold primary CTA + ghost secondaries; feature
-  content as real tables/lists/screenshots — **no three-icon-card
-  grids, no emoji decoration, no gradient text**.
-- Motion: pure CSS only per `/docs/DESIGN.md` §6 — `linear()` springs,
-  `@starting-style` entrances, scroll-driven reveals with IO fallback.
-  No animation libraries; keep the site zero-JS. The live pulse motif
-  appears wherever copy shows live states.
-- Screenshots in docs must show the real product UI (ink + marigold),
-  not generic mockups.
-
-## Content conventions
-
-- Docs content lives in `src/content/docs/` (Starlight collections);
-  sidebar in `astro.config.mjs`.
-- Config values, env vars, API paths: fenced code or inline mono —
-  never bare body text.
-- Tone: direct, self-hoster-to-self-hoster; no marketing fluff, no
-  "blazing fast", no superlatives without a fact behind them.
-
-## Code structure
-
-- **The landing page is fully bespoke** — `src/pages/index.astro` is a
-  plain Astro page (own `<head>`, header, footer; **no Starlight
-  shell**). Section order: `site-header` → `landing-hero` → `hero-mock`
-  (browser-frame browse-page mock, the hero centerpiece) →
-  `landing-demos` → `landing-cta` → `landing-why` → `site-footer`.
-- Starlight chrome is for docs routes only. Anything product-y renders
-  in the bespoke system: `.sl-link-button` base styles live in
-  `src/styles/theme.css` so buttons match on both landing and docs.
-- Theme lives in `src/styles/theme.css` (ink ladder + marigold, both
-  scopes, landing reset) with Space Grotesk self-hosted in
-  `public/fonts/`. Demo/mock components render the real product anatomy
-  from `/docs/DESIGN.md` §7 — flat surfaces only, no gradients.
-- Docs content lives in `src/content/docs/` (Starlight collections;
-  sidebar in `astro.config.mjs`). There is intentionally no
-  `docs/index.md` — the landing owns `/`.
-- One component per file when adding Astro components
-  (`src/components/`), same rule as the other apps.
-- Keep the site zero-JS where possible: prefer pure CSS theming over
-  client scripts; no frameworks beyond Astro/Starlight.
+- **Tokens, not colours.** `src/app/globals.css` holds the same tokens as the app: ink ladder,
+  marigold with ink text on fills (never white), live red only for live. No violet, no
+  gradients, radii 4/6/8 px, Space Grotesk for display, mono for commands and numbers.
+- **Real screenshots only** in `public/screens/` (taken from the running app, no browser-chrome
+  mock-ups, no invented UI). Retake them when the UI changes.
+- **Honest copy.** Direct, self-hoster to self-hoster. No superlatives without a fact. Never
+  name or compare adda to another product.
+- **Docs have one source.** `ARCHITECTURE.md`, `OPERATIONS.md` and `CHAT.md` live in `/docs`
+  and are copied into `content/docs/_generated/` by `pnpm -C site sync-docs` (run on `dev`;
+  `build` fails if the committed copies are stale). Edit `/docs`, not the copies. Everything
+  else under `content/docs/` is written for the site.
+- **Add a docs page:** create the `.md` file, add it to `src/lib/nav.ts`.
+- Environment variables, paths and commands go in fenced code or inline mono, never bare text.
+- Frontmatter values that contain a colon must be quoted.
 
 ## Quality
 
-- After every change: `pnpm -C site build` (and `make site-dev` to
-  eyeball dark theme + splash).
-- Pre-ship the `/docs/DESIGN.md` §8 anti-slop checklist — for the site it
-  is the brand's first impression.
+```bash
+pnpm -C site typecheck && pnpm -C site build     # make site-build
+make site-dev                                     # http://localhost:4321
+pnpm check:design                                 # from the repo root
+```
+
+Pre-ship the DESIGN.md anti-slop checklist: the site is the brand's first impression.

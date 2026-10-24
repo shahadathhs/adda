@@ -12,6 +12,8 @@ milestones live in `docs/SCOPE.md`.
 | `docs/CHAT.md`           | Chat backend: data model, wire protocol, rules, build order      |
 | `docs/design/SCREENS.md` | The concept screens to match (`docs/design/screens/*.png`)       |
 | `docs/DESIGN.md`         | Tokens, type, motion, component patterns, anti-slop checklist    |
+| `docs/ARCHITECTURE.md`   | How the services, streaming path and code fit together           |
+| `docs/OPERATIONS.md`     | Install, config, metrics, backup and restore, upgrade            |
 
 **Definition of done for a feature:** its flow's acceptance criteria in
 `docs/FLOWS.md` hold, they are covered by tests (pytest for the API and
@@ -19,8 +21,8 @@ WebSocket, Playwright for the browser), the screen matches its concept render
 including loading, empty, error and reconnecting states, and docs that describe
 the behaviour are updated in the same commit.
 pnpm monorepo: FastAPI backend (`backend/`) + Next.js viewer/studio web app
-(`web/`) + mediamtx streaming server + Astro/Starlight docs site
-(`site/`).
+(`web/`) + mediamtx streaming server + a static Next.js marketing and docs
+site (`site/`).
 
 ## Layout
 
@@ -29,7 +31,7 @@ adda/
 ├── backend/   # FastAPI API + WebSocket gateway
 ├── web/       # viewer + studio web app (Next.js App Router)
 │   └── src/lib/{api,types,config}   # API client, DTOs, runtime config
-├── site/      # Astro/Starlight marketing + docs (→ Vercel)
+├── site/      # static Next.js marketing + docs (→ Vercel)
 ├── infra/     # mediamtx (streaming server) + Caddy (HTTPS) configs
 └── docs/      # scope, architecture, deployment
 ```
@@ -87,11 +89,11 @@ pnpm -C web build                # next build (standalone output)
   code uses the typed client in `src/lib/api` (localStorage tokens).
 - Legacy UUID links redirect: `/community/[id]` → channel view.
 
-### Docs/marketing site (Astro + Starlight, workspace member)
+### Marketing and docs site (static Next.js, workspace member)
 
 ```bash
 make site-dev                         # dev server → http://localhost:4321
-make site-build                       # static build → site/dist/
+make site-build                       # static export → site/out/
 ```
 
 ### Infra (Docker)
@@ -113,7 +115,9 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   in-memory Redis. New behaviour ships with tests in `backend/tests/`.
 - Run web lint/build after web or package changes:
   `pnpm lint && pnpm typecheck && pnpm -C web build`.
-- Run `pnpm -C site build` after docs-site changes.
+- Run `pnpm -C site build` after docs-site changes. Edit `/docs` for the engineering docs; the
+  site copies of `ARCHITECTURE`, `OPERATIONS` and `CHAT` are synced (`pnpm -C site sync-docs`).
+- Browser tests: `pnpm e2e` (Playwright, against the running stack; needs ffmpeg or Docker).
 
 ## Conventions
 
@@ -132,7 +136,7 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   `exceptions.py`. The shared `models/` package and `alembic/` sit at the
   backend root. Features live in `modules/<feature>/` — one folder per feature
   (`auth`, `users`, `communities`, `chat`, `streaming`, `recordings`, `stats`,
-  `realtime`; `notifications` is added per `docs/CHAT.md`). Channel roles:
+  `realtime`, `notifications`). Channel roles:
   the owner is `Community.owner_id`; moderators are `ChannelModerator` rows.
   "Community" is the internal name for a streamer's channel; the UI, docs and
   public text say "channel".

@@ -10,9 +10,9 @@ fees, no cloud.
 
 ![adda concept screens](docs/design/overview.png)
 
-> **Status: v1 in progress.** The streaming core works. The social layer in the
-> screens above is being built. [What is built, and what is not](#status) is
-> spelled out below. Nothing here has been released yet.
+> **Status: feature-complete for v1, not yet released.** Every flow below is built and
+> tested. A timed clean-server install and latency numbers are still to be measured, and
+> the site is not deployed yet. See [what is built, and what is not](#status).
 
 ## What you get
 
@@ -55,27 +55,29 @@ OBS ──RTMP──▶ mediamtx ──auth webhook──▶ backend (FastAPI) �
 
 ## Status
 
-Honest status of each flow. The full list, with acceptance criteria and the
-screen each one belongs to, is in [docs/FLOWS.md](docs/FLOWS.md).
+Every flow, with its acceptance criteria and the screen it belongs to, is in
+[docs/FLOWS.md](docs/FLOWS.md).
 
-| Flow   | What                                                                                                                          | Status                                                     |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| F0     | One-command install, HTTPS, generated secrets                                                                                 | Built; clean-server timing not yet verified                |
-| F1     | Register, login, rotating refresh tokens, change and reset password                                                           | Built; reset email needs SMTP                              |
-| F2     | Home, channel pages (SSR), HLS player, viewer counts                                                                          | Built; search and the new home layout in progress          |
-| F3     | Create channel, stream key, rotate key, edit, delete                                                                          | Built; edit and delete flows to verify                     |
-| F4     | Go live, offline detection, force-stop                                                                                        | Built                                                      |
-| F5     | Chat: persisted history, send, delete, moderators, badges                                                                     | Partial; timeouts, bans, slow mode and rate limits planned |
-| F6     | Follows                                                                                                                       | Built                                                      |
-| F7     | Recordings and thumbnails                                                                                                     | Built; download and processing state to verify             |
-| F8     | Admin API                                                                                                                     | Partial                                                    |
-| F9–F16 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode, channel profiles, recording comments | Planned ([chat design](docs/CHAT.md))                      |
+| Flow   | What                                                                                       | Status                                      |
+| ------ | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| F0     | One-command install, HTTPS, generated secrets                                              | Built; clean-server timing not yet measured |
+| F1     | Register, login, rotating refresh tokens, change and reset password                        | Built; reset email needs SMTP               |
+| F2     | Home, search, channel pages (SSR), HLS player, viewer counts                               | Built                                       |
+| F3, F4 | Create channel, stream key, rotate, go live, offline detection, end stream                 | Built                                       |
+| F5     | Chat: history, send, delete, moderators, slow mode, followers-only, timeouts, bans, limits | Built                                       |
+| F6     | Follows                                                                                    | Built                                       |
+| F7     | Recordings, thumbnails, playback, download, owner delete                                   | Built; no transcoding                       |
+| F8     | Admin API, health, readiness, metrics, JSON logs, backup and restore                       | Built; no admin web UI                      |
+| F9–F14 | Guests, replies, mentions, reactions, pins, emotes, polls, notifications, identity mode    | Built                                       |
+| F15    | Channel profile: about, links, banner, announcements, followers                            | Built                                       |
+| F16    | Recording comments                                                                         | Built                                       |
 
-Backend tests run with `make test` (84 so far: accounts and token rotation,
-channel lifecycle, follows, moderators, chat history and live chat over a real
-WebSocket, guests and identity mode, the stream publish webhook, and the data migration). Chat, notifications
-and the browser end-to-end tests come with their milestones
-([docs/SCOPE.md](docs/SCOPE.md)).
+Tests: `make test` runs 143 backend tests (accounts and tokens, channels, streams, chat
+rules, polls, emotes, notifications, identity, the channel page, recording comments,
+migrations, operability) against an embedded Postgres, and one more test starts two real
+server processes against one Redis. `pnpm e2e` runs 5 Playwright tests against the real
+stack with an ffmpeg test-pattern publisher. CI runs all of it
+([docs/SCOPE.md](docs/SCOPE.md) has the milestones).
 
 ## Not in v1
 
@@ -131,8 +133,13 @@ make lint           # ruff + oxlint + prettier
 make typecheck      # pyright
 pnpm typecheck      # tsc
 pnpm check:design   # banned UI patterns from DESIGN.md
+make test           # backend tests, no Docker needed
+pnpm e2e            # Playwright against the running stack (needs ffmpeg or Docker)
 make check          # everything, including the builds
 ```
+
+`scripts/test-stream.sh <channel-slug>` publishes a test pattern to a channel so the live
+screens have something to show.
 
 ## Design
 
@@ -150,16 +157,18 @@ and a strict radius and motion scale. Concept renders of all 23 screens are in
 | [docs/FLOWS.md](docs/FLOWS.md)                   | Acceptance criteria per flow and the screen-to-test map |
 | [docs/CHAT.md](docs/CHAT.md)                     | Chat backend design: data model, wire protocol, rules   |
 | [docs/design/SCREENS.md](docs/design/SCREENS.md) | The concept screens                                     |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | How the pieces fit                                      |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md)         | Install, metrics, backup and restore, upgrade           |
 | [DESIGN.md](docs/DESIGN.md)                      | Design system                                           |
 | [AGENTS.md](AGENTS.md)                           | Conventions for contributors and coding agents          |
 
 ## Contributing
 
-Conventional commits are enforced by a git hook. Start with
+See [CONTRIBUTING.md](CONTRIBUTING.md). Conventional commits are enforced by a git hook. Start with
 [AGENTS.md](AGENTS.md) for the layout and rules, and keep the WebSocket
 contract (`backend/modules/realtime/protocol.py` and
 `web/src/lib/types/realtime.ts`) in sync.
 
 ## License
 
-To be added before the first release.
+[MIT](LICENSE).

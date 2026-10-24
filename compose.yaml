@@ -76,6 +76,8 @@ services:
       PASSWORD_RESET_URL: ${PASSWORD_RESET_URL:-https://${ADDA_DOMAIN:-localhost}/reset-password}
       RECORDINGS_DIR: /recordings
       THUMBS_DIR: /thumbs
+      UPLOADS_DIR: /uploads
+      LOG_FORMAT: ${LOG_FORMAT:-json}
       SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:-admin}
       SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL:-admin@example.com}
       SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:?set SUPERADMIN_PASSWORD in .env (install.sh generates it)}
@@ -91,6 +93,7 @@ services:
     volumes:
       - ./recordings:/recordings
       - ./thumbs:/thumbs
+      - ./uploads:/uploads # emotes and banners
     depends_on:
       postgres:
         condition: service_healthy
@@ -102,7 +105,7 @@ services:
           "CMD",
           "python",
           "-c",
-          "import urllib.request; urllib.request.urlopen('http://localhost:7001/health')",
+          "import urllib.request; urllib.request.urlopen('http://localhost:7001/ready')",
         ]
       interval: 10s
       timeout: 5s

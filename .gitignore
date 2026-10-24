@@ -41,3 +41,8 @@ backend/.env
 /recordings/
 /thumbs/
 /uploads/
+/uploads/
+
+# ── Playwright ──
+test-results/
+playwright-report/

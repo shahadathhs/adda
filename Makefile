@@ -44,8 +44,8 @@ env: ## Create .env files (root, backend, web) from their examples
 	  else echo "$$f exists (skipped)"; fi; \
 	done
 
-dirs: ## Create local data directories (recordings/, thumbs/)
-	@mkdir -p recordings thumbs
+dirs: ## Create local data directories (recordings/, thumbs/, uploads/)
+	@mkdir -p recordings thumbs uploads
 
 toolchain: ## Ensure uv is installed
 	@command -v uv >/dev/null 2>&1 || { \
@@ -145,7 +145,7 @@ reset-migrate: db-up ## Reset DB: drop everything, re-apply migrations from scra
 
 reset: ## Full factory reset: remove containers + volumes + recordings + thumbnails, then start fresh (DESTRUCTIVE)
 	$(COMPOSE) down -v
-	@rm -rf recordings thumbs && mkdir recordings thumbs
+	@rm -rf recordings thumbs uploads && mkdir recordings thumbs uploads
 	@$(MAKE) --no-print-directory env dirs
 	@$(MAKE) --no-print-directory up
 	@echo "Reset complete — fresh DB (migrated + seeded on backend startup)."
@@ -178,17 +178,17 @@ lint: lint-backend lint-web ## Lint backend (ruff) + JS/TS (oxlint/prettier)
 build-web: ## Build web app (next build)
 	@cd $(FRONTEND_DIR) && $(PNPM) build
 
-# ── Marketing / docs site (Astro + Starlight) ─────────────────────────
+# ── Marketing / docs site (Next.js, static export → Vercel) ───────────
 # Deps come from the root workspace: `pnpm install` (see: make install).
 
 site-dev: ## Run docs-site dev server on :4321
 	@cd $(SITE_DIR) && $(PNPM) dev
 
-site-build: ## Build static docs site → site/dist/
+site-build: ## Build the static site → site/out/
 	@cd $(SITE_DIR) && $(PNPM) build
 
-site-preview: ## Preview the built docs site
-	@cd $(SITE_DIR) && $(PNPM) preview
+site-preview: ## Serve the built site from site/out/ on :4321
+	@python3 -m http.server 4321 -d $(SITE_DIR)/out
 
 # ── Quality & cleanup ─────────────────────────────────────────────────
 
@@ -205,9 +205,9 @@ clean: ## Remove containers + Docker volumes (keeps recordings) — DESTRUCTIVE
 # Keeps the source, git history and your .env files.
 fclean: ## Remove EVERYTHING generated: containers, volumes, images, recordings, deps, build output, caches — DESTRUCTIVE
 	-$(COMPOSE) down -v --remove-orphans --rmi local
-	@rm -rf recordings thumbs
+	@rm -rf recordings thumbs uploads
 	@rm -rf node_modules web/node_modules site/node_modules
-	@rm -rf web/.next site/dist site/.astro
+	@rm -rf web/.next site/.next site/out
 	@rm -rf backend/.venv backend/.pytest_cache backend/.ruff_cache backend/.pyright
 	@find . -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
 	@find . -name '*.tsbuildinfo' -not -path './.git/*' -delete 2>/dev/null || true
