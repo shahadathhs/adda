@@ -11,14 +11,14 @@ pnpm monorepo: FastAPI backend (`backend/`) + Next.js viewer/studio web app
 ```
 adda/
 ├── apps/
-│   ├── web/            # viewer + studio web app (Next.js App Router)
+│   └── web/            # viewer + studio web app (Next.js App Router)
 ├── packages/           # shared TS logic — NEVER shared UI
 │   ├── types/          # DTOs mirroring Pydantic schemas (@adda/types)
 │   ├── api-client/     # request + auth + WS client + endpoints (@adda/api-client)
 │   └── shared/         # runtime server config + zod schemas (@adda/shared)
 ├── backend/            # FastAPI (unified API for all clients)
 ├── site/               # Astro/Starlight marketing + docs (→ Vercel)
-└── mediamtx/           # streaming server config
+└── infra/              # mediamtx (streaming server) + Caddy (HTTPS) configs
 ```
 
 **Boundary rule:** apps may import `@adda/*` packages but never each other's

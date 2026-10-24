@@ -72,7 +72,7 @@ The stack waits for its own health checks before Caddy serves traffic.
 ## 3. Reverse proxy (custom setups)
 
 The bundled Caddy handles HTTPS and routes `/api`, `/ws`, `/hls` and the
-web app on one domain (see `deploy/caddy/Caddyfile`). Skip this section
+web app on one domain (see `infra/caddy/Caddyfile`). Skip this section
 unless you're replacing it. If you proxy yourself:
 
 Route two hostnames: the **app** (`app.example.com` — frontend + API +

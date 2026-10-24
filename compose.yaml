@@ -38,7 +38,7 @@ services:
       retries: 10
 
   mediamtx:
-    build: ./mediamtx
+    build: ./infra/mediamtx
     restart: unless-stopped
     environment:
       MTX_AUTHHTTPADDRESS: ${MTX_AUTH_ADDRESS:-http://backend:7001/api/streams/auth}
@@ -127,7 +127,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:

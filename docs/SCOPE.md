@@ -91,6 +91,9 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
 - [x] Fix `AGENTS.md` (it described the old Vite/TanStack web app)
 - [ ] Move `@app.on_event("startup")` to a lifespan handler
 - [x] `VERSION` file
+- [x] Tooling centralised at the root (husky, lint-staged, commitlint, oxlint,
+      prettier, editorconfig, tsconfig.base); lockfile committed; configs moved
+      to `infra/`
 - [ ] Governance files (`LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`)
 - [ ] Rewrite `README.md` and the dual web/desktop columns in `DESIGN.md`
 
