@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     # Log every SQL statement. Very noisy, so it is separate from `debug`.
     sql_echo: bool = False
     api_prefix: str = "/api"
+    # "text" for development, "json" for one log object per line in production.
+    log_format: str = "text"
 
     # Database
     database_url: str = "postgresql+asyncpg://adda:adda@localhost:5432/adda"
@@ -57,6 +59,8 @@ class Settings(BaseSettings):
     # Where live-stream thumbnails are written (one JPEG per community,
     # overwritten in place while live; kept as the offline poster).
     thumbs_dir: str = "../thumbs"
+    # Where uploaded emotes and channel banners are stored (a volume in docker).
+    uploads_dir: str = "../uploads"
 
     # CORS origins (comma-separated).
     cors_origins: str = "http://localhost:5173"

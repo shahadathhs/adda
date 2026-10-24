@@ -21,6 +21,7 @@ from typing import Any
 
 from fastapi import WebSocket
 
+from core import metrics
 from core.redis_client import redis_client
 
 logger = logging.getLogger("adda.ws")
@@ -62,10 +63,16 @@ class ConnectionManager:
 
     def register(self, conn: Connection) -> None:
         self.connections[conn.id] = conn
+        metrics.WS_CONNECTIONS.inc()
+        if conn.is_guest:
+            metrics.WS_GUESTS.inc()
 
     async def disconnect(self, conn: Connection) -> None:
         async with self._lock:
-            self.connections.pop(conn.id, None)
+            if self.connections.pop(conn.id, None) is not None:
+                metrics.WS_CONNECTIONS.dec()
+                if conn.is_guest:
+                    metrics.WS_GUESTS.dec()
             for channel in list(conn.channels):
                 peers = self.channel_peers.get(channel)
                 if peers:

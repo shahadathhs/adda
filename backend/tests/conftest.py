@@ -32,6 +32,7 @@ os.environ.update(
     SMTP_HOST="",
     RECORDINGS_DIR=os.path.join(_DATA_DIR, "recordings"),
     THUMBS_DIR=os.path.join(_DATA_DIR, "thumbs"),
+    UPLOADS_DIR=os.path.join(_DATA_DIR, "uploads"),
     # Nothing listens here; mediamtx calls fail fast and are stubbed in tests.
     MTX_API_URL="http://127.0.0.1:9",
 )

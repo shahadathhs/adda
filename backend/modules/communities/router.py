@@ -221,8 +221,9 @@ async def channel_followers(
             username=u.username,
             display_name=u.display_name,
             avatar_url=u.avatar_url,
+            since=since,
         )
-        for u in followers
+        for u, since in followers
     ]
 
 

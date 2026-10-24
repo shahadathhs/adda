@@ -8,9 +8,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from core.exceptions import BadRequestException, NotFoundException
+from core.exceptions import BadRequestException, ForbiddenException, NotFoundException
+from core.security.deps import get_current_user
 from core.security.guards import require_admin
 from models.community import Community
+from models.user import SystemRole, User
 from modules.recordings.schemas import RecordingFeedItem, RecordingOut
 from modules.recordings.service.files import delete_recording, resolve_recording, scan_recordings
 
@@ -76,6 +78,24 @@ async def serve_recording(path: str) -> FileResponse:
     if full is None:
         raise NotFoundException("Recording not found")
     return FileResponse(full, media_type="video/mp4")
+
+
+@router.delete("/file", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_own_recording(
+    community_id: uuid.UUID,
+    path: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    """The channel owner (or staff) deletes one of the channel's recordings."""
+    community = await db.get(Community, community_id)
+    if community is None:
+        raise NotFoundException("Community not found")
+    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
+        raise ForbiddenException("Only the channel owner can delete recordings")
+    if path not in {r["path"] for r in scan_recordings(str(community_id))}:
+        raise NotFoundException("Recording not found")
+    delete_recording(path)
 
 
 # ── Admin ─────────────────────────────────────────────────────────────

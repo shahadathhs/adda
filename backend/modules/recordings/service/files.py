@@ -79,3 +79,16 @@ def delete_recording(rel_path: str) -> bool:
         return False
     os.remove(full)
     return True
+
+
+def purge_community_files(community_id: str) -> None:
+    """Remove every recording that belongs to a deleted channel (both file layouts)."""
+    import shutil
+
+    base = _base()
+    shutil.rmtree(os.path.join(base, "community", community_id), ignore_errors=True)
+    root = os.path.join(base, "community")
+    if os.path.isdir(root):
+        for fn in os.listdir(root):
+            if fn.startswith(f"{community_id}-") and fn.endswith(".mp4"):
+                os.remove(os.path.join(root, fn))

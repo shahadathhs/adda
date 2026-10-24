@@ -10,9 +10,15 @@ import asyncio
 import contextlib
 import logging
 import time
+import uuid
 from datetime import UTC, datetime
 
+from core import metrics
+from core.database import async_session_factory
 from core.redis_client import redis_client
+from models.community import Community
+from modules.chat.service import polls
+from modules.notifications.service.notify import notify_went_live
 from modules.realtime.manager import manager
 from modules.realtime.protocol import outgoing
 from modules.streaming.service import thumbs
@@ -60,8 +66,29 @@ async def _announce(community_id: str, is_live: bool, started: float | None) -> 
     )
 
 
+async def _notify_followers(community_id: str) -> None:
+    """Bell (and opted-in email) alerts to followers when a channel goes live."""
+    try:
+        async with async_session_factory() as db:
+            community = await db.get(Community, uuid.UUID(community_id))
+            if community is not None:
+                await notify_went_live(db, community)
+    except Exception:
+        log.exception("live notifications failed for %s", community_id)
+
+
+async def _close_polls() -> None:
+    try:
+        async with async_session_factory() as db:
+            await polls.close_expired(db)
+    except Exception:
+        log.exception("closing expired polls failed")
+
+
 async def _tick() -> None:
+    await _close_polls()
     current = set(await list_live_community_ids())
+    metrics.LIVE_CHANNELS.set(len(current))
     previous = {str(key) for key in await redis_client.hkeys(STARTED_KEY)}
 
     # Thumbnails follow live state (also re-syncs after a backend restart,
@@ -73,6 +100,7 @@ async def _tick() -> None:
         await redis_client.hset(STARTED_KEY, community_id, started)
         log.info("community %s went live", community_id)
         await _announce(community_id, is_live=True, started=started)
+        await _notify_followers(community_id)
 
     for community_id in previous - current:
         await redis_client.hdel(STARTED_KEY, community_id)

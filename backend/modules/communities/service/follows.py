@@ -1,6 +1,7 @@
 """Follow relationships: users following communities (channels)."""
 
 import uuid
+from datetime import datetime
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -64,13 +65,13 @@ async def list_followed_communities(db: AsyncSession, user_id: uuid.UUID) -> lis
     return list(result.scalars().all())
 
 
-async def list_followers(db: AsyncSession, community_id: uuid.UUID) -> list[User]:
-    """Public follower list for a channel, most recent first."""
+async def list_followers(db: AsyncSession, community_id: uuid.UUID) -> list[tuple[User, datetime]]:
+    """Public follower list for a channel, most recent first, with when each one followed."""
     result = await db.execute(
-        select(User)
+        select(User, Follow.created_at)
         .join(Follow, Follow.user_id == User.id)
         .where(Follow.community_id == community_id)
         .order_by(Follow.created_at.desc())
         .limit(200)
     )
-    return list(result.scalars())
+    return [(u, since) for u, since in result.all()]
