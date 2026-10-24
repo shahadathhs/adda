@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useDiscover } from "@/lib/data";
+import { AuthArt } from "@/components/auth-art";
 import { LiveBadge, UserAvatar } from "@/components/ui/primitives";
 import { StreamThumb } from "@/components/stream-thumb";
 import { ViewerCount } from "@/components/viewer-count";
@@ -10,7 +11,7 @@ import { ViewerCount } from "@/components/viewer-count";
 export function AuthPreview() {
   const { data } = useDiscover();
   const c = data?.filter((d) => d.is_live).sort((a, b) => b.viewers - a.viewers)[0];
-  if (!c) return null;
+  if (!c) return <AuthArt />;
 
   return (
     <Link

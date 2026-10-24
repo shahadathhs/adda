@@ -13,9 +13,9 @@ const claims = [
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid gap-6 px-4 py-8 sm:px-6 lg:min-h-[calc(100vh-9rem)] lg:grid-cols-[480px_1fr]">
-      <aside className="hidden flex-col justify-center rounded-lg border border-border bg-card p-8 lg:flex">
+      <aside className="hidden flex-col justify-between rounded-lg border border-border bg-card p-8 lg:flex">
         <AuthPreview />
-        <div>
+        <div className="mt-auto">
           <h2 className="max-w-[420px] font-display text-[28px] font-bold leading-8 tracking-tight text-foreground">
             Your own live-streaming site. Watch, chat, and keep every broadcast.
           </h2>
