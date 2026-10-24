@@ -22,7 +22,7 @@ const sizes: Record<Size, string> = {
 /** Button styles, for a link that should look like a button (never nest a button in a link). */
 export function buttonClass(variant: Variant = "default", size: Size = "md", className?: string) {
   return cn(
-    "inline-flex cursor-pointer items-center justify-center gap-2 font-medium",
+    "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium",
     "transition-[background-color,border-color,color,scale] duration-120 ease-[var(--ease-micro)]",
     "active:scale-[0.97]",
     "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",

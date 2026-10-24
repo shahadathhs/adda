@@ -55,7 +55,7 @@ export function SearchPage({ query }: { query?: string }) {
         <ResultsMessage
           kind="empty"
           action={
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
               <Link href="/live" className={buttonClass("outline")}>
                 Live now
               </Link>
