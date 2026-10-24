@@ -8,7 +8,6 @@ import {
   register,
   setSession,
   socket,
-  verify2faLogin,
 } from "@adda/api-client";
 import type { Token, User } from "@adda/types";
 import { toast } from "sonner";
@@ -37,24 +36,10 @@ export function useLogin() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      const res = await login({ email, password });
-      if ("requires_2fa" in res) return res;
-      return adoptSession(res);
+      return adoptSession(await login({ email, password }));
     },
-    onSuccess: (data) => {
-      if ("id" in data) qc.setQueryData(sessionKeys.me, data);
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Login failed"),
-  });
-}
-
-export function useLogin2fa() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ tempToken, code }: { tempToken: string; code: string }) =>
-      adoptSession(await verify2faLogin(tempToken, code)),
     onSuccess: (user) => qc.setQueryData(sessionKeys.me, user),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Verification failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Login failed"),
   });
 }
 

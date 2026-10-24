@@ -13,7 +13,7 @@ The backend is FastAPI; all HTTP routes live under **`/api`**. When
 3. On expiry, `POST /api/auth/refresh` with the refresh token → new pair
    (rotating — the old refresh token dies; reuse revokes the session)
 
-Other flows: register, OTP email login, 2FA enable/verify, password reset.
+Other flows: register, change password, password reset (email link).
 
 ## REST surface (selected)
 

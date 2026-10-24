@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { changePassword, setPassword as setPasswordApi } from "@adda/api-client";
+import { changePassword } from "@adda/api-client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-export function PasswordCard({ hasPassword }: { hasPassword: boolean }) {
+export function PasswordCard() {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -23,30 +23,17 @@ export function PasswordCard({ hasPassword }: { hasPassword: boolean }) {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Change failed"),
   });
-  const setInitial = useMutation({
-    mutationFn: () => setPasswordApi(next),
-    onSuccess: () => {
-      toast.success("Password set");
-      setNext("");
-      setConfirm("");
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Could not set password"),
-  });
 
   return (
     <Card className="space-y-3 p-4">
-      <h2 className="font-display font-bold tracking-tight">
-        {hasPassword ? "Change password" : "Set a password"}
-      </h2>
-      {hasPassword && (
-        <Input
-          type="password"
-          placeholder="Current password"
-          value={current}
-          onChange={(e) => setCurrent(e.target.value)}
-          aria-label="Current password"
-        />
-      )}
+      <h2 className="font-display font-bold tracking-tight">Change password</h2>
+      <Input
+        type="password"
+        placeholder="Current password"
+        value={current}
+        onChange={(e) => setCurrent(e.target.value)}
+        aria-label="Current password"
+      />
       <Input
         type="password"
         placeholder="New password (min 8)"
@@ -64,10 +51,10 @@ export function PasswordCard({ hasPassword }: { hasPassword: boolean }) {
       <Button
         variant="primary"
         size="sm"
-        disabled={next.length < 8 || next !== confirm || (hasPassword && !current)}
-        onClick={() => (hasPassword ? change.mutate() : setInitial.mutate())}
+        disabled={next.length < 8 || next !== confirm || !current}
+        onClick={() => change.mutate()}
       >
-        {hasPassword ? "Change password" : "Set password"}
+        Change password
       </Button>
     </Card>
   );

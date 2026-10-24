@@ -146,7 +146,7 @@ automatically on backend startup; they're idempotent.
 | Web (Next.js)    | 5173           | viewer web app (SSR)       |
 | Backend API      | 7001           | REST + WebSocket            |
 | PostgreSQL       | 5432           | database                    |
-| Redis            | 6379           | pub/sub, presence, OTP      |
+| Redis            | 6379           | pub/sub, presence          |
 | mediamtx RTMP    | 1935           | OBS ingest                  |
 | mediamtx HLS     | 8888           | playback (browser)          |
 | mediamtx WebRTC  | 8889           | low-latency playback        |

@@ -30,9 +30,6 @@ export const resetPasswordSchema = z
   });
 export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
-export const otpRequestSchema = z.object({ email: z.string().email() });
-export type OtpRequestValues = z.infer<typeof otpRequestSchema>;
-
 /** Single password field (e.g. confirming an action). */
 export const passwordSchema = z.object({ password: z.string().min(1) });
 export type PasswordValues = z.infer<typeof passwordSchema>;
@@ -68,17 +65,6 @@ export const changePasswordSchema = z
     path: ["confirm"],
   });
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
-
-export const setPasswordSchema = z
-  .object({
-    new_password: z.string().min(8).max(128),
-    confirm: z.string().min(8).max(128),
-  })
-  .refine((v) => v.new_password === v.confirm, {
-    message: "Passwords don't match",
-    path: ["confirm"],
-  });
-export type SetPasswordValues = z.infer<typeof setPasswordSchema>;
 
 // ── Communities ──────────────────────────────────────────────────────
 export const createCommunitySchema = z.object({

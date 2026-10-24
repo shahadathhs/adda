@@ -8,13 +8,11 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { TextTabs } from "@/components/page-tabs";
 import { ProfileCard } from "@/components/settings-profile-card";
 import { PasswordCard } from "@/components/settings-password-card";
-import { TwoFactorCard } from "@/components/settings-2fa-card";
 import { StudioClient } from "@/components/studio-client";
 import { useMe } from "@/lib/session";
 
 const SETTINGS_TABS = [
   { id: "password", label: "Password" },
-  { id: "security", label: "Security" },
   { id: "connection", label: "Connection" },
 ];
 
@@ -32,8 +30,7 @@ function Dashboard() {
         <div className="space-y-6">
           <TextTabs tabs={SETTINGS_TABS} active={settingsTab} onChange={setSettingsTab} />
           <div className="max-w-2xl">
-            {settingsTab === "password" && user && <PasswordCard hasPassword={user.has_password} />}
-            {settingsTab === "security" && user && <TwoFactorCard user={user} />}
+            {settingsTab === "password" && user && <PasswordCard />}
             {settingsTab === "connection" && (
               <Card className="space-y-2 p-5 text-sm text-muted-foreground">
                 <h2 className="font-display font-bold tracking-tight text-foreground">

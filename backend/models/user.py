@@ -32,15 +32,6 @@ class User(Base):
     )
     # Suspended accounts cannot log in (admin moderation lever).
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=text("true"))
-    # Email-based two-factor authentication.
-    two_factor_enabled: Mapped[bool] = mapped_column(
-        Boolean, default=False, server_default=text("false")
-    )
-
-    @property
-    def has_password(self) -> bool:
-        """True if the user can log in with a password."""
-        return self.password_hash is not None
 
     def to_public_dict(self) -> dict[str, str | bool | None]:
         return {

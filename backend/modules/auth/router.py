@@ -4,11 +4,6 @@ import uuid
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.auth_emails import (
-    send_2fa_code_email,
-    send_2fa_setup_email,
-    send_otp_login_email,
-)
 from core.config import settings
 from core.database import get_db
 from core.email import send_password_reset_email
@@ -18,8 +13,6 @@ from core.exceptions import (
     ForbiddenException,
     UnauthorizedException,
 )
-from core.otp import generate_otp, verify_otp
-from core.redis_client import redis_client
 from core.security.deps import get_current_user
 from core.security.password import verify_password
 from core.security.tokens import create_reset_token, verify_reset_token
@@ -27,15 +20,9 @@ from models.user import User
 from modules.auth.schemas import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
-    Login2faVerify,
-    OtpRequest,
-    OtpVerify,
     RefreshRequest,
     ResetPasswordRequest,
-    SetPasswordRequest,
     Token,
-    TwoFactorDisable,
-    TwoFactorVerify,
     UpdateProfileRequest,
     UserLogin,
     UserRegister,
@@ -59,13 +46,6 @@ logger = logging.getLogger("adda.auth")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-OTP_LOGIN_KEY = "adda:otp:login:{email}"
-OTP_2FA_KEY = "adda:otp:2fa:{user_id}"
-OTP_2FA_SETUP_KEY = "adda:otp:2fa-setup:{user_id}"
-TEMP_TOKEN_KEY = "adda:temp-token:{token}"
-
-TEMP_TOKEN_TTL = 300  # 5 minutes
-
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
@@ -78,45 +58,12 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
     return await create_session(db, user)
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
     user = await authenticate(db, data.email, data.password)
     if user is None:
         raise UnauthorizedException("Incorrect email or password")
     if not user.is_active:
-        raise ForbiddenException("Account suspended")
-
-    if user.two_factor_enabled:
-        if not settings.smtp_host:
-            raise BadRequestException(
-                "2FA is enabled but email is not configured. Contact an admin."
-            )
-        # Generate a temp token + 2FA code.
-        temp_token = f"tt-{uuid.uuid4().hex}"
-        await redis_client.set(
-            TEMP_TOKEN_KEY.format(token=temp_token), str(user.id), ex=TEMP_TOKEN_TTL
-        )
-        code = await generate_otp(OTP_2FA_KEY.format(user_id=user.id))
-        await send_2fa_code_email(user.email, code)
-        return {"requires_2fa": True, "temp_token": temp_token}
-
-    return await create_session(db, user)
-
-
-@router.post("/login/verify-2fa", response_model=Token)
-async def login_verify_2fa(data: Login2faVerify, db: AsyncSession = Depends(get_db)):
-    user_id_raw = await redis_client.get(TEMP_TOKEN_KEY.format(token=data.temp_token))
-    if user_id_raw is None:
-        raise BadRequestException("Invalid or expired session")
-    await redis_client.delete(TEMP_TOKEN_KEY.format(token=data.temp_token))
-
-    user_id = user_id_raw if isinstance(user_id_raw, str) else user_id_raw.decode()
-
-    if not await verify_otp(OTP_2FA_KEY.format(user_id=user_id), data.code):
-        raise UnauthorizedException("Invalid or expired code")
-
-    user = await db.get(User, uuid.UUID(user_id))
-    if user is None or not user.is_active:
         raise ForbiddenException("Account suspended")
 
     return await create_session(db, user)
@@ -173,18 +120,6 @@ async def change_password(
     return {"message": "Your password has been changed."}
 
 
-@router.post("/set-password")
-async def set_password_endpoint(
-    data: SetPasswordRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    if current_user.password_hash is not None:
-        raise BadRequestException("Password is already set. Use change-password instead.")
-    await set_password(db, current_user, data.new_password)
-    return {"message": "Password has been set."}
-
-
 # ── Password reset (email link) ───────────────────────────────────────
 @router.post("/forgot-password", status_code=status.HTTP_202_ACCEPTED)
 async def forgot_password(data: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
@@ -209,70 +144,3 @@ async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(
         raise BadRequestException("Invalid or expired reset token")
     await set_password(db, user, data.password)
     return {"message": "Your password has been reset."}
-
-
-# ── OTP login (passwordless) ──────────────────────────────────────────
-@router.post("/otp/request", status_code=status.HTTP_202_ACCEPTED)
-async def otp_request(data: OtpRequest, db: AsyncSession = Depends(get_db)):
-    if not settings.smtp_host:
-        raise BadRequestException("Email login is not configured.")
-    user = await get_user_by_email(db, str(data.email))
-    if user is None or not user.is_active:
-        # Don't reveal whether the email exists.
-        return {"message": "If that account exists, a code has been sent."}
-    code = await generate_otp(OTP_LOGIN_KEY.format(email=data.email))
-    await send_otp_login_email(user.email, code)
-    return {"message": "If that account exists, a code has been sent."}
-
-
-@router.post("/otp/verify", response_model=Token)
-async def otp_verify(data: OtpVerify, db: AsyncSession = Depends(get_db)):
-    if not await verify_otp(OTP_LOGIN_KEY.format(email=data.email), data.code):
-        raise UnauthorizedException("Invalid or expired code")
-    user = await get_user_by_email(db, data.email)
-    if user is None or not user.is_active:
-        raise UnauthorizedException("Invalid or expired code")
-    return await create_session(db, user)
-
-
-# ── 2FA management ────────────────────────────────────────────────────
-@router.post("/2fa/enable", status_code=status.HTTP_202_ACCEPTED)
-async def enable_2fa(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    if current_user.two_factor_enabled:
-        raise BadRequestException("2FA is already enabled.")
-    if not settings.smtp_host:
-        raise BadRequestException("Email is not configured — cannot enable 2FA.")
-    code = await generate_otp(OTP_2FA_SETUP_KEY.format(user_id=current_user.id))
-    await send_2fa_setup_email(current_user.email, code)
-    return {"message": "Verification code sent to your email."}
-
-
-@router.post("/2fa/enable/verify")
-async def enable_2fa_verify(
-    data: TwoFactorVerify,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    if not await verify_otp(OTP_2FA_SETUP_KEY.format(user_id=current_user.id), data.code):
-        raise UnauthorizedException("Invalid or expired code")
-    current_user.two_factor_enabled = True
-    await db.commit()
-    return {"message": "Two-factor authentication enabled."}
-
-
-@router.post("/2fa/disable")
-async def disable_2fa(
-    data: TwoFactorDisable,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    if not current_user.password_hash or not verify_password(
-        data.password, current_user.password_hash
-    ):
-        raise UnauthorizedException("Password is incorrect")
-    current_user.two_factor_enabled = False
-    await db.commit()
-    return {"message": "Two-factor authentication disabled."}

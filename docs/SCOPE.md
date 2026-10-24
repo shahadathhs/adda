@@ -82,8 +82,9 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
 
 - [x] Branch `archive/v3-full` from the pre-cleanup `adda-v3`
 - [x] Remove the desktop app (code, CI, compose, Makefile, site docs)
-- [ ] Remove DMs (routes, models, protocol messages, migration)
-- [ ] Remove OTP, 2FA and the set-password flow
+- [x] Remove DMs (routes, models, protocol messages, migration)
+- [x] Remove OTP, 2FA and the set-password flow; add the missing
+      forgot-password page so the email reset flow closes end to end
 - [ ] Simplify the community surface: one chat per channel, no join requests
       or memberships UI. The internal `Community` name stays; the UI, API
       docs and README say "channel"

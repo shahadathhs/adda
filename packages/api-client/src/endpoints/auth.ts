@@ -1,4 +1,4 @@
-import type { LoginResponse, Token, User } from "@adda/types";
+import type { Token, User } from "@adda/types";
 import { request } from "../client";
 
 export const register = (data: {
@@ -13,27 +13,15 @@ export const register = (data: {
   });
 
 export const login = (data: { email: string; password: string }) =>
-  request<LoginResponse>("/api/auth/login", {
+  request<Token>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
   });
 
-export const verify2faLogin = (temp_token: string, code: string) =>
-  request<Token>("/api/auth/login/verify-2fa", {
-    method: "POST",
-    body: JSON.stringify({ temp_token, code }),
-  });
-
-export const requestOtp = (email: string) =>
-  request<{ message: string }>("/api/auth/otp/request", {
+export const forgotPassword = (email: string) =>
+  request<{ message: string }>("/api/auth/forgot-password", {
     method: "POST",
     body: JSON.stringify({ email }),
-  });
-
-export const verifyOtp = (email: string, code: string) =>
-  request<Token>("/api/auth/otp/verify", {
-    method: "POST",
-    body: JSON.stringify({ email, code }),
   });
 
 export const resetPassword = (token: string, password: string) =>
@@ -65,25 +53,4 @@ export const changePassword = (current_password: string, new_password: string) =
   request<{ message: string }>("/api/auth/change-password", {
     method: "POST",
     body: JSON.stringify({ current_password, new_password }),
-  });
-
-export const setPassword = (new_password: string) =>
-  request<{ message: string }>("/api/auth/set-password", {
-    method: "POST",
-    body: JSON.stringify({ new_password }),
-  });
-
-export const enable2fa = () =>
-  request<{ message: string }>("/api/auth/2fa/enable", { method: "POST" });
-
-export const enable2faVerify = (code: string) =>
-  request<{ message: string }>("/api/auth/2fa/enable/verify", {
-    method: "POST",
-    body: JSON.stringify({ code }),
-  });
-
-export const disable2fa = (password: string) =>
-  request<{ message: string }>("/api/auth/2fa/disable", {
-    method: "POST",
-    body: JSON.stringify({ password }),
   });

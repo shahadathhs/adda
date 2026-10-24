@@ -39,7 +39,7 @@ function ResetForm() {
   if (!token) {
     return (
       <p className="text-sm text-muted-foreground">
-        This link is missing its token — request a new reset email from the sign-in page.
+        This link is missing its token — request a new one from the forgot-password page.
       </p>
     );
   }
