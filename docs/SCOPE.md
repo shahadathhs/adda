@@ -195,6 +195,24 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
       is persisted and the web chat loads it
 - [x] `@app.on_event("startup")` replaced by a lifespan handler
 
+### M2a — Bring the app up to the screens (before the rest of M2)
+
+The app must match the concept renders in `docs/design/screens` before more
+features are layered on. Preview any screen with invented data at
+`/design/<screen>` (development only) and compare it with its render; use
+`scripts/shot.sh <route> <out.png> [width] [height]` to capture it.
+
+- [x] App shell: top bar (Following, Browse, search, bell, avatar), guest bar
+- [x] Home (01): following rail, featured live channel, live grid, channels,
+      recordings; empty and loading states
+- [x] Channel live and offline (02, 03, 07, 21): player overlay, title row,
+      tabs, chat column, about column, guest prompt, reconnecting state
+- [ ] Browse and search (06), not found (19), stream ended (20)
+- [ ] Account: sign in, create account, reset (08–10), settings (12, 13)
+- [ ] Studio: setup, live, moderators, channel page, emotes (14–18)
+- [ ] Mobile (M1, M2), recording playback (04), channel profile (05)
+- [ ] Screenshot comparison for every screen in CI-less form (script + review)
+
 ### M2 — Realtime chat platform (F5, F9–F12)
 
 Backend and web together, in the order of [CHAT.md](CHAT.md): messages and

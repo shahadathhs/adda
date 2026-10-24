@@ -2,43 +2,32 @@
 
 import Link from "next/link";
 import type { RecordingFeedItem } from "@/lib/types";
-import { thumbUrl } from "@/lib/data";
+import { UserAvatar } from "@/components/ui/primitives";
+import { recordingTitle } from "@/lib/recordings";
+import { StreamThumb } from "@/components/stream-thumb";
 
-/** VOD card — poster (the channel's stream frame), title, channel, date. */
+/** VOD card: the channel's frame, a Recording tag, title, channel and date. */
 export function RecordingCard({ recording: r }: { recording: RecordingFeedItem }) {
-  const [prefix, suffix] = r.name.includes("-")
-    ? [r.name.slice(0, r.name.lastIndexOf("-")), r.name.lastIndexOf(".")]
-    : [r.name, r.name.lastIndexOf(".")];
-  void suffix;
-  const title =
-    prefix
-      .replace(/^\d{4}-\d{2}-\d{2}T?/, "")
-      .replace(/[-_]+/g, " ")
-      .trim() || r.name;
-
   return (
     <Link
       href={`/channel/${r.community_slug}`}
-      className="group block overflow-hidden rounded-lg border border-border bg-card outline-none transition-[translate,box-shadow] duration-120 ease-[var(--ease-micro)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.5)] focus-visible:outline-2 focus-visible:outline-ring"
+      className="group block overflow-hidden rounded-lg border border-border bg-card outline-none transition-[translate,border-color] duration-120 ease-[var(--ease-micro)] hover:-translate-y-0.5 hover:border-muted-foreground/40 focus-visible:outline-2 focus-visible:outline-ring"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-[#171b22]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={thumbUrl(r.community_id)}
-          alt=""
-          loading="lazy"
-          className="h-full w-full object-cover transition-[filter] duration-120 group-hover:brightness-110"
-        />
-        <span className="absolute bottom-2 left-2 rounded-xs bg-black/60 px-1.5 py-0.5 text-[11px] text-white/90">
-          VOD
+      <div className="relative border-b border-border">
+        <StreamThumb communityId={r.community_id} name={r.community_name} />
+        <span className="absolute left-2 top-2 rounded-xs bg-black/60 px-1.5 py-px text-[11px] font-bold uppercase tracking-wide text-white/80">
+          Recording
         </span>
       </div>
-      <div className="p-2.5">
-        <p className="truncate text-sm font-semibold text-foreground">{title}</p>
-        <p className="truncate text-[13px] text-muted-foreground">
-          {r.community_name} ·{" "}
-          {new Date(r.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}
-        </p>
+      <div className="flex gap-2.5 px-3 pb-3 pt-2.5">
+        <UserAvatar name={r.community_name} className="h-9 w-9 text-[13px]" />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">{recordingTitle(r.name)}</p>
+          <p className="truncate text-[13px] text-muted-foreground">
+            {r.community_name} ·{" "}
+            {new Date(r.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}
+          </p>
+        </div>
       </div>
     </Link>
   );

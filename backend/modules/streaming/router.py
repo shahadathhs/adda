@@ -42,9 +42,16 @@ async def discover(
     """Public browse grid — live channels first (by viewers), then the rest."""
     live_ids = set(await list_live_community_ids())
     viewers_map: dict[str, int] = {}
+    started_map: dict[str, str | None] = {}
     if live_ids:
-        counts = await asyncio.gather(*(viewer_count(cid) for cid in live_ids))
-        viewers_map = dict(zip(live_ids, counts, strict=True))
+        ordered = list(live_ids)
+        counts = await asyncio.gather(*(viewer_count(cid) for cid in ordered))
+        starts = await asyncio.gather(*(monitor.started_at(cid) for cid in ordered))
+        viewers_map = dict(zip(ordered, counts, strict=True))
+        started_map = {
+            cid: monitor.iso(s) if s is not None else None
+            for cid, s in zip(ordered, starts, strict=True)
+        }
 
     communities = await search_communities(db, q, limit=limit, offset=offset)
     ids = [c.id for c in communities]
@@ -61,6 +68,7 @@ async def discover(
             stream_title=c.stream_title,
             is_live=str(c.id) in live_ids,
             viewers=viewers_map.get(str(c.id), 0),
+            started_at=started_map.get(str(c.id)),
             follower_count=followers_map.get(c.id, 0),
             hls_url=hls_url(str(c.id)) if str(c.id) in live_ids else None,
             webrtc_url=webrtc_url(str(c.id)) if str(c.id) in live_ids else None,

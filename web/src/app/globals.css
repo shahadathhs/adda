@@ -193,6 +193,24 @@
 }
 
 @layer utilities {
+  /* Avatar tones — a small fixed set so channels read as distinct but on-brand. */
+  .tone-0 {
+    background: rgba(245, 166, 35, 0.14);
+    color: #f5a623;
+  }
+  .tone-1 {
+    background: rgba(47, 191, 113, 0.16);
+    color: #2fbf71;
+  }
+  .tone-2 {
+    background: rgba(90, 169, 230, 0.16);
+    color: #5aa9e6;
+  }
+  .tone-3 {
+    background: rgba(214, 122, 177, 0.16);
+    color: #d67ab1;
+  }
+
   /* Counts, durations, keys — always mono tabular (DESIGN.md §4) */
   .font-num {
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;

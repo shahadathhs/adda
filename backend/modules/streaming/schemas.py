@@ -19,6 +19,7 @@ class DiscoverItem(BaseModel):
     stream_title: str | None = None
     is_live: bool = False
     viewers: int = 0
+    started_at: str | None = None
     follower_count: int = 0
     hls_url: str | None = None
     webrtc_url: str | None = None

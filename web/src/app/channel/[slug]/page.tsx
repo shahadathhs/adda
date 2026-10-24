@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { Community } from "@/lib/types";
 import { ssrFetch } from "@/lib/ssr";
-import { ChannelView } from "@/components/channel-view";
+import { ChannelView } from "@/components/channel/channel-view";
 
 export const dynamic = "force-dynamic";
 
@@ -42,10 +42,8 @@ export default async function ChannelPage({ params }: Props) {
   if (!community) notFound();
 
   return (
-    <>
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <ChannelView community={community} />
-      </main>
-    </>
+    <main>
+      <ChannelView community={community} />
+    </main>
   );
 }

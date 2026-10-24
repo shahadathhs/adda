@@ -1,83 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Eye } from "lucide-react";
 import type { DiscoverChannel } from "@/lib/types";
-import { thumbUrl } from "@/lib/data";
-import { LiveBadge } from "@/components/ui/primitives";
-import { cn } from "@/lib/cn";
+import { LiveBadge, UserAvatar } from "@/components/ui/primitives";
+import { StreamThumb } from "@/components/stream-thumb";
+import { ViewerCount } from "@/components/viewer-count";
 
 /**
- * The stream card — ported 1:1 from the approved site hero mock
- * (DESIGN.md §7): 16:9 media panel, LIVE badge top-left, mono viewer
- * count bottom-left over a dark overlay, avatar + title/meta row.
- * The last captured frame serves as the poster for offline channels;
- * the fallback is the mock's tonal panel with a display monogram.
+ * The stream card: 16:9 frame, LIVE badge top-left, viewer count bottom-left,
+ * then avatar, stream title and channel name. Offline channels show the last
+ * frame with an OFFLINE tag instead.
  */
-export function StreamCard({ channel }: { channel: DiscoverChannel }) {
-  const [thumbFailed, setThumbFailed] = useState(false);
-  const c = channel;
-
+export function StreamCard({ channel: c }: { channel: DiscoverChannel }) {
   return (
     <Link
       href={`/channel/${c.slug}`}
-      className="group block overflow-hidden rounded-lg border border-border bg-card outline-none transition-[translate,box-shadow,border-color] duration-120 ease-[var(--ease-micro)] hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.5)] focus-visible:outline-2 focus-visible:outline-ring"
+      className="group block overflow-hidden rounded-lg border border-border bg-card outline-none transition-[translate,border-color] duration-120 ease-[var(--ease-micro)] hover:-translate-y-0.5 hover:border-muted-foreground/40 focus-visible:outline-2 focus-visible:outline-ring"
     >
-      {/* 16:9 media panel — mock anatomy */}
-      <div className="relative aspect-video w-full overflow-hidden border-b border-border bg-[#171b22]">
-        {!thumbFailed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={thumbUrl(c.community_id)}
-            alt=""
-            loading="lazy"
-            onError={() => setThumbFailed(true)}
-            className="h-full w-full object-cover transition-[filter] duration-120 group-hover:brightness-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center" aria-hidden="true">
-            <span className="font-display text-4xl font-bold text-muted-foreground/25">
-              {c.name.slice(0, 2).toUpperCase()}
-            </span>
-          </div>
-        )}
-
+      <div className="relative border-b border-border">
+        <StreamThumb communityId={c.community_id} name={c.name} />
         <div className="absolute left-2 top-2">
           {c.is_live ? (
             <LiveBadge />
           ) : (
-            <span className="rounded-xs bg-black/60 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white/80">
+            <span className="rounded-xs bg-black/60 px-1.5 py-px text-[11px] font-bold uppercase tracking-wide text-white/80">
               Offline
             </span>
           )}
         </div>
-
         {c.is_live && (
-          <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-xs bg-black/60 px-1.5 py-0.5 text-xs text-white">
-            <Eye className="h-3 w-3" aria-hidden="true" />
-            <span className="font-num">{c.viewers}</span>
-          </span>
+          <div className="absolute bottom-2 left-2">
+            <ViewerCount viewers={c.viewers} />
+          </div>
         )}
       </div>
-
-      {/* Meta row — avatar 36, title 14/600, meta 13 muted */}
-      <div className="flex items-start gap-2.5 p-2.5">
-        <span
-          className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold",
-            c.is_live ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
-          )}
-          aria-hidden="true"
-        >
-          {c.name.slice(0, 1).toUpperCase()}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold text-foreground">{c.name}</span>
-          <span className="block truncate text-[13px] text-muted-foreground">
-            {c.stream_title || c.description || `@${c.slug}`}
-          </span>
-        </span>
+      <div className="flex gap-2.5 px-3 pb-3 pt-2.5">
+        <UserAvatar name={c.name} src={c.avatar_url} className="h-9 w-9 text-[13px]" />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {(c.is_live && c.stream_title) || c.name}
+          </p>
+          <p className="truncate text-[13px] text-muted-foreground">
+            {c.is_live ? c.name : `@${c.slug}`}
+          </p>
+        </div>
       </div>
     </Link>
   );

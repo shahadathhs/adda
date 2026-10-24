@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { toneClass } from "@/lib/tone";
 
 const initials = (name: string) =>
   name
-    .split(/\s+/)
+    .split(/[\s_-]+/)
     .map((w) => w[0])
     .filter(Boolean)
     .slice(0, 2)
@@ -33,7 +34,8 @@ export function UserAvatar({
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-primary-subtle font-semibold text-primary",
+        "flex shrink-0 items-center justify-center rounded-full font-semibold",
+        toneClass(name),
         className,
       )}
       aria-label={name}
@@ -48,7 +50,7 @@ export function UserAvatar({
 export function LiveBadge({ viewers }: { viewers?: number }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-xs bg-live px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-      <span className="live-dot !h-1.5 !w-1.5" aria-hidden="true" />
+      <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
       LIVE
       {viewers != null && viewers > 0 && <span className="font-num normal-case">{viewers}</span>}
     </span>

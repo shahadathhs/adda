@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { LiveBadge } from "@/components/ui/primitives";
+import { ViewerCount } from "@/components/viewer-count";
 
 /**
  * HLS player with auto-reconnect watchdog: native HLS on Safari, hls.js
  * elsewhere. Re-runs setup if the stream never starts (live edge moving).
  */
-export function LivePlayer({ hlsUrl }: { hlsUrl: string }) {
+export function LivePlayer({ hlsUrl, viewers }: { hlsUrl: string; viewers?: number }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<{ destroy: () => void } | null>(null);
   const [status, setStatus] = useState<"connecting" | "playing" | "ended">("connecting");
@@ -74,7 +76,15 @@ export function LivePlayer({ hlsUrl }: { hlsUrl: string }) {
   }, [hlsUrl]);
 
   return (
-    <div className="relative overflow-hidden rounded-lg bg-black">
+    <div className="relative overflow-hidden rounded-lg border border-border bg-black">
+      <div className="pointer-events-none absolute left-2 top-2 z-10">
+        <LiveBadge />
+      </div>
+      {viewers !== undefined && (
+        <div className="pointer-events-none absolute right-2 top-2 z-10">
+          <ViewerCount viewers={viewers} />
+        </div>
+      )}
       <video ref={videoRef} controls autoPlay muted playsInline className="aspect-video w-full" />
       {status === "connecting" && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/60">
