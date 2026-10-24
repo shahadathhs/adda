@@ -27,17 +27,20 @@ importers:
         specifier: ^3.9.6
         version: 3.9.9
 
-  apps/web:
+  site:
     dependencies:
-      '@adda/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@adda/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
-      '@adda/types':
-        specifier: workspace:*
-        version: link:../../packages/types
+      '@astrojs/starlight':
+        specifier: ^0.36.0
+        version: 0.36.3(astro@5.18.2(@types/node@26.6.4)(jiti@2.7.0)(lightningcss@1.33.0)(rollup@4.64.3)(typescript@7.0.2)(yaml@2.9.1))
+      astro:
+        specifier: ^5.0.0
+        version: 5.18.2(@types/node@26.6.4)(jiti@2.7.0)(lightningcss@1.33.0)(rollup@4.64.3)(typescript@7.0.2)(yaml@2.9.1)
+      sharp:
+        specifier: ^0.34.0
+        version: 0.34.5
+
+  web:
+    dependencies:
       '@tanstack/react-query':
         specifier: ^5.101.4
         version: 5.104.1(react@19.3.0)
@@ -87,35 +90,6 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
-
-  packages/api-client:
-    dependencies:
-      '@adda/shared':
-        specifier: workspace:*
-        version: link:../shared
-      '@adda/types':
-        specifier: workspace:*
-        version: link:../types
-
-  packages/shared:
-    dependencies:
-      zod:
-        specifier: ^4.0.0
-        version: 4.6.5
-
-  packages/types: {}
-
-  site:
-    dependencies:
-      '@astrojs/starlight':
-        specifier: ^0.36.0
-        version: 0.36.3(astro@5.18.2(@types/node@26.6.4)(jiti@2.7.0)(lightningcss@1.33.0)(rollup@4.64.3)(typescript@7.0.2)(yaml@2.9.1))
-      astro:
-        specifier: ^5.0.0
-        version: 5.18.2(@types/node@26.6.4)(jiti@2.7.0)(lightningcss@1.33.0)(rollup@4.64.3)(typescript@7.0.2)(yaml@2.9.1)
-      sharp:
-        specifier: ^0.34.0
-        version: 0.34.5
 
 packages:
 

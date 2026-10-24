@@ -6,7 +6,7 @@
 .DEFAULT_GOAL := help
 
 BACKEND_DIR  := backend
-FRONTEND_DIR := apps/web
+FRONTEND_DIR := web
 SITE_DIR     := site
 COMPOSE      := docker compose
 UV           := uv run
@@ -30,8 +30,8 @@ help: ## Show this help
 
 # ── Setup ─────────────────────────────────────────────────────────────
 
-env: ## Create .env files (root, backend, apps/web) from their examples
-	@for f in .env backend/.env apps/web/.env; do \
+env: ## Create .env files (root, backend, web) from their examples
+	@for f in .env backend/.env web/.env; do \
 	  if [ ! -f "$$f" ] && [ -f "$$f.example" ]; then cp "$$f.example" "$$f" && echo "Created $$f"; \
 	  else echo "$$f exists (skipped)"; fi; \
 	done
@@ -107,7 +107,7 @@ web: ## Run web dev server on :5173 (vite)
 release: ## Prepare a release: make release v=0.2.0 (bump + commit + push; merge to main to build)
 	@test -n "$(v)" || { echo 'Usage: make release v=0.2.0'; exit 1; }
 	./scripts/bump-version.sh $(v)
-	git add VERSION apps/web/package.json
+	git add VERSION web/package.json
 	git commit -m "chore: release v$(v)"
 	git push origin $$(git rev-parse --abbrev-ref HEAD)
 	@echo ""

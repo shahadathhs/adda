@@ -41,7 +41,7 @@ async def started_at(community_id: str) -> float | None:
 async def _announce(community_id: str, is_live: bool, started: float | None) -> None:
     viewers = await viewer_count(community_id) if is_live else 0
     # Channel strings are matched verbatim by the connection manager — the
-    # client convention (packages/api-client ws.ts) is slash-separated:
+    # client convention (web/src/lib/api/ws.ts) is slash-separated:
     # community/<id>.
     channel = f"community/{community_id}"
     await manager.broadcast(

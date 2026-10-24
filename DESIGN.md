@@ -6,10 +6,10 @@ hard rules.
 
 **Surfaces — one product, three densities:**
 
-| Surface          | Location    | Density               | Type                    |
-| ---------------- | ----------- | --------------------- | ----------------------- |
-| Viewer web app   | `apps/web/` | medium, content-first | display + system + mono |
-| Marketing + docs | `site/`     | editorial spacing     | display + system + mono |
+| Surface          | Location | Density               | Type                    |
+| ---------------- | -------- | --------------------- | ----------------------- |
+| Viewer web app   | `web/`   | medium, content-first | display + system + mono |
+| Marketing + docs | `site/`  | editorial spacing     | display + system + mono |
 
 **The surfaces are one product.** Density and chrome vary; the identity
 kit is identical everywhere and copied verbatim, never reinterpreted:

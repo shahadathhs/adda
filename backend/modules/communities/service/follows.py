@@ -64,9 +64,7 @@ async def list_followed_communities(db: AsyncSession, user_id: uuid.UUID) -> lis
     return list(result.scalars().all())
 
 
-async def list_followers(
-    db: AsyncSession, community_id: uuid.UUID
-) -> list[User]:
+async def list_followers(db: AsyncSession, community_id: uuid.UUID) -> list[User]:
     """Public follower list for a channel, most recent first."""
     result = await db.execute(
         select(User)

@@ -3,32 +3,26 @@
 A self-hosted, web-only live-streaming platform with realtime chat. Scope and
 milestones live in `docs/SCOPE.md`.
 pnpm monorepo: FastAPI backend (`backend/`) + Next.js viewer/studio web app
-(`apps/web/`) + mediamtx streaming server + Astro/Starlight docs site
+(`web/`) + mediamtx streaming server + Astro/Starlight docs site
 (`site/`).
 
-## Target architecture (in progress)
+## Layout
 
 ```
 adda/
-├── apps/
-│   └── web/            # viewer + studio web app (Next.js App Router)
-├── packages/           # shared TS logic — NEVER shared UI
-│   ├── types/          # DTOs mirroring Pydantic schemas (@adda/types)
-│   ├── api-client/     # request + auth + WS client + endpoints (@adda/api-client)
-│   └── shared/         # runtime server config + zod schemas (@adda/shared)
-├── backend/            # FastAPI (unified API for all clients)
-├── site/               # Astro/Starlight marketing + docs (→ Vercel)
-└── infra/              # mediamtx (streaming server) + Caddy (HTTPS) configs
+├── backend/   # FastAPI API + WebSocket gateway
+├── web/       # viewer + studio web app (Next.js App Router)
+│   └── src/lib/{api,types,config}   # API client, DTOs, runtime config
+├── site/      # Astro/Starlight marketing + docs (→ Vercel)
+├── infra/     # mediamtx (streaming server) + Caddy (HTTPS) configs
+└── docs/      # scope, architecture, deployment
 ```
-
-**Boundary rule:** apps may import `@adda/*` packages but never each other's
-code. There is no `packages/ui` and there never will be.
 
 ## Design system (required reading)
 
 `/DESIGN.md` is the law for all UI work — tokens, type, radius, motion,
 component patterns, and the anti-slop checklist. Per-surface rules live in
-`apps/web/AGENTS.md` and `site/AGENTS.md`. Core
+`web/AGENTS.md` and `site/AGENTS.md`. Core
 rules: marigold accent `#f5a623` with dark-ink text on fills (never white),
 live red `#eb3223` reserved for live states, violet/purple banned, radii
 only 4/6/8px, mono tabular numerics, spring motion (120ms micro / 250ms
@@ -37,7 +31,7 @@ Both surfaces (web and site) share one identity kit.
 
 ## Commands
 
-### Install (workspace — covers apps/web, packages, site)
+### Install (workspace — covers web and site)
 
 ```bash
 pnpm install
@@ -58,17 +52,16 @@ uv run pyright                        # type checking (must pass, no new warning
 ### Web app (Next.js workspace member)
 
 ```bash
-pnpm -C apps/web dev                  # dev server → http://localhost:5173
+pnpm -C web dev                  # dev server → http://localhost:5173
 pnpm lint                             # oxlint + prettier (whole repo)
 pnpm typecheck                        # tsc --noEmit
-pnpm -C apps/web build                # next build (standalone output)
+pnpm -C web build                # next build (standalone output)
 ```
 
 - Next.js App Router viewer app: SSR browse (`/`) and channel pages
   (`/channel/[slug]`) with OG metadata; authed pages are client-side.
 - Server components fetch via `API_SSR_URL` (see `src/lib/ssr.ts`); client
-  code uses `@adda/api-client` (localStorage tokens).
-- `@adda/*` packages are transpiled via `transpilePackages` (raw TS source).
+  code uses the typed client in `src/lib/api` (localStorage tokens).
 - Legacy UUID links redirect: `/community/[id]` → channel view.
 
 ### Docs/marketing site (Astro + Starlight, workspace member)
@@ -92,7 +85,7 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
 - Run type checking after every backend change: `cd backend && uv run pyright`.
   No new warnings in changed files.
 - Run web lint/build after web or package changes:
-  `pnpm lint && pnpm typecheck && pnpm -C apps/web build`.
+  `pnpm lint && pnpm typecheck && pnpm -C web build`.
 - Run `pnpm -C site build` after docs-site changes.
 
 ## Conventions
@@ -102,8 +95,8 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   code, docs, comments, site content, or commits. Describe features in
   adda's own words; the product stands on its own.
 - **WebSocket contract is sacred.** The message types in
-  `backend/modules/realtime/protocol.py` and `packages/types/src/realtime.ts`
-  (transport in `packages/api-client/src/ws.ts`) must stay in sync. When adding
+  `backend/modules/realtime/protocol.py` and `web/src/lib/types/realtime.ts`
+  (transport in `web/src/lib/api/ws.ts`) must stay in sync. When adding
   a realtime feature, define the type in both places first.
 - Backend is async-first (async SQLAlchemy, asyncpg, `redis.asyncio`). Never use
   blocking calls in request handlers.
@@ -127,9 +120,7 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   all request/response schemas.
 - Web app is Next.js App Router (`src/app/`) with TanStack Query for client
   data. Shared components live in `src/components/`, helpers in `src/lib/`;
-  API calls and DTOs come from `@adda/api-client` and `@adda/types`.
-- Workspace packages export TypeScript source (no build step) — keep them
-  dependency-light and UI-free.
+  API calls live in `src/lib/api`, DTOs in `src/lib/types`.
 
 ## Ports
 

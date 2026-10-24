@@ -63,7 +63,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Build
-        run: pnpm -C apps/web build
+        run: pnpm -C web build
 
   site:
     name: Docs site (build)

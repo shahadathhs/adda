@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bump the project version in VERSION and apps/web/package.json.
+# Bump the project version in VERSION and web/package.json.
 # Usage: ./scripts/bump-version.sh 0.2.0
 set -euo pipefail
 
@@ -15,7 +15,7 @@ if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
 fi
 
 echo "$VERSION" > VERSION
-(cd apps/web && npm version "$VERSION" --no-git-tag-version --allow-same-version >/dev/null)
+(cd web && npm version "$VERSION" --no-git-tag-version --allow-same-version >/dev/null)
 
-echo "Bumped to $VERSION in VERSION and apps/web/package.json"
+echo "Bumped to $VERSION in VERSION and web/package.json"
 echo "Next: commit, tag v$VERSION, push with --tags."

@@ -32,7 +32,7 @@
   "ignorePatterns": ["**/node_modules", "**/dist", "**/.next", "**/.astro", "**/next-env.d.ts"],
   "overrides": [
     {
-      "files": ["apps/web/src/app/**"],
+      "files": ["web/src/app/**"],
       "rules": {
         "react/only-export-components": "off"
       }

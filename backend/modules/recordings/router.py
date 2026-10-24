@@ -67,7 +67,7 @@ async def recent_recordings(
                 )
             )
     items.sort(key=lambda i: i.created_at, reverse=True)
-    return items[:max(1, min(limit, 48))]
+    return items[: max(1, min(limit, 48))]
 
 
 @router.get("/file")

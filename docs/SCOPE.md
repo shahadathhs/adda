@@ -93,7 +93,8 @@ The siblings in this portfolio (Algomind, DropGrid, Voice Studio) set it.
 - [x] `VERSION` file
 - [x] Tooling centralised at the root (husky, lint-staged, commitlint, oxlint,
       prettier, editorconfig, tsconfig.base); lockfile committed; configs moved
-      to `infra/`
+      to `infra/`; `apps/web` flattened to `web/` and the `@adda/*` packages
+      folded into `web/src/lib/` (single client, so no shared-package layer)
 - [ ] Governance files (`LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`)
 - [ ] Rewrite `README.md` and the dual web/desktop columns in `DESIGN.md`
 
