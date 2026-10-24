@@ -3,79 +3,89 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Radio } from "lucide-react";
+import { AuthShell } from "@/components/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { describedBy } from "@/lib/field-aria";
 import { Input } from "@/components/ui/input";
 import { useLogin } from "@/lib/session";
-import { AuthShell } from "@/components/auth-shell";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const login = useLogin();
 
   return (
     <AuthShell>
-      <div className="flex min-h-screen items-center justify-center p-6 py-24">
-        <Card className="w-full max-w-sm p-6">
-          <div className="mb-5 flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/15">
-              <Radio className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-display text-lg font-bold tracking-tight">Welcome back</h1>
-              <p className="text-xs text-muted-foreground">Sign in to watch and chat</p>
-            </div>
-          </div>
+      <h1 className="font-display text-[28px] font-bold leading-8 tracking-tight text-foreground">
+        Welcome back
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">Sign in to chat, follow and get alerts.</p>
 
-          <form
-            className="space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              login.mutate(
-                { email: email.trim(), password },
-                { onSuccess: () => router.push("/") },
-              );
-            }}
-          >
-            <Input
-              type="email"
-              required
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-              type="password"
-              required
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button
-              variant="primary"
-              type="submit"
-              className="w-full"
-              disabled={login.isPending || !email || !password}
-            >
-              {login.isPending ? "Signing in…" : "Sign in"}
-            </Button>
-          </form>
+      <form
+        className="mt-7 space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setError(null);
+          login.mutate(
+            { email: email.trim(), password },
+            {
+              onSuccess: () => router.push("/"),
+              onError: (err) => setError(err instanceof Error ? err.message : "Could not sign in"),
+            },
+          );
+        }}
+      >
+        <Field label="Email" htmlFor="email">
+          <Input
+            id="email"
+            type="email"
+            required
+            autoComplete="email"
+            autoFocus
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Field>
+        <Field label="Password" htmlFor="password" error={error}>
+          <Input
+            id="password"
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            {...describedBy("password", !!error, error)}
+          />
+        </Field>
+        <p className="text-right text-xs">
+          <Link href="/forgot-password" className="text-primary hover:underline">
+            Forgot password?
+          </Link>
+        </p>
+        <Button
+          variant="primary"
+          size="lg"
+          type="submit"
+          className="w-full"
+          disabled={login.isPending || !email || !password}
+        >
+          {login.isPending ? "Signing in…" : "Sign in"}
+        </Button>
+      </form>
 
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            <Link href="/forgot-password" className="hover:underline">
-              Forgot password?
-            </Link>
-            {" · "}
-            No account?{" "}
-            <Link href="/register" className="text-primary hover:underline">
-              Create one
-            </Link>
-          </p>
-        </Card>
-      </div>
+      <p className="mt-5 text-center text-[13px] text-muted-foreground">
+        No account yet?{" "}
+        <Link href="/register" className="text-primary hover:underline">
+          Create one
+        </Link>
+      </p>
+      <p className="mt-5 border-t border-border pt-5 text-center text-xs text-muted-foreground/80">
+        Just looking? You can watch any public channel without an account.
+      </p>
     </AuthShell>
   );
 }

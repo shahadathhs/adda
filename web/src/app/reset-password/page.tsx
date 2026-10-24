@@ -1,73 +1,91 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { toast } from "sonner";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 import { resetPassword } from "@/lib/api";
-import { Button } from "@/components/ui/button";
+import { AuthNotice } from "@/components/auth-notice";
 import { AuthShell } from "@/components/auth-shell";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { describedBy } from "@/lib/field-aria";
 import { Input } from "@/components/ui/input";
 
 function ResetForm() {
-  const params = useSearchParams();
+  const token = useSearchParams().get("token") ?? "";
   const router = useRouter();
-  const token = params.get("token") ?? "";
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [pending, setPending] = useState(false);
-  const [done, setDone] = useState(false);
+  const mismatch =
+    confirm.length > 0 && password !== confirm ? "The passwords do not match." : null;
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirm) {
-      toast.error("Passwords don't match");
-      return;
-    }
-    setPending(true);
-    try {
-      await resetPassword(token, password);
-      setDone(true);
-      setTimeout(() => router.push("/login"), 1500);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Reset failed");
-    } finally {
-      setPending(false);
-    }
-  };
+  const save = useMutation({
+    mutationFn: () => resetPassword(token, password),
+    onSuccess: () => setTimeout(() => router.push("/login"), 1500),
+  });
 
-  if (!token) {
+  if (!token || save.isError) {
     return (
-      <p className="text-sm text-muted-foreground">
-        This link is missing its token — request a new one from the forgot-password page.
+      <div className="mt-5 space-y-4">
+        <AuthNotice tone="error">
+          This link has expired or was already used.{" "}
+          <Link href="/forgot-password" className="text-primary hover:underline">
+            Request a new one
+          </Link>
+        </AuthNotice>
+      </div>
+    );
+  }
+
+  if (save.isSuccess) {
+    return (
+      <p role="status" className="mt-4 text-sm text-muted-foreground">
+        Password saved. Taking you to sign in…
       </p>
     );
   }
 
-  if (done) {
-    return <p className="text-sm">Password updated — redirecting you to sign in…</p>;
-  }
-
   return (
-    <form className="space-y-3" onSubmit={submit}>
-      <Input
-        required
-        type="password"
-        minLength={8}
-        placeholder="New password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <Input
-        required
-        type="password"
-        minLength={8}
-        placeholder="Confirm new password"
-        value={confirm}
-        onChange={(e) => setConfirm(e.target.value)}
-      />
-      <Button variant="primary" type="submit" className="w-full" disabled={pending}>
-        {pending ? "Saving…" : "Reset password"}
+    <form
+      className="mt-6 space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!mismatch) save.mutate();
+      }}
+    >
+      <Field label="New password" htmlFor="password" help="At least 8 characters.">
+        <Input
+          id="password"
+          type="password"
+          required
+          minLength={8}
+          maxLength={128}
+          autoComplete="new-password"
+          autoFocus
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </Field>
+      <Field label="Confirm password" htmlFor="confirm" error={mismatch}>
+        <Input
+          id="confirm"
+          type="password"
+          required
+          autoComplete="new-password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          {...describedBy("confirm", !!mismatch, mismatch)}
+        />
+      </Field>
+      <Button
+        variant="primary"
+        size="lg"
+        type="submit"
+        className="w-full"
+        disabled={save.isPending || !password || !!mismatch}
+      >
+        {save.isPending ? "Saving…" : "Save password"}
       </Button>
     </form>
   );
@@ -76,16 +94,18 @@ function ResetForm() {
 export default function ResetPasswordPage() {
   return (
     <AuthShell>
-      <div className="flex min-h-screen items-center justify-center p-6 py-24">
-        <Card className="w-full max-w-sm p-6">
-          <h1 className="mb-4 font-display text-lg font-bold tracking-tight">
-            Reset your password
-          </h1>
-          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
-            <ResetForm />
-          </Suspense>
-        </Card>
-      </div>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        Reset
+      </p>
+      <h1 className="mt-1 font-display text-[28px] font-bold leading-8 tracking-tight text-foreground">
+        Choose a new password
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Pick something you do not use anywhere else.
+      </p>
+      <Suspense fallback={<p className="mt-4 text-sm text-muted-foreground">Loading…</p>}>
+        <ResetForm />
+      </Suspense>
     </AuthShell>
   );
 }

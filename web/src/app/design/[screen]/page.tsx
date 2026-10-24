@@ -6,6 +6,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { ChannelView } from "@/components/channel/channel-view";
 import { HomeClient } from "@/components/home-client";
+import { SettingsFrame } from "@/components/settings/settings-frame";
+import { IdentitySection } from "@/components/settings/identity-section";
+import { ProfileForm } from "@/components/settings/profile-form";
+import { PasswordForm } from "@/components/settings/password-form";
 import {
   fixtureChannelRecordings,
   fixtureChannels,
@@ -42,6 +46,27 @@ export default function DesignScreen({ params }: { params: Promise<{ screen: str
       <main>
         <HomeClient initial={fixtureChannels} recordings={fixtureRecordings} />
       </main>
+    );
+
+  if (screen === "settings-profile")
+    return (
+      <SettingsFrame current="/settings">
+        <div className="space-y-8">
+          <section>
+            <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">Profile</h2>
+            <ProfileForm user={{ ...fixtureUser, bio: "Radio hobbyist. Learning to solder." }} />
+          </section>
+          <IdentitySection user={fixtureUser} />
+        </div>
+      </SettingsFrame>
+    );
+
+  if (screen === "settings-password")
+    return (
+      <SettingsFrame current="/settings/password">
+        <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">Password</h2>
+        <PasswordForm />
+      </SettingsFrame>
     );
 
   if (screen.startsWith("channel-")) {

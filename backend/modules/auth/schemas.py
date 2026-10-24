@@ -51,4 +51,4 @@ class UpdateProfileRequest(BaseModel):
     )
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
     avatar_url: str | None = Field(default=None, max_length=512)
-    bio: str | None = Field(default=None, max_length=500)
+    bio: str | None = Field(default=None, max_length=280)

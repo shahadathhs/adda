@@ -1,60 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { apiBaseUrl } from "@/lib/config";
-import { Card } from "@/components/ui/card";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { TextTabs } from "@/components/page-tabs";
-import { IdentityCard } from "@/components/identity-card";
-import { ProfileCard } from "@/components/settings-profile-card";
-import { PasswordCard } from "@/components/settings-password-card";
 import { StudioClient } from "@/components/studio-client";
-import { useMe } from "@/lib/session";
 
-const SETTINGS_TABS = [
-  { id: "chat", label: "Chat" },
-  { id: "password", label: "Password" },
-  { id: "connection", label: "Connection" },
-];
+/** The studio. Old `?tab=profile` and `?tab=settings` links go to the settings pages. */
+export default function DashboardPage() {
+  const router = useRouter();
+  const tab = useSearchParams().get("tab");
+  const toSettings = tab === "profile" || tab === "settings";
 
-function Dashboard() {
-  const { data: user } = useMe();
-  const params = useSearchParams();
-  const tab = params.get("tab") ?? "profile";
-  const [settingsTab, setSettingsTab] = useState("chat");
+  useEffect(() => {
+    if (toSettings) router.replace("/settings");
+  }, [toSettings, router]);
 
+  if (toSettings) return null;
   return (
     <DashboardShell>
-      {tab === "profile" && user && <ProfileCard user={user} />}
-      {tab === "studio" && <StudioClient />}
-      {tab === "settings" && (
-        <div className="space-y-6">
-          <TextTabs tabs={SETTINGS_TABS} active={settingsTab} onChange={setSettingsTab} />
-          <div className="max-w-2xl">
-            {settingsTab === "chat" && user && <IdentityCard user={user} />}
-            {settingsTab === "password" && user && <PasswordCard />}
-            {settingsTab === "connection" && (
-              <Card className="space-y-2 p-5 text-sm text-muted-foreground">
-                <h2 className="font-display font-bold tracking-tight text-foreground">
-                  Connection
-                </h2>
-                <p>
-                  Server: <span className="font-mono text-xs">{apiBaseUrl()}</span>
-                </p>
-                <p className="text-xs">
-                  Streamers: manage your channels from the{" "}
-                  <strong className="text-foreground">Studio</strong>.
-                </p>
-              </Card>
-            )}
-          </div>
-        </div>
-      )}
+      <StudioClient />
     </DashboardShell>
   );
-}
-
-export default function DashboardPage() {
-  return <Dashboard />;
 }

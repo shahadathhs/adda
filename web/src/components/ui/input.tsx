@@ -9,6 +9,7 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
         "placeholder:text-muted-foreground",
         "transition-colors duration-120 ease-[var(--ease-micro)]",
         "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-1",
+        "aria-invalid:border-destructive",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}

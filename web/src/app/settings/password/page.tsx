@@ -1,0 +1,15 @@
+import { PasswordForm } from "@/components/settings/password-form";
+
+export default function PasswordSettingsPage() {
+  return (
+    <section aria-labelledby="password-heading">
+      <h2
+        id="password-heading"
+        className="mb-3 font-display text-xl font-semibold tracking-tight text-foreground"
+      >
+        Password
+      </h2>
+      <PasswordForm />
+    </section>
+  );
+}

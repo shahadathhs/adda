@@ -57,3 +57,6 @@ export const changePassword = (current_password: string, new_password: string) =
     method: "POST",
     body: JSON.stringify({ current_password, new_password }),
   });
+
+export const authConfig = () =>
+  request<{ email_enabled: boolean; reset_link_minutes: number }>("/api/auth/config");

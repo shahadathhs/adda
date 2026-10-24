@@ -64,12 +64,7 @@ export function UserMenu() {
               <Wand2 className="h-4 w-4" aria-hidden="true" />
               Studio
             </Link>
-            <Link
-              href="/dashboard?tab=settings"
-              role="menuitem"
-              className={item}
-              onClick={() => setOpen(false)}
-            >
+            <Link href="/settings" role="menuitem" className={item} onClick={() => setOpen(false)}>
               <Settings className="h-4 w-4" aria-hidden="true" />
               Settings
             </Link>

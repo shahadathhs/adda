@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearSession, getToken, login, logout, me, register, setSession, socket } from "@/lib/api";
 import type { Token, User } from "@/lib/types";
-import { toast } from "sonner";
 
 export const sessionKeys = { me: ["session", "me"] as const };
 
@@ -30,7 +29,6 @@ export function useLogin() {
       return adoptSession(await login({ email, password }));
     },
     onSuccess: (user) => qc.setQueryData(sessionKeys.me, user),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Login failed"),
   });
 }
 
@@ -42,7 +40,6 @@ export function useRegister() {
       password: string;
       display_name: string;
     }) => register(data),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Registration failed"),
   });
 }
 

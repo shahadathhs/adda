@@ -294,3 +294,18 @@ async def _suspend(user_id: str) -> None:
     async with async_session_factory() as db:
         await db.execute(update(User).where(User.id == uuid.UUID(user_id)).values(is_active=False))
         await db.commit()
+
+
+async def test_auth_config_tells_the_pages_whether_email_works(client: TestClient) -> None:
+    resp = await client.get("/auth/config")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["email_enabled"] is False  # the test environment has no SMTP host
+    assert body["reset_link_minutes"] > 0
+
+
+async def test_bio_is_limited_to_280_characters(client: TestClient, make_user) -> None:
+    acct = await make_user("rafi")
+    ok = await client.patch("/auth/me", acct.access, json={"bio": "x" * 280})
+    too_long = await client.patch("/auth/me", acct.access, json={"bio": "x" * 281})
+    assert ok.status_code == 200 and too_long.status_code == 422

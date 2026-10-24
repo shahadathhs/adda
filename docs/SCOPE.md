@@ -208,7 +208,8 @@ features are layered on. Preview any screen with invented data at
 - [x] Channel live and offline (02, 03, 07, 21): player overlay, title row,
       tabs, chat column, about column, guest prompt, reconnecting state
 - [ ] Browse and search (06), not found (19), stream ended (20)
-- [ ] Account: sign in, create account, reset (08–10), settings (12, 13)
+- [x] Account: sign in, create account, reset (08–10), profile and password
+      settings (12); notification settings (13) arrive with M3
 - [ ] Studio: setup, live, moderators, channel page, emotes (14–18)
 - [ ] Mobile (M1, M2), recording playback (04), channel profile (05)
 - [ ] Screenshot comparison for every screen in CI-less form (script + review)

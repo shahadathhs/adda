@@ -46,12 +46,12 @@ async def send_password_reset_email(to: str, reset_link: str) -> None:
     )
     html = f"""\
 <div style="font-family:sans-serif;line-height:1.6;max-width:560px;margin:auto">
-  <h2 style="color:#7c3aed">Reset your adda password</h2>
+  <h2 style="color:#f5a623">Reset your adda password</h2>
   <p>We received a request to reset your password. Click the button below to choose a new one.
      The link expires in {settings.reset_token_expire_minutes} minutes.</p>
   <p style="margin:24px 0">
-    <a href="{reset_link}" style="display:inline-block;background:#7c3aed;color:#fff;
-       padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:600">
+    <a href="{reset_link}" style="display:inline-block;background:#f5a623;color:#1a1205;
+       padding:12px 22px;border-radius:4px;text-decoration:none;font-weight:600">
        Reset password</a>
   </p>
   <p style="color:#6b7280;font-size:14px">

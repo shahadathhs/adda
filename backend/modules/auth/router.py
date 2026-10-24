@@ -120,6 +120,15 @@ async def change_password(
     return {"message": "Your password has been changed."}
 
 
+@router.get("/config")
+async def auth_config() -> dict[str, bool | int]:
+    """What the sign-in pages need to know: can this server send email, and how long links last."""
+    return {
+        "email_enabled": bool(settings.smtp_host),
+        "reset_link_minutes": settings.reset_token_expire_minutes,
+    }
+
+
 # ── Password reset (email link) ───────────────────────────────────────
 @router.post("/forgot-password", status_code=status.HTTP_202_ACCEPTED)
 async def forgot_password(data: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
