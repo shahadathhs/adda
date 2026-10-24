@@ -55,7 +55,7 @@ first sign-in.
 
 :::note[Email]
 The installer skips email (SMTP) for now. Without it, everything works —
-admins can reset passwords from the desktop console — but automatic
+admins can reset passwords through the API — but automatic
 reset emails need SMTP: add the `SMTP_*` values to `/opt/adda/.env` and
 restart. See the [configuration reference](/reference/configuration/).
 :::
@@ -87,6 +87,5 @@ alice and bob) for poking around. Production installs never do.
 
 - [Self-hosting guide](/guides/self-hosting/) — backups, tuning, scaling
 - [Going live with OBS](/guides/streaming/) — stream titles, health, recordings
-- [Desktop console](/guides/desktop/) — manage your platform as a native app
 - [Configuration](/reference/configuration/) — every environment variable
 - [FAQ](/faq/) — common issues (including port conflicts)

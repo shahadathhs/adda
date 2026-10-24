@@ -99,7 +99,7 @@ async def list_mine(
     current_user: User = Depends(get_current_user),
 ):
     """Channels where the current user holds a creator/moderator role —
-    the channel picker of the desktop creator console."""
+    the channel picker of the studio."""
     out: list[CommunityOut] = []
     for community, role in await list_my_communities(db, current_user.id):
         item = await _serialize(db, community)

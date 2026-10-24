@@ -1,9 +1,9 @@
 # adda — Project Agent Instructions
 
-A self-hosted multi-tenant live-streaming platform with community chat.
-pnpm monorepo: FastAPI backend (`backend/`) + React/TS viewer
-web app (`apps/web/`, Vite + TanStack) + Tauri operator console
-(`apps/desktop/`) + mediamtx streaming server + Astro/Starlight docs site
+A self-hosted, web-only live-streaming platform with realtime chat. Scope and
+milestones live in `docs/SCOPE.md`.
+pnpm monorepo: FastAPI backend (`backend/`) + Next.js viewer/studio web app
+(`apps/web/`) + mediamtx streaming server + Astro/Starlight docs site
 (`site/`).
 
 ## Target architecture (in progress)
@@ -11,8 +11,7 @@ web app (`apps/web/`, Vite + TanStack) + Tauri operator console
 ```
 adda/
 ├── apps/
-│   ├── web/            # viewer web app (Vite + React + TanStack Router)
-│   └── desktop/        # (planned) React + Tauri operator console
+│   ├── web/            # viewer + studio web app (Next.js App Router)
 ├── packages/           # shared TS logic — NEVER shared UI
 │   ├── types/          # DTOs mirroring Pydantic schemas (@adda/types)
 │   ├── api-client/     # request + auth + WS client + endpoints (@adda/api-client)
@@ -23,19 +22,18 @@ adda/
 ```
 
 **Boundary rule:** apps may import `@adda/*` packages but never each other's
-code. There is no `packages/ui` and there never will be — desktop and web UIs
-evolve independently.
+code. There is no `packages/ui` and there never will be.
 
 ## Design system (required reading)
 
 `/DESIGN.md` is the law for all UI work — tokens, type, radius, motion,
 component patterns, and the anti-slop checklist. Per-surface rules live in
-`apps/web/AGENTS.md`, `apps/desktop/AGENTS.md`, and `site/AGENTS.md`. Core
+`apps/web/AGENTS.md` and `site/AGENTS.md`. Core
 rules: marigold accent `#f5a623` with dark-ink text on fills (never white),
 live red `#eb3223` reserved for live states, violet/purple banned, radii
 only 4/6/8px, mono tabular numerics, spring motion (120ms micro / 250ms
 state, transform+opacity only), one exported React component per file.
-All three surfaces share one identity kit — density is the only variable.
+Both surfaces (web and site) share one identity kit.
 
 ## Commands
 
@@ -78,26 +76,6 @@ pnpm -C apps/web build                # next build (standalone output)
 make site-dev                         # dev server → http://localhost:4321
 make site-build                       # static build → site/dist/
 ```
-
-### Desktop console (Tauri v2, requires Rust toolchain)
-
-```bash
-pnpm -C apps/desktop desktop:dev        # tauri dev — needs backend running on :7001
-pnpm -C apps/desktop desktop:build      # bundles installers into src-tauri/target
-pnpm -C apps/desktop dev                # console UI in a browser on :5174 (no Rust)
-```
-
-- The console (`apps/desktop/`) is the **creator client** — channel
-  management for streamers/moderators (their channels only) plus a Platform
-  section for system admins. It shares logic via `@adda/*` packages but has
-  its own UI (dense, dark, keyboard-first; never shares UI with web).
-- Server URL is runtime-configured (`@adda/shared`): first-run connect screen,
-  changeable in Settings. Auth = operator account (admin/superadmin) with the
-  same rotating refresh tokens as web.
-- Native notifications on `stream_status` WS events via the Tauri
-  notification plugin; ⌘K command palette; ⌘1–⌘7 view switching.
-- Linux installers build without local Rust via Docker:
-  `docker compose --profile desktop run --rm desktop` → `./dist-desktop/`.
 
 ### Infra (Docker)
 
@@ -146,11 +124,9 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   module's `model.py` but never its `router`/`service` (prevents import cycles).
 - Use triple-quoted strings for multi-line prompt/text. Pydantic v2 models for
   all request/response schemas.
-- Web app uses TanStack Query + TanStack Router (file-based routes under
-  `src/routes/`). Feature-sliced: each domain has `src/features/<domain>/` with
-  `hooks.ts` + UI (api/types live in `@adda/*` — the per-feature `api.ts`/
-  `types.ts` files are re-export shims; new code should import `@adda/*`
-  directly). Shared UI in `src/shared/ui/` (shadcn/ui style).
+- Web app is Next.js App Router (`src/app/`) with TanStack Query for client
+  data. Shared components live in `src/components/`, helpers in `src/lib/`;
+  API calls and DTOs come from `@adda/api-client` and `@adda/types`.
 - Workspace packages export TypeScript source (no build step) — keep them
   dependency-light and UI-free.
 

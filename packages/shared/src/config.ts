@@ -1,6 +1,6 @@
 /**
  * Runtime server configuration. Bundler-agnostic: env vars are read
- * defensively so this module works under Vite, Next.js, and Tauri alike.
+ * defensively so this module works under Vite and Next.js alike.
  */
 
 interface EnvLike {
@@ -17,7 +17,7 @@ declare const process: { env?: Record<string, string | undefined> } | undefined;
 /**
  * Read build-time env defaults bundler-agnostically: Vite exposes
  * `import.meta.env.VITE_*`, Next inlines `process.env.NEXT_PUBLIC_*`.
- * These are only DEFAULTS — desktop apps override at runtime via
+ * These are only DEFAULTS — a runtime override can be stored via
  * localStorage (setServerConfig).
  */
 function readEnvDefaults(): { api?: string; hls?: string } {
@@ -47,9 +47,6 @@ export interface ServerConfig {
   /** HLS (mediamtx) origin used for live playback. */
   hls: string;
 }
-
-/** True when running inside the Tauri desktop shell. */
-export const isDesktopApp = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
 function stripTrailingSlash(url: string): string {
   return url.replace(/\/+$/, "");
@@ -86,7 +83,7 @@ export function getServerConfig(): ServerConfig {
   return { api: DEFAULT_API_BASE_URL, hls: DEFAULT_HLS_BASE_URL };
 }
 
-/** Persist a server override (desktop app / remote deployments). */
+/** Persist a server override (remote deployments). */
 export function setServerConfig(api: string, hls?: string): void {
   const normalizedApi = stripTrailingSlash(api);
   localStorage.setItem(

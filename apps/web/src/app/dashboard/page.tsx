@@ -45,8 +45,8 @@ function Dashboard() {
                   Server: <span className="font-mono text-xs">{apiBaseUrl()}</span>
                 </p>
                 <p className="text-xs">
-                  Streamers and admins: manage streams and communities from the{" "}
-                  <strong className="text-foreground">Adda Console</strong> desktop app.
+                  Streamers: manage your channels from the{" "}
+                  <strong className="text-foreground">Studio</strong>.
                 </p>
               </Card>
             )}

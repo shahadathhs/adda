@@ -39,4 +39,3 @@ apps/web/.env.local
 /recordings/
 /thumbs/
 /uploads/
-/dist-desktop/

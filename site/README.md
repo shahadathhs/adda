@@ -2,7 +2,7 @@
 
 The public face of the project: a static Astro/Starlight site that
 **explains the product** and **guides self-hosters** through deploying
-the backend + web stack and using the desktop console. It is maintained
+the backend + web stack. It is maintained
 by the project, deployed once by us — it is not part of a user's
 self-hosted stack.
 

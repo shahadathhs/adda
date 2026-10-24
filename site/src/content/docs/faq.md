@@ -15,12 +15,6 @@ Something else on the machine already uses Redis's port (another project's
 container or a local Redis). Either stop it, or change `REDIS_PORT` in `.env`
 and `REDIS_URL` to match, then `make up` again.
 
-## macOS says the app is from an unknown developer
-
-Desktop installers are currently unsigned. Right-click the app → **Open** →
-**Open** in the dialog (macOS), or
-`xattr -d com.apple.quarantine /Applications/Adda.app` in a terminal.
-Windows SmartScreen: **More info → Run anyway**.
 
 ## Is there transcoding / multi-bitrate?
 

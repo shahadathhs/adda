@@ -7,6 +7,4 @@ node_modules
 backend
 .venv
 recordings
-dist-desktop
 *.md
-apps/desktop/src-tauri/target

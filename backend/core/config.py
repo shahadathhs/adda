@@ -56,11 +56,8 @@ class Settings(BaseSettings):
     # overwritten in place while live; kept as the offline poster).
     thumbs_dir: str = "../thumbs"
 
-    # CORS origins (comma-separated). The tauri:// entries cover the desktop
-    # app (macOS/Linux uses tauri://localhost, Windows http://tauri.localhost).
-    cors_origins: str = (
-        "http://localhost:5173,http://localhost:5174,tauri://localhost,http://tauri.localhost"
-    )
+    # CORS origins (comma-separated).
+    cors_origins: str = "http://localhost:5173"
 
     # Bootstrap accounts — seeded idempotently on startup (only created if they
     # don't already exist). Override all of these in prod with strong values.

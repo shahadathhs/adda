@@ -7,7 +7,6 @@
 
 BACKEND_DIR  := backend
 FRONTEND_DIR := apps/web
-DESKTOP_DIR  := apps/desktop
 SITE_DIR     := site
 COMPOSE      := docker compose
 UV           := uv run
@@ -18,10 +17,10 @@ PNPM         := pnpm
 ALEMBIC := cd $(BACKEND_DIR) && $(UV) alembic
 
 .PHONY: help setup env dirs toolchain install \
-        up down restart build logs logs-backend logs-web logs-desktop ps \
-        dev backend web desktop desktop-dev desktop-build desktop-clean release \
+        up down restart build logs logs-backend logs-web ps \
+        dev backend web release \
         migrate migration reset reset-migrate db-up typecheck \
-        lint lint-backend lint-web format build-web build-desktop \
+        lint lint-backend lint-web format build-web \
         site-dev site-build site-preview \
         check clean clean-recordings
 
@@ -82,9 +81,6 @@ logs-backend: ## Tail backend logs
 logs-web: ## Tail web logs
 	$(COMPOSE) logs -f --tail=100 web
 
-logs-desktop: ## Tail desktop-builder logs
-	$(COMPOSE) --profile desktop logs -f --tail=100 desktop
-
 ps: ## List running containers
 	$(COMPOSE) ps
 
@@ -104,44 +100,18 @@ backend: ## Run backend dev server on :7001 (uvicorn --reload)
 web: ## Run web dev server on :5173 (vite)
 	@cd $(FRONTEND_DIR) && $(PNPM) dev
 
-# ── Desktop app (Tauri) ───────────────────────────────────────────────
-# The desktop app is a client of the running stack — start the server side
-# first (make up, or make dev in another terminal).
-
-desktop-dev: ## Run the desktop app in dev mode (needs local Rust + running stack)
-	@cd $(DESKTOP_DIR) && \
-	  if lsof -i :5174 -sTCP:LISTEN >/dev/null 2>&1; then \
-	    echo "vite already running on :5174 — attaching to it"; \
-	    $(PNPM) tauri dev --config '{"build":{"beforeDevCommand":""}}'; \
-	  else \
-	    $(PNPM) desktop:dev; \
-	  fi
-
-desktop-build: ## Build desktop installers natively (needs local Rust; macOS/Windows only)
-	@cd $(DESKTOP_DIR) && $(PNPM) desktop:build
-
-desktop: ## Build Linux desktop installers via Docker (no Rust needed) → ./dist-desktop/
-	$(COMPOSE) --profile desktop build desktop
-	$(COMPOSE) --profile desktop run --rm desktop
-	@echo "Installers ready in ./dist-desktop/ (deb + appimage)."
-
-desktop-clean: ## Remove desktop build caches (Docker volumes + dist-desktop/)
-	$(COMPOSE) --profile desktop down --volume --remove-orphans
-	@rm -rf dist-desktop
-
 # ── Release ───────────────────────────────────────────────────────────
-# Bumps the version and commits. When the bump lands on main, CI builds
-# all desktop installers and publishes the GitHub release (tag included).
+# Bumps the version and commits. When the bump lands on main,
+# the release tag and notes are created from the bumped version.
 
 release: ## Prepare a release: make release v=0.2.0 (bump + commit + push; merge to main to build)
 	@test -n "$(v)" || { echo 'Usage: make release v=0.2.0'; exit 1; }
 	./scripts/bump-version.sh $(v)
-	git add apps/web/package.json apps/web/src-tauri/tauri.conf.json apps/web/src-tauri/Cargo.toml
+	git add VERSION apps/web/package.json
 	git commit -m "chore: release v$(v)"
 	git push origin $$(git rev-parse --abbrev-ref HEAD)
 	@echo ""
-	@echo "Version bumped to v$(v) and pushed. Merge this branch into main —"
-	@echo "CI will build the installers and publish the release automatically."
+	@echo "Version bumped to v$(v) and pushed. Merge this branch into main and tag it."
 
 # ── Backend: migrations, tests, typecheck ──────────────────────────────
 # Alembic autogenerate diffs models against the LIVE database, so we always
@@ -194,9 +164,6 @@ lint: lint-backend lint-web ## Lint backend (ruff) + web (oxlint/eslint/prettier
 build-web: ## Build web app (next build)
 	@cd $(FRONTEND_DIR) && $(PNPM) build
 
-build-desktop: ## Build desktop console UI (tsc + vite)
-	@cd $(DESKTOP_DIR) && $(PNPM) build
-
 # ── Marketing / docs site (Astro + Starlight) ─────────────────────────
 # Deps come from the root workspace: `pnpm install` (see: make install).
 
@@ -211,7 +178,7 @@ site-preview: ## Preview the built docs site
 
 # ── Quality & cleanup ─────────────────────────────────────────────────
 
-check: typecheck lint build-web build-desktop site-build ## Run all quality gates (backend + web + desktop + site)
+check: typecheck lint build-web site-build ## Run all quality gates (backend + web + site)
 
 clean-recordings: ## Delete ALL recordings (keeps the folder) — DESTRUCTIVE
 	@rm -rf recordings && mkdir recordings

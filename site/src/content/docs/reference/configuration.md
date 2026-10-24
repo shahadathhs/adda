@@ -48,14 +48,10 @@ Used by Docker Compose and shared by services.
 
 | Variable        | Default                                                                                   |
 | --------------- | ----------------------------------------------------------------------------------------- |
-| `CORS_ORIGINS`  | `http://localhost:5173,http://localhost:5174,tauri://localhost,http://tauri.localhost`    |
+| `CORS_ORIGINS`  | `http://localhost:5173`                                                                    |
 
-Comma-separated browser origins allowed to call the API. The defaults cover
-the web app (5173), the desktop console in dev/preview (5174), and the
-packaged Tauri console (`tauri://localhost` on macOS/Linux,
-`http://tauri.localhost` on Windows). In production, set it to your web
-app's origin(s) — keep the `tauri://` entries so operators can use the
-console.
+Comma-separated browser origins allowed to call the API. The default covers
+the web app (5173). In production, set it to your web app's origin(s).
 
 ### Streaming (mediamtx)
 
@@ -104,7 +100,6 @@ Seeding is idempotent — it only creates accounts that don't exist yet.
 | `VITE_HLS_BASE_URL`    | `http://localhost:8888`  | fallback; runtime-overridable |
 
 :::note[Runtime server config]
-The desktop app (and the web app) store a server config in localStorage key
-`adda_server_config`. The desktop setup screen writes it on first run —
-`VITE_*` values are only fallback defaults.
+The web app can store a server config in the localStorage key
+`adda_server_config`; `VITE_*` values are only fallback defaults.
 :::

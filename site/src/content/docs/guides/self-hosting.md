@@ -5,9 +5,8 @@ description: Production deployment guide — TLS, reverse proxy, persistence, sc
 
 adda is designed to be self-hosted on a single box (a 2 vCPU / 4 GB VPS is a
 fine start for a small community) and can scale horizontally when you outgrow
-it. You host two things: the **stack** (backend + web app + streaming) and
-nothing else — the desktop console is an installer your operators download,
-and there is no cloud component of ours anywhere in your deployment.
+it. You host one thing: the **stack** (backend + web app + streaming). There is
+no cloud component of ours anywhere in your deployment.
 
 ## Requirements
 

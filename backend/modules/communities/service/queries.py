@@ -7,7 +7,7 @@ from models.community import Community
 from models.membership import CommunityRole, Membership
 
 # Roles with creator/moderator powers inside a channel — the audience of the
-# desktop creator console.
+# studio.
 ELEVATED_ROLES = {
     CommunityRole.owner,
     CommunityRole.admin,

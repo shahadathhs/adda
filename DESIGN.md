@@ -9,7 +9,6 @@ hard rules.
 | Surface | Location | Density | Type |
 |---|---|---|---|
 | Viewer web app | `apps/web/` | medium, content-first | display + system + mono |
-| Operator console | `apps/desktop/` | dense, keyboard-first | system + mono (no webfonts) |
 | Marketing + docs | `site/` | editorial spacing | display + system + mono |
 
 **The surfaces are one product.** Density and chrome vary; the identity
@@ -63,7 +62,7 @@ The five non-default decisions everything else derives from:
 
 | Axiom | adda | Escapes the default of |
 |---|---|---|
-| Density | Web: medium, content-first · Desktop: dense, 13px base | spacious SaaS layouts |
+| Density | Medium, content-first | spacious SaaS layouts |
 | Radius | 4px controls / 6px panels / 8px media | `rounded-xl` everywhere |
 | Saturation | one warm accent on near-black ink; state colors quiet | timid slate-on-white |
 | Type | grotesk display + system body + mono numerics | Inter-for-everything |

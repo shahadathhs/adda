@@ -7,7 +7,7 @@ export default defineConfig({
     starlight({
       title: "adda",
       description:
-        "Self-hosted, multi-tenant live streaming for your community — web, desktop, and mobile browser in one bundle.",
+        "Self-hosted live streaming with realtime chat and automatic recordings — one Docker Compose stack, all in the browser.",
       favicon: "/favicon.svg",
       logo: {
         src: "./src/assets/logo.svg",
@@ -33,7 +33,6 @@ export default defineConfig({
           items: [
             { label: "Self-hosting", link: "/guides/self-hosting/" },
             { label: "Going live (OBS)", link: "/guides/streaming/" },
-            { label: "Desktop app", link: "/guides/desktop/" },
             { label: "Administration", link: "/guides/admin/" },
           ],
         },

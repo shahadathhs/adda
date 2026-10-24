@@ -8,15 +8,7 @@ import globals from "globals";
 // only covers plain JS files; formatting of TS is enforced by
 // `prettier --check` (see the lint script).
 export default defineConfig([
-  globalIgnores([
-    "node_modules/*",
-    "dist/*",
-    ".next/*",
-    "src-tauri/target/*",
-    "src-tauri/gen/*",
-    "**/*.ts",
-    "**/*.tsx",
-  ]),
+  globalIgnores(["node_modules/*", "dist/*", ".next/*", "**/*.ts", "**/*.tsx"]),
 
   {
     files: ["**/*.{js,cjs,mjs}"],

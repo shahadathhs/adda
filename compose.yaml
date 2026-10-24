@@ -136,40 +136,8 @@ services:
       web:
         condition: service_started
 
-  # Builds desktop installers (Linux .deb/.AppImage) — not a long-running
-  # service. Run: make desktop
-  # Output lands in ./dist-desktop/ on the host.
-  desktop:
-    build:
-      context: .
-      dockerfile: apps/desktop/src-tauri/Dockerfile
-    profiles: ["desktop"]
-    working_dir: /repo
-    environment:
-      # AppImage tooling can't use FUSE inside containers.
-      APPIMAGE_EXTRACT_AND_RUN: "1"
-    volumes:
-      - .:/repo
-      - desktop_node_modules:/repo/node_modules
-      - desktop_pnpm_store:/root/.local/share/pnpm/store
-      - desktop_cargo_registry:/usr/local/cargo/registry
-      - desktop_cargo_git:/usr/local/cargo/git
-      - desktop_tauri_target:/repo/apps/desktop/src-tauri/target
-      - ./dist-desktop:/out
-    command: >
-      sh -c "pnpm install --filter @adda/desktop... --no-frozen-lockfile &&
-             pnpm --filter @adda/desktop exec tauri build --bundles deb,appimage &&
-             rm -rf /out/* &&
-             cp -r apps/desktop/src-tauri/target/release/bundle/deb /out/ &&
-             cp -r apps/desktop/src-tauri/target/release/bundle/appimage /out/"
-
 volumes:
   postgres_data:
   redis_data:
   caddy_data:
   caddy_config:
-  desktop_node_modules:
-  desktop_pnpm_store:
-  desktop_cargo_registry:
-  desktop_cargo_git:
-  desktop_tauri_target:
