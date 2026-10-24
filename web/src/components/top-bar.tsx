@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Radio, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
 import { SearchBox } from "@/components/search-box";
@@ -22,6 +22,9 @@ export function TopBar() {
   const { data: user } = useMe();
   const pathname = usePathname();
   const following = useSearchParams().get("tab") === "following";
+  const onAuthPage = ["/login", "/register", "/forgot-password", "/reset-password"].some((p) =>
+    pathname?.startsWith(p),
+  );
   const onHome = pathname === "/" || pathname === "/search";
 
   return (
@@ -69,18 +72,19 @@ export function TopBar() {
               <UserMenu />
             </>
           ) : (
-            <>
-              <Link href="/login">
-                <Button variant="ghost" size="md">
+            !onAuthPage && (
+              <>
+                <Link href="/login" className={buttonClass("ghost")}>
                   Sign in
-                </Button>
-              </Link>
-              <Link href="/register" className="hidden sm:block">
-                <Button variant="primary" size="md">
+                </Link>
+                <Link
+                  href="/register"
+                  className={buttonClass("primary", "md", "hidden sm:inline-flex")}
+                >
                   Create account
-                </Button>
-              </Link>
-            </>
+                </Link>
+              </>
+            )
           )}
         </div>
       </PageContainer>

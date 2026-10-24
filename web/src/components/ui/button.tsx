@@ -20,25 +20,25 @@ const sizes: Record<Size, string> = {
   lg: "h-10 rounded-sm px-5 text-sm",
 };
 
+/** Button styles, for a link that should look like a button (never nest a button in a link). */
+export function buttonClass(variant: Variant = "default", size: Size = "md", className?: string) {
+  return cn(
+    "inline-flex cursor-pointer items-center justify-center gap-2 font-medium",
+    "transition-[background-color,border-color,color,scale] duration-120 ease-[var(--ease-micro)]",
+    "active:scale-[0.97]",
+    "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
+    "disabled:pointer-events-none disabled:opacity-50",
+    variants[variant],
+    sizes[size],
+    className,
+  );
+}
+
 export function Button({
   variant = "default",
   size = "md",
   className,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
-  return (
-    <button
-      className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-2 font-medium",
-        "transition-[background-color,border-color,color,scale] duration-120 ease-[var(--ease-micro)]",
-        "active:scale-[0.97]",
-        "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
-        "disabled:pointer-events-none disabled:opacity-50",
-        variants[variant],
-        sizes[size],
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <button className={buttonClass(variant, size, className)} {...props} />;
 }
