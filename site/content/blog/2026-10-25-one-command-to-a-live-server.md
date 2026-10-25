@@ -11,7 +11,7 @@ adda's installer is a shell script you pipe from the repository. Piping a script
 deserves suspicion, so here is exactly what it does.
 
 ```text
-curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/main/scripts/install.sh | sh
 ```
 
 ## The steps

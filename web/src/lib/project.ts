@@ -8,6 +8,6 @@ export const PROJECT = {
   docs: `${SITE}/docs/operations`,
   repo: "https://github.com/shahadathhs/adda",
   issues: "https://github.com/shahadathhs/adda/issues",
-  license: "https://github.com/shahadathhs/adda/blob/dev/LICENSE",
+  license: "https://github.com/shahadathhs/adda/blob/main/LICENSE",
   author: { handle: "shahadathhs", url: "https://github.com/shahadathhs" },
 } as const;

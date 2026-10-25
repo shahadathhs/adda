@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const repoDocs = join(here, "..", "..", "docs");
 const out = join(here, "..", "content", "docs", "_generated");
-const REPO = "https://github.com/shahadathhs/adda/blob/dev";
+const REPO = "https://github.com/shahadathhs/adda/blob/main";
 
 // source file → [site slug, description]
 const SYNCED = {

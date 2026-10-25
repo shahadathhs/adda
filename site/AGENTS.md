@@ -30,7 +30,7 @@ site/
 - **Honest copy.** Direct, self-hoster to self-hoster. No superlatives without a fact. Never
   name or compare adda to another product.
 - **Docs have one source.** `ARCHITECTURE.md`, `OPERATIONS.md` and `CHAT.md` live in `/docs`
-  and are copied into `content/docs/_generated/` by `pnpm -C site sync-docs` (run on `dev`;
+  and are copied into `content/docs/_generated/` by `pnpm -C site sync-docs` (run on `main`;
   `build` fails if the committed copies are stale). Edit `/docs`, not the copies. Everything
   else under `content/docs/` is written for the site.
 - **Add a docs page:** create the `.md` file, add it to `src/lib/nav.ts`.

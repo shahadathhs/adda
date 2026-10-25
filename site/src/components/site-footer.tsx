@@ -17,13 +17,13 @@ export function SiteFooter() {
             Operations
           </Link>
           <ExternalLink
-            href={`${SITE.repo}/blob/dev/docs/SCOPE.md`}
+            href={`${SITE.repo}/blob/main/docs/SCOPE.md`}
             className="hover:text-foreground"
           >
             Scope
           </ExternalLink>
           <ExternalLink
-            href={`${SITE.repo}/blob/dev/SECURITY.md`}
+            href={`${SITE.repo}/blob/main/SECURITY.md`}
             className="hover:text-foreground"
           >
             Security

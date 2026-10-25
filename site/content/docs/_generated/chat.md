@@ -3,14 +3,14 @@ title: "Chat backend design"
 description: "The chat data model, the WebSocket protocol, the REST endpoints and the rules."
 ---
 
-The chat the screens show ([02](https://github.com/shahadathhs/adda/blob/dev/docs/design/screens/02-channel-live.png),
-[07](https://github.com/shahadathhs/adda/blob/dev/docs/design/screens/07-guest-channel-live.png),
-[15](https://github.com/shahadathhs/adda/blob/dev/docs/design/screens/15-studio-live.png)) is more than a message list: badges,
+The chat the screens show ([02](https://github.com/shahadathhs/adda/blob/main/docs/design/screens/02-channel-live.png),
+[07](https://github.com/shahadathhs/adda/blob/main/docs/design/screens/07-guest-channel-live.png),
+[15](https://github.com/shahadathhs/adda/blob/main/docs/design/screens/15-studio-live.png)) is more than a message list: badges,
 replies, mentions, reactions, emotes, a pin, a poll, identity mode, and
 moderation. This document fixes the backend design for all of it, so the
 features share one model instead of accumulating special cases.
 
-Flows and acceptance criteria are in [FLOWS.md](https://github.com/shahadathhs/adda/blob/dev/docs/FLOWS.md) (F5, F9–F14).
+Flows and acceptance criteria are in [FLOWS.md](https://github.com/shahadathhs/adda/blob/main/docs/FLOWS.md) (F5, F9–F14).
 
 ## Principles
 

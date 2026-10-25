@@ -18,7 +18,7 @@ included), generates every secret and starts the platform behind automatic HTTPS
 On the server, as root:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/main/scripts/install.sh | sh
 ```
 
 It asks two things, your **domain** (for example `adda.example.com`) and your **admin email**.

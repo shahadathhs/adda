@@ -3,8 +3,8 @@ title: "Architecture"
 description: "How the services, the streaming path, realtime and the code fit together."
 ---
 
-How the pieces fit. Scope and acceptance criteria are in [SCOPE.md](https://github.com/shahadathhs/adda/blob/dev/docs/SCOPE.md) and
-[FLOWS.md](https://github.com/shahadathhs/adda/blob/dev/docs/FLOWS.md); the chat design is in [CHAT.md](/docs/chat); running it in
+How the pieces fit. Scope and acceptance criteria are in [SCOPE.md](https://github.com/shahadathhs/adda/blob/main/docs/SCOPE.md) and
+[FLOWS.md](https://github.com/shahadathhs/adda/blob/main/docs/FLOWS.md); the chat design is in [CHAT.md](/docs/chat); running it in
 production is in [OPERATIONS.md](/docs/operations).
 
 ```

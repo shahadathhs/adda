@@ -258,7 +258,7 @@ export default function Home() {
             is HLS, and recordings and uploaded videos are not transcoded, so quality is what the
             encoder or the uploader sends. The full scope, with the reasoning, is in the{" "}
             <ExternalLink
-              href={`${SITE.repo}/blob/dev/docs/SCOPE.md`}
+              href={`${SITE.repo}/blob/main/docs/SCOPE.md`}
               className="text-primary underline underline-offset-4"
             >
               repository

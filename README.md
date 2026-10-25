@@ -101,7 +101,7 @@ You need a Linux server with a domain pointing at it, and ports 80, 443 and 1935
 Run this as root:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/main/scripts/install.sh | sh
 ```
 
 It asks for your domain and admin email, installs Docker if needed, generates every

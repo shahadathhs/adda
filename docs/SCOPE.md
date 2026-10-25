@@ -272,5 +272,5 @@ invented data at `/design/<screen>` (development only) and capture it with
 ### M8 — Release
 
 - [x] `LICENSE` (MIT), `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`
-- [ ] Point the install script and docs at `main` (they use `dev` until then)
+- [x] The install script and docs point at `main`
 - [ ] Tag `v1.0.0`
