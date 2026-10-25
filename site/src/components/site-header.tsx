@@ -27,7 +27,7 @@ export function SiteHeader() {
         </nav>
         <Link
           href="/docs/quickstart"
-          className="ml-auto inline-flex h-8 shrink-0 items-center rounded-sm bg-primary px-3 sm:px-3.5 text-sm font-semibold text-primary-foreground transition-colors duration-[120ms] hover:bg-primary-hover"
+          className="ml-auto inline-flex h-8 shrink-0 items-center rounded-sm bg-primary px-3 sm:px-3.5 text-sm font-semibold text-primary-foreground transition-[background-color,scale] duration-[120ms] hover:bg-primary-hover active:scale-[0.97]"
         >
           Install
         </Link>

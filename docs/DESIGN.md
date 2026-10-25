@@ -341,6 +341,13 @@ animate):
   requests, each arrowhead after its line. It starts when the diagram is a third in view.
 - **Feature screenshots drift 3% against their frame** (`ParallaxScreen`, scroll-linked) so the
   frame reads as a window onto the app; the image is oversized by 6% so no edge shows.
+- **Hover or focus a box in the diagram** and only its connections stay lit, the rest dims to
+  about a fifth, and a line below says what it does. Keyboard focus does the same.
+- **The status table** arrives row by row (35ms) with a check mark settling beside each built
+  item and a clock beside one still to measure; rows highlight on hover.
+- **The role list** marks the roles a hovered role builds on as "included" (an owner can do
+  everything a guest, an account and a moderator can).
+- **Buttons press to 0.97** (the marigold press), on the landing page, header and install box.
 - **A scroll bar** fills under the header on every page (`ScrollProgress`, spring-smoothed); it stays empty on a page too short to scroll.
 - Everything animates `transform`, `opacity` or SVG `pathLength` only. Reduced motion: reveals
   fade without moving, the screenshot sits still, the diagram is drawn at once. Without

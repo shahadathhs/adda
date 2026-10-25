@@ -3,6 +3,8 @@ import { Check } from "lucide-react";
 import { ArchitectureDiagram } from "@/components/architecture-diagram";
 import { ExternalLink } from "@/components/external-link";
 import { ParallaxScreen } from "@/components/parallax-screen";
+import { RoleList } from "@/components/role-list";
+import { StatusTable } from "@/components/status-table";
 import { Reveal } from "@/components/reveal";
 import { InstallCommand } from "@/components/install-command";
 import { Screen } from "@/components/screen";
@@ -184,20 +186,15 @@ export default function Home() {
               lookup is logged.
             </p>
           </div>
-          <dl className="divide-y divide-border rounded-lg border border-border bg-card">
-            {[
+          <RoleList
+            roles={[
               ["Guest", "Watch, read chat, read polls, play recordings"],
               ["Account", "Chat, reply, react, vote, follow, comment on recordings"],
               ["Moderator", "Delete, pin, time out, ban, slow mode, reveal an anonymous author"],
               ["Owner", "Everything above, plus stream key, emotes, channel page, moderators"],
               ["Admin", "Users, streams and recordings across the server, through an API"],
-            ].map(([who, what]) => (
-              <div key={who} className="grid gap-1 px-5 py-3.5 sm:grid-cols-[7rem_1fr] sm:gap-4">
-                <dt className="font-semibold">{who}</dt>
-                <dd className="text-sm text-muted-foreground">{what}</dd>
-              </div>
-            ))}
-          </dl>
+            ]}
+          />
         </Reveal>
       </section>
 
@@ -242,18 +239,7 @@ export default function Home() {
           <h2 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight">
             What is built, and what is not.
           </h2>
-          <div className="mt-8 overflow-x-auto rounded-lg border border-border">
-            <table className="w-full text-left text-sm">
-              <tbody>
-                {STATUS.map(([what, state]) => (
-                  <tr key={what} className="border-b border-border last:border-b-0">
-                    <td className="px-5 py-3 text-foreground">{what}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{state}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <StatusTable rows={STATUS} />
           <p className="mt-5 max-w-3xl text-sm leading-6 text-muted-foreground">
             Not in version 1: desktop or mobile apps, direct messages, several rooms per channel, a
             light theme, an admin web interface, transcoding or clips, and WebRTC playback. Playback
@@ -284,13 +270,13 @@ export default function Home() {
           <div className="mt-6 flex justify-center gap-3">
             <Link
               href="/docs/quickstart"
-              className="inline-flex h-10 items-center rounded-sm bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors duration-[120ms] hover:bg-primary-hover"
+              className="inline-flex h-10 items-center rounded-sm bg-primary px-5 text-sm font-semibold text-primary-foreground transition-[background-color,scale] duration-[120ms] hover:bg-primary-hover active:scale-[0.97]"
             >
               Quickstart
             </Link>
             <ExternalLink
               href={SITE.repo}
-              className="inline-flex h-10 items-center rounded-sm border border-input px-5 text-sm font-medium transition-colors duration-[120ms] hover:bg-secondary"
+              className="inline-flex h-10 items-center rounded-sm border border-input px-5 text-sm font-medium transition-[background-color,scale] duration-[120ms] hover:bg-secondary active:scale-[0.97]"
             >
               View the source
             </ExternalLink>

@@ -22,7 +22,7 @@ export function InstallCommand({ command }: { command: string }) {
             setTimeout(() => setCopied(false), 2000);
           });
         }}
-        className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-sm border border-input px-3 text-[13px] font-medium text-foreground transition-colors duration-[120ms] hover:bg-secondary"
+        className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-sm border border-input px-3 text-[13px] font-medium text-foreground transition-[background-color,scale] duration-[120ms] hover:bg-secondary active:scale-[0.97]"
       >
         {copied ? (
           <Check className="h-3.5 w-3.5 text-ok" aria-hidden="true" />
