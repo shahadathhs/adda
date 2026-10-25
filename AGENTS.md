@@ -117,7 +117,10 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   `pnpm lint && pnpm typecheck && pnpm -C web build`.
 - Run `pnpm -C site build` after docs-site changes. Edit `/docs` for the engineering docs; the
   site copies of `ARCHITECTURE`, `OPERATIONS` and `CHAT` are synced (`pnpm -C site sync-docs`).
-- Browser tests: `pnpm e2e` (Playwright, against the running stack; needs ffmpeg or Docker).
+- Browser tests: `pnpm e2e` (Playwright, against the running stack; needs ffmpeg or Docker
+  for the test stream and a generated test video).
+- Concept screens: `node scripts/render-design.mjs` regenerates `docs/design/screens`. Change
+  a screen in `docs/design/src` in the same commit as the UI it shows.
 
 ## Conventions
 
@@ -147,6 +150,8 @@ docker compose up -d --build          # postgres + redis + mediamtx + backend + 
   `/admin/*` routes), `webhook.py` for external webhooks, `schemas.py` for
   Pydantic DTOs, and a `service/` package of short focused files (e.g.
   `queries.py`, `commands.py`). Routers stay thin; logic lives in `service/`.
+- **Every page uses one width.** The app shell wraps pages in `PageContainer` (1280px); do
+  not add wider per-page wrappers. Directory filters and page numbers live in the address.
 - **No role-based folders.** Admin endpoints belong to their feature module,
   protected by the `require_admin` guard applied at the router level
   (`APIRouter(dependencies=[Depends(require_admin)])`). The `/admin/...` URL

@@ -68,25 +68,26 @@ marketing pages.
 Acceptance criteria, tests and the screen map are in [FLOWS.md](FLOWS.md).
 Screen numbers refer to [design/SCREENS.md](design/SCREENS.md).
 
-| ID  | Flow                | Screens            | Summary                                                                                            |
-| --- | ------------------- | ------------------ | -------------------------------------------------------------------------------------------------- |
-| F0  | Install             | —                  | `./scripts/install.sh`: secrets generated, stack up behind Caddy with HTTPS, admin created         |
-| F1  | Accounts            | 08, 09, 10, 12     | Register, login, rotating refresh tokens, logout, change password, email reset link, profile       |
-| F2  | Discover and watch  | 01, 03, 06, 19, M1 | Live-first home, search, channel page (SSR + OG), HLS player with reconnect, viewer count          |
-| F3  | Channel lifecycle   | 14, 17             | Create channel, stream key and RTMP URL, rotate key (kicks publisher), edit, delete                |
-| F4  | Go live             | 14, 15, 20, 21     | OBS publishes, webhook authorises, live pushed over WebSocket, offline within seconds, ended state |
-| F5  | Chat and moderation | 02, 07, 15, 18, 21 | History, send, presence, delete, slow mode, followers-only, timeouts and bans, reconnect catch-up  |
-| F6  | Follows             | 01, 03, 05         | Follow, unfollow, follower count and "since", following rail with live indicators                  |
-| F7  | Recordings          | 03, 04, 20         | Recording and thumbnail on stream end, processing state, play, download                            |
-| F8  | Operate             | —                  | Seeded admin; force-stop, suspend and delete through the documented admin API (no admin UI)        |
-| F9  | Guests              | 07                 | Read-only visitors: browse, watch, read chat and polls. No chatting, reacting, voting or following |
-| F10 | Chat extras         | 02, 15, M2         | Replies, @mentions, message reactions, pinned message                                              |
-| F11 | Emotes              | 16, 02             | Streamer uploads emotes for the channel; chat renders `:name:`                                     |
-| F12 | Polls               | 02, 15, M2         | Streamer starts a poll; viewers vote; live results; closes and keeps the result                    |
-| F13 | Notifications       | 11, 13             | In-app bell plus optional email: followed channel live, mentioned, replied to                      |
-| F14 | Identity mode       | 12, 02             | An account appears under its name or as "Anonymous" (still recorded under the account)             |
-| F15 | Channel profile     | 05, 03, 17         | About, links, banner, follower count, badges, announcements, moderators                            |
-| F16 | Recording comments  | 04                 | Timestamped comments on a past broadcast; click a timestamp to seek                                |
+| ID  | Flow                | Screens                            | Summary                                                                                                                                   |
+| --- | ------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| F0  | Install             | —                                  | `./scripts/install.sh`: secrets generated, stack up behind Caddy with HTTPS, admin created                                                |
+| F1  | Accounts            | 08, 09, 10, 12                     | Register, login, rotating refresh tokens, logout, change password, email reset link, profile                                              |
+| F2  | Discover and watch  | 01, 03, 06, 19, 22, 23, 26, 27, M1 | Live-first home, global search, directories with filters and pagination, channel page (SSR + OG), HLS player with reconnect, viewer count |
+| F3  | Channel lifecycle   | 14, 17                             | Create channel, stream key and RTMP URL, rotate key (kicks publisher), edit, delete                                                       |
+| F4  | Go live             | 14, 15, 20, 21                     | OBS publishes, webhook authorises, live pushed over WebSocket, offline within seconds, ended state                                        |
+| F5  | Chat and moderation | 02, 07, 15, 18, 21                 | History, send, presence, delete, slow mode, followers-only, timeouts and bans, reconnect catch-up                                         |
+| F6  | Follows             | 01, 03, 05                         | Follow, unfollow, follower count and "since", following rail with live indicators                                                         |
+| F7  | Recordings          | 03, 04, 20                         | Recording and thumbnail on stream end, processing state, play, download                                                                   |
+| F8  | Operate             | —                                  | Seeded admin; force-stop, suspend and delete through the documented admin API (no admin UI)                                               |
+| F9  | Guests              | 07                                 | Read-only visitors: browse, watch, read chat and polls. No chatting, reacting, voting or following                                        |
+| F10 | Chat extras         | 02, 15, M2                         | Replies, @mentions, message reactions, pinned message                                                                                     |
+| F11 | Emotes              | 16, 02                             | Streamer uploads emotes for the channel; chat renders `:name:`                                                                            |
+| F12 | Polls               | 02, 15, M2                         | Streamer starts a poll; viewers vote; live results; closes and keeps the result                                                           |
+| F13 | Notifications       | 11, 13                             | In-app bell plus optional email: followed channel live, mentioned, replied to                                                             |
+| F14 | Identity mode       | 12, 02                             | An account appears under its name or as "Anonymous" (still recorded under the account)                                                    |
+| F15 | Channel profile     | 05, 03, 17                         | About, links, banner, follower count, badges, announcements, moderators                                                                   |
+| F16 | Recording comments  | 04                                 | Timestamped comments on a past broadcast; click a timestamp to seek                                                                       |
+| F17 | Uploaded videos     | 24, 25, 28, 23                     | Owner uploads MP4/MOV/WebM (resumable, up to 4 GB); direct play; visibility; directory and search                                         |
 
 ### Who can do what
 
@@ -203,7 +204,7 @@ invented data at `/design/<screen>` (development only) and capture it with
 
 - [x] App shell, home, channel live and offline, guest, stream ended, reconnecting
 - [x] Browse and search, not found, mobile home
-- [x] Sign in, create account, reset, settings (profile, notifications, password)
+- [x] Sign in, create account, reset, settings (profile with password, notifications)
 - [x] Studio: setup, live, emotes, channel page, moderators
 - [x] Recording playback with timestamped comments, channel profile
 
@@ -239,6 +240,16 @@ invented data at `/design/<screen>` (development only) and capture it with
 - [x] Home, browse and search, mobile layouts
 - [x] New logo and favicon in marigold; the purple mark is gone
 - [x] `pnpm check:design` clean (0 errors, 0 warnings)
+
+### M5b — Browse, search and video uploads (F2, F17)
+
+- [x] Global search with suggestions; Live, Channels, Videos and Recordings directories
+      with filters, sorting and numbered pagination; home hero; scroll reveals
+- [x] One 1280px page width, a full footer, the About page; settings as tabs; profile
+      picture and status
+- [x] Uploaded videos: resumable chunked upload, ffprobe validation, remux and poster,
+      visibility, owner management; pytest with ffmpeg faked, Playwright with the real thing
+- [x] Concept renders and the marketing site brought up to date
 
 ### M6 — Operability and verification (F0, F8)
 

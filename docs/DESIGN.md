@@ -318,17 +318,18 @@ arriving.
 
 ### Element rules
 
-| Element                 | Motion                                                                              |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| Buttons                 | press `scale .97`, 120ms micro spring return                                        |
-| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                           |
-| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                  |
-| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)       |
-| ⌘K palette              | `scale .98→1` + fade, 150ms                                                         |
-| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom       |
-| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**       |
-| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name` |
-| Site scroll reveals     | 12px rise + fade, once per element, `animation-timeline: view()` with IO fallback   |
+| Element                 | Motion                                                                                                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Buttons                 | press `scale .97`, 120ms micro spring return                                                                                                              |
+| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                                                                                                 |
+| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                                                                                        |
+| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)                                                                             |
+| ⌘K palette              | `scale .98→1` + fade, 150ms                                                                                                                               |
+| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom                                                                             |
+| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**                                                                             |
+| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name`                                                                       |
+| Site scroll reveals     | 12px rise + fade, once per element, `animation-timeline: view()` with IO fallback                                                                         |
+| App card reveals        | 16px rise + fade, 250ms, once, 50ms stagger across a row; `Reveal` shows anything already on screen at load, and everything under reduced motion, at once |
 
 ### Engineering rules
 
@@ -424,8 +425,36 @@ text. Reaction **chips** sit under the message.
 - **Segmented control:** bordered, the selected segment is `panel-2` with `fg`.
 - **Panel:** `panel` fill, 1px `line`, radius-md, 16px padding. Danger zone
   panels use a `danger`-alpha border.
+- **Upload card:** a dashed drop zone, then title, description and a "Who can watch"
+  select; while sending it becomes a progress bar (a `scaleX` transform, never width) with
+  bytes sent and Cancel; a stopped upload names the reason and offers Try again.
+- **Status chips:** 11px 700 uppercase on `panel-2` (Public, Preparing…, Paused at 40%);
+  Failed is a `danger`-alpha fill with the reason in `danger` below.
 - **Stream key and URLs:** a mono "keybox" with copy and reveal icons.
 - **Table:** 11px uppercase `fg-muted` headers, 13px rows, 1px `line` rules.
+
+### Search, directories and pagination
+
+- **Search box:** one component everywhere (top bar 36px, home hero 48px). It is an
+  ARIA combobox: a popover under it lists channels (live badge and viewers), videos and
+  recordings with the matched text in `fg`, then "See all results"; with an empty box it
+  lists live channels. Arrow keys, Enter and Escape work; loading shows a spinner, an empty
+  result and an error each have a line of text.
+- **Directory page:** eyebrow, H1 and a one-line count; a filter bar panel (text filter,
+  selects, "Clear filters" only when a filter is active); a card grid (4 columns at 1280);
+  numbered pagination. Loading is skeleton cards shaped like the real ones; empty and
+  error are bordered panels, error with a "Try again" button. Filters and the page live in
+  the address.
+- **Pagination:** page links in 36px squares, the current page `panel-2`, previous and next
+  chevrons, a first–last window with ellipses, and "1–12 of 91" on the left.
+- **Video card:** the stream card's anatomy with the poster, a mono duration badge
+  bottom-right (black 70%) and title, channel and date below. A video is never marked LIVE.
+- **Footer:** `panel` fill with a top rule; brand and tagline, then Watch, Project and
+  Run-your-own link columns, then a one-line credit. Links are `fg-muted`, `fg` on hover.
+- **Tab rows** (route and content tabs) scroll sideways when they do not fit; they never
+  widen the page.
+- **Link or button:** a link that looks like a button uses `buttonClass()`; never nest a
+  button inside a link.
 
 ### Banners and system states
 

@@ -18,7 +18,7 @@ OBS ──RTMP──▶ mediamtx ──auth webhook──▶ backend (FastAPI) �
 | Service  | Role                                                                                                                             |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | mediamtx | Accepts RTMP from the encoder, writes HLS for viewers and MP4 recordings. Asks the backend to authorise every publish            |
-| backend  | REST API, the WebSocket gateway, the stream monitor, thumbnails, emails                                                          |
+| backend  | REST API, the WebSocket gateway, the stream monitor, thumbnails, video preparation (ffmpeg), emails                              |
 | Postgres | The record: accounts, channels, messages, polls, moderation log, notifications                                                   |
 | Redis    | Speed and fan-out: pub/sub between backend instances, presence, rate limits, slow-mode keys, live poll tallies                   |
 | web      | Next.js app: SSR for browse and channel pages, client-side for everything signed-in                                              |
@@ -36,6 +36,29 @@ OBS ──RTMP──▶ mediamtx ──auth webhook──▶ backend (FastAPI) �
    per channel) and starts or stops the thumbnail worker.
 4. Viewers play `…/hls/community/<id>/index.m3u8` with hls.js (native HLS on Safari).
 5. mediamtx writes `recordings/community/<id>/*.mp4`; the backend lists and serves them.
+
+## Browse, search and uploaded videos
+
+- **Browse and search** (`modules/browse`): `GET /api/browse/channels|recordings|videos`
+  return `{items, total, page, page_size}` for the directory pages, with a text filter,
+  a status or channel filter, a sort and a page (at most 48 per page); `GET /api/search`
+  returns a few channels, recordings and videos for the search box. Private and suspended
+  channels never appear. Live state and viewer counts come from mediamtx and Redis, so
+  filtering and sorting happen in memory after one query: fine at self-hosted scale.
+- **Uploaded videos** (`modules/videos`, table `videos`): the channel owner creates a
+  video with its size, then sends the file in 8 MB parts at an explicit offset
+  (`PUT /videos/{id}/chunk?offset=`); the server's own file size is the source of truth,
+  so a wrong offset is a 409 and the client resumes from the count it is given. On
+  `complete` a background task inspects the file with ffprobe, accepts only codecs browsers
+  play directly, remuxes MP4-family files with the index first (`-c copy -movflags
++faststart`, no re-encoding), takes a poster frame and marks the video `ready` or
+  `failed` with the reason. Files live in `uploads/videos/<id>/`. A restart resumes videos
+  that were being prepared, and uploads untouched for a day are removed. Media is served
+  by `FileResponse`, so range requests work; unlisted and private media accept the
+  viewer's token as `?token=` because a video element cannot send a header.
+- **Profile extras** (`modules/users/profile_router.py`): avatar upload (sniffed by bytes,
+  stored in `uploads/avatars/`) and the status line (`status_emoji`, `status_text`,
+  `status_expires_at`; an expired status reads as unset).
 
 ## Realtime
 
@@ -72,12 +95,17 @@ backend/
 
 ```
 web/src/
-├── app/         routes (App Router): /, /search, /channel/[slug], /studio/*, /settings/*, auth pages
-├── components/  one exported component per file; chat/, channel/, studio/, home/, settings/
-└── lib/         api (typed client + socket), types (DTOs), hooks (chat, notifications), config
+├── app/         routes (App Router): /, /live, /channels, /videos, /recordings, /search, /about,
+│                /channel/[slug] (+ /recording, /video/[id], /profile), /studio/*, /settings/*, auth pages
+├── components/  one exported component per file; browse/, search/, home/, channel/, studio/,
+│                settings/, about/, ui/ (primitives)
+└── lib/         api (typed client, socket, chunked upload), types (DTOs), hooks (chat,
+                 notifications, browse, videos), config
 ```
 
-Server components fetch with `API_SSR_URL`; client code uses the typed client with
+Every page renders inside `PageContainer`, a centred column capped at 1280px (the top bar and
+footer share it). Directory filters and the page number live in the address
+(`lib/use-url-params.ts`), so every view can be linked. Server components fetch with `API_SSR_URL`; client code uses the typed client with
 tokens in `localStorage`. `/design/<screen>` renders screens with invented data in
 development only, for comparison with `docs/design/screens`.
 

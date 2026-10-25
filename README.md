@@ -8,6 +8,8 @@ fees, no cloud.
 > **adda** (আড্ডা) — Bengali for an informal, wide-ranging conversation among
 > friends.
 
+Website and documentation: **https://adda.vercel.app**
+
 ![adda concept screens](docs/design/overview.png)
 
 > **Status: feature-complete for v1, not yet released.** Every flow below is built and
@@ -18,10 +20,13 @@ fees, no cloud.
 
 - **Live streaming:** publish from OBS over RTMP; viewers watch over HLS in the
   browser, with a viewer count and an automatic reconnect.
+- **Find things fast:** one search box (suggestions as you type) and directory pages for
+  live channels, channels, videos and recordings, each with filters, sorting and
+  numbered pagination.
 - **Realtime chat** on every channel, with replies, @mentions, reactions,
   custom emotes, a pinned message and live polls.
 - **Follows and a notification bell** (optional email alerts when a followed
-  channel goes live).
+  channel goes live), a profile picture and a status line.
 - **Recordings** of every broadcast, with timestamped comments.
 - **Video uploads:** channel owners upload MP4, MOV or WebM (up to 4 GB, resumable) and
   viewers watch them on the channel, in a video directory and in search.
@@ -64,7 +69,7 @@ Every flow, with its acceptance criteria and the screen it belongs to, is in
 | ------ | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
 | F0     | One-command install, HTTPS, generated secrets                                              | Built; clean-server timing not yet measured |
 | F1     | Register, login, rotating refresh tokens, change and reset password                        | Built; reset email needs SMTP               |
-| F2     | Home, search, channel pages (SSR), HLS player, viewer counts                               | Built                                       |
+| F2     | Home, global search, directories with pagination, channel pages (SSR), HLS player, About   | Built                                       |
 | F3, F4 | Create channel, stream key, rotate, go live, offline detection, end stream                 | Built                                       |
 | F5     | Chat: history, send, delete, moderators, slow mode, followers-only, timeouts, bans, limits | Built                                       |
 | F6     | Follows                                                                                    | Built                                       |
@@ -129,7 +134,8 @@ Or run everything in containers with `make up`.
 | Postgres / Redis                   | 5432 / 6379               |
 | mediamtx RTMP / HLS / WebRTC / API | 1935 / 8888 / 8889 / 9997 |
 
-Quality gates (all run in CI):
+Quality gates (all run in CI; `pnpm e2e` also needs ffmpeg or Docker, to publish a test
+stream and generate a test video):
 
 ```bash
 make lint           # ruff + oxlint + prettier
@@ -148,7 +154,7 @@ screens have something to show.
 
 The visual system is in [DESIGN.md](docs/DESIGN.md): dark ink surfaces, one marigold
 accent, a separate red that is only ever used for live states, mono numerals,
-and a strict radius and motion scale. Concept renders of all 23 screens are in
+and a strict radius and motion scale. Concept renders of all 28 screens are in
 [docs/design/](docs/design/SCREENS.md); regenerate them with
 `node scripts/render-design.mjs`.
 

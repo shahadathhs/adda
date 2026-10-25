@@ -21,7 +21,7 @@ views) reconnecting. See the `ux-states-a11y` skill for the checklist.
 Test: a CI job brings the compose stack up, waits for `/health`, registers a
 user, and publishes a test pattern with ffmpeg.
 
-## F1 — Accounts (screens 08, 09, 10, 12)
+## F1 — Accounts (screens 08, 09, 10, 12, 13)
 
 - Register needs username, display name, email and password (8+). Duplicate
   username or email gives a specific, non-leaking error.
@@ -29,7 +29,10 @@ user, and publishes a test pattern with ffmpeg.
   wrong password; suspended accounts are told so.
 - Refresh tokens rotate on every use. Reusing an already-rotated token revokes
   the whole session. Logout revokes the token.
-- Change password requires the current one.
+- Change password requires the current one. It sits on the settings Profile tab, next to
+  the picture, status and chat-identity cards; settings has two tabs, Profile and
+  Notifications (the old `/settings/password` address redirects to Profile).
+- Signing out returns to the home page, never to the sign-in form.
 - Forgot password always answers with the same message. The link is single-use
   and expires (30 minutes by default). Without SMTP the link is logged for the
   host and the page says to ask the host.
@@ -41,20 +44,25 @@ user, and publishes a test pattern with ffmpeg.
 
 Tests: pytest for each rule; Playwright for register, login, reset.
 
-## F2 — Discover and watch (01, 03, 06, 19, M1)
+## F2 — Discover and watch (01, 03, 06, 19, 22, 23, 26, 27, M1)
 
 - Home lists live channels first, sorted by viewers; the top one is featured.
   The following rail needs an account.
 - One search box in every page's top bar (and the home hero) suggests channels
   and recordings as you type, with live channels first; arrow keys, Enter and
   Escape work. `/search` shows every match, grouped.
-- Live, Channels and Recordings each have a directory page with a text filter,
+- Live, Channels, Videos and Recordings each have a directory page with a text filter,
   status or channel filter, sorting and numbered pagination (12 per page). The
   filters and the page number live in the address. Private and suspended
   channels never appear. Home sections show 8 cards and link to "View all".
 - Cards fade in as they scroll into view; nothing is hidden without JavaScript
   or under reduced motion.
-- An About page names the author and links the source, the docs and the site.
+- An About page (26) names the author and links the source, the docs and the site; the
+  four-column footer on every page links Watch, Project and Run-your-own pages.
+- Every page, auth pages included, sits in one centred column capped at 1280px; the top
+  bar and footer content share it, so nothing runs edge to edge.
+- The top bar has Following (signed in), Live, Channels, Videos and Recordings; there is no
+  "Browse" link. On phones the links are a scrollable second row.
 - Channel pages are server-rendered with title and Open Graph metadata.
 - The HLS player starts muted, shows reconnecting state, and recovers.
 - Offline channels show the offline panel and recordings. An unknown slug
@@ -210,12 +218,12 @@ generated MP4 through ffmpeg in the backend container.
 
 | Screen | Flow(s)          | Backend module              | Proven by                       |
 | ------ | ---------------- | --------------------------- | ------------------------------- |
-| 01     | F2, F6           | `communities`, `stats`      | pytest browse; e2e home         |
+| 01     | F2, F6, F17      | `browse`, `communities`     | pytest browse; e2e home         |
 | 02     | F5, F10–F12, F14 | `chat`, `realtime`          | pytest chat; two-instance; e2e  |
 | 03     | F2, F6, F7, F15  | `communities`, `recordings` | pytest; e2e offline             |
 | 04     | F7, F16          | `recordings`, `chat`        | pytest comments; e2e            |
 | 05     | F6, F15          | `communities`, `users`      | pytest profile                  |
-| 06     | F2               | `communities`               | pytest search; e2e              |
+| 06     | F2               | `browse`                    | pytest search; e2e              |
 | 07     | F9               | `realtime`, `chat`          | pytest guest rejection; e2e     |
 | 08–10  | F1               | `auth`                      | pytest auth; e2e                |
 | 11     | F13              | `notifications`             | pytest notifications            |
@@ -228,4 +236,9 @@ generated MP4 through ffmpeg in the backend container.
 | 19     | F2               | web only (404)              | e2e                             |
 | 20     | F4, F7           | `streaming`, `recordings`   | pytest; e2e                     |
 | 21     | F4, F5           | `realtime`                  | e2e (kill the socket)           |
+| 22–23  | F2, F17          | `browse`                    | pytest browse; e2e              |
+| 24     | F17              | `videos`                    | pytest videos; e2e              |
+| 25, 28 | F17              | `videos`                    | pytest upload protocol; e2e     |
+| 26     | F2               | web only                    | e2e                             |
+| 27     | F2               | `browse`                    | pytest search; e2e              |
 | M1, M2 | F2, F5           | as 01 and 02                | e2e at mobile width             |

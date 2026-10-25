@@ -18,14 +18,15 @@ admin password once. Migrations run on every backend start.
 
 `.env` in the install directory. The ones people change:
 
-| Variable                                                                                 | Meaning                                                                                                |
-| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `ADDA_DOMAIN`                                                                            | The public domain                                                                                      |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` | Email for password-reset links and opt-in live alerts. Leave `SMTP_HOST` empty and email is simply off |
-| `LOG_FORMAT`                                                                             | `json` (the default in compose) or `text`                                                              |
-| `SUPERADMIN_*`                                                                           | The seeded admin account                                                                               |
+| Variable                                                                                 | Meaning                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ADDA_DOMAIN`                                                                            | The public domain                                                                                                                                          |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_STARTTLS` | Email for password-reset links and opt-in live alerts. Leave `SMTP_HOST` empty and email is simply off                                                     |
+| `LOG_FORMAT`                                                                             | `json` (the default in compose) or `text`                                                                                                                  |
+| `SUPERADMIN_*`                                                                           | The seeded admin account                                                                                                                                   |
+| `NEXT_PUBLIC_SITE_URL`                                                                   | Optional: the marketing and docs site linked from the app footer and About page; defaults to `https://adda.vercel.app` (set before building the web image) |
 
-The full list is in the reference docs (`site/src/content/docs/reference/configuration.md`).
+The full list is in the reference docs (`site/content/docs/reference/configuration.md`).
 
 ## Health and metrics
 
