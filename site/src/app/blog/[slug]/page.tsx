@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/mdx";
-import { ReadingProgress } from "@/components/reading-progress";
 import { fmtDate } from "@/components/post-card";
 import { allPosts } from "@/lib/content";
 
@@ -40,7 +39,6 @@ export default async function BlogPost({ params }: Props) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <ReadingProgress />
       <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground">
         ← Blog
       </Link>

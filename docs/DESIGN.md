@@ -341,7 +341,7 @@ animate):
   requests, each arrowhead after its line. It starts when the diagram is a third in view.
 - **Feature screenshots drift 3% against their frame** (`ParallaxScreen`, scroll-linked) so the
   frame reads as a window onto the app; the image is oversized by 6% so no edge shows.
-- **A reading bar** fills under the header on posts (`ReadingProgress`, spring-smoothed).
+- **A scroll bar** fills under the header on every page (`ScrollProgress`, spring-smoothed); it stays empty on a page too short to scroll.
 - Everything animates `transform`, `opacity` or SVG `pathLength` only. Reduced motion: reveals
   fade without moving, the screenshot sits still, the diagram is drawn at once. Without
   JavaScript a `<noscript>` rule shows everything.
@@ -362,7 +362,7 @@ animate):
     choreography genuinely exceeds CSS — justify it in the PR.
   - **Site (Next.js):** [Motion](https://motion.dev) (`motion`, loaded through
     `LazyMotion` with `domAnimation`, a few KB). Scroll-linked work (the drawn diagram, the
-    screenshot drift, the reading bar) needs `useScroll`, which CSS alone does not cover
+    screenshot drift, the scroll bar) needs `useScroll`, which CSS alone does not cover
     in every browser. Scroll motion must carry information, not decorate: see
     "Site scroll motion" below.
 
