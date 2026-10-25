@@ -56,11 +56,7 @@ export function AboutPage() {
             The whole platform is in one repository, under the MIT license: the API, the web app,
             the infrastructure and the docs. Issues and pull requests are welcome.
           </AboutCard>
-          <AboutCard
-            title="Website and docs"
-            href={PROJECT.site || PROJECT.docs}
-            action={PROJECT.site ? "Visit the website" : "Read the operations guide"}
-          >
+          <AboutCard title="Website and docs" href={PROJECT.site} action="Visit the website">
             Install on a clean server, configure email, back up and restore, and upgrade: the guides
             cover running adda from the first command to the second year.
           </AboutCard>

@@ -8,14 +8,13 @@ favor of `/docs/DESIGN.md`.
 
 - Tokens live in `src/app/globals.css` as shadcn-style CSS variables
   (`--background`, `--primary`, …) mapped through `@theme inline`.
-  Values come from `/docs/DESIGN.md` §3 — the current violet values
-  (`hsl(262 83% 58%)`) are legacy and must be replaced, never reused.
+  Values come from `/docs/DESIGN.md` §3.
 - Accent = marigold `#f5a623` with **ink** `accent-fg` `#1a1205` on
   accent fills. Never white-on-accent.
 - Live red `--live: #eb3223` is a separate token; never substitute the
   accent for live states.
-- Space Grotesk loads via `next/font` (`latin` subset, weights 500/700)
-  as `--font-display`; body stays on the system stack; `font-num` =
+- Space Grotesk is self-hosted (`src/app/fonts`, `next/font/local`) as
+  `--font-display`; no request to a font CDN; body stays on the system stack; `font-num` =
   mono + `tabular-nums` for counts, durations, keys.
 - Radii: use the scale (4/6/8px) via `--radius-sm|md|lg`. Ban
   `rounded-xl`+ on controls.
@@ -25,6 +24,11 @@ favor of `/docs/DESIGN.md`.
   `view-transition-name`), `@starting-style` +
   `allow-discrete` for entries/exits. Only `transform`/`opacity`
   animate. No animation libraries without PR justification.
+- **One page width:** wrap nothing in your own `max-w-*` page container; the app shell puts
+  every page inside `PageContainer` (1280px). Narrower is fine for forms and prose.
+- Directory pages keep their filters and page number in the address (`useUrlParams`).
+- Anything that scrolls into view uses `<Reveal>`; a link styled as a button uses
+  `buttonClass()` (`components/ui/button-styles.ts`), never a button inside a link.
 - SSR pages (`/`, `/channel/[slug]`) render with the same tokens — no
   flash of the old theme; check no-JS rendering too.
 
@@ -32,11 +36,6 @@ favor of `/docs/DESIGN.md`.
 
 - **One exported React component per file.** A file may contain small
   private helpers, but exactly one default/primary export.
-- Current violations to fix when touched (split, don't grow):
-  - `src/components/channel-view.tsx` — 4 components
-  - `src/app/settings/page.tsx` — 4
-  - `src/components/browse-client.tsx` — 3
-  - `src/components/top-bar.tsx`, `src/app/reset-password/page.tsx` — 2
 - `src/components/ui/` holds primitives (one file per primitive);
   feature components live beside their route or in
   `src/components/<feature>/`.

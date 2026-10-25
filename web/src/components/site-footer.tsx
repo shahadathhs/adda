@@ -82,19 +82,22 @@ export function SiteFooter() {
                 Report an issue
               </a>
             </li>
-            {PROJECT.site && (
-              <li>
-                <a href={PROJECT.site} className={link}>
-                  Website
-                </a>
-              </li>
-            )}
+            <li>
+              <a href={PROJECT.site} className={link}>
+                Website
+              </a>
+            </li>
           </Column>
 
           <Column title="Run your own">
             <li>
               <a href={PROJECT.docs} className={link}>
                 Running a server
+              </a>
+            </li>
+            <li>
+              <a href={`${PROJECT.site}/docs`} className={link}>
+                Documentation
               </a>
             </li>
             <li>
