@@ -15,7 +15,8 @@ updates:
     schedule:
       interval: weekly
 
+  # One pnpm workspace (web and site): the lockfile is at the root, so it is updated from there.
   - package-ecosystem: npm
-    directory: /web
+    directory: /
     schedule:
       interval: weekly
