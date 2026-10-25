@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bump the desktop app version everywhere it's declared.
+# Bump the project version in VERSION and web/package.json.
 # Usage: ./scripts/bump-version.sh 0.2.0
 set -euo pipefail
 
@@ -14,25 +14,8 @@ if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
   exit 1
 fi
 
-ROOT=$(pwd)
+echo "$VERSION" > VERSION
+(cd web && npm version "$VERSION" --no-git-tag-version --allow-same-version >/dev/null)
 
-# frontend/package.json
-cd "$ROOT/frontend"
-npm version "$VERSION" --no-git-tag-version
-
-# src-tauri/tauri.conf.json (uses node for a safe JSON edit)
-node -e '
-  const fs = require("fs");
-  const p = "src-tauri/tauri.conf.json";
-  const conf = JSON.parse(fs.readFileSync(p, "utf8"));
-  conf.version = process.argv[1];
-  fs.writeFileSync(p, JSON.stringify(conf, null, 2) + "\n");
-' "$VERSION"
-
-# src-tauri/Cargo.toml (top-level [package] only)
-cd "$ROOT/frontend/src-tauri"
-sed -i.bak -E '0,/^version = ".*$/s//version = "'"$VERSION"'"/' Cargo.toml
-rm -f Cargo.toml.bak
-
-echo "Bumped to $VERSION in package.json, tauri.conf.json, Cargo.toml"
-echo "Next: commit, tag v$VERSION, push with --tags to trigger the release build."
+echo "Bumped to $VERSION in VERSION and web/package.json"
+echo "Next: commit, tag v$VERSION, push with --tags."

@@ -1,0 +1,12 @@
+node_modules
+dist
+.next
+.astro
+pnpm-lock.yaml
+coverage
+.pnpm-store
+backend
+recordings
+thumbs
+mediamtx
+**/next-env.d.ts

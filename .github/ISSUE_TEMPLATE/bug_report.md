@@ -6,9 +6,11 @@ labels: bug
 ---
 
 ## Summary
+
 <!-- Brief description of the problem -->
 
 ## Steps to reproduce
+
 1.
 2.
 3.
@@ -18,10 +20,13 @@ labels: bug
 ## Actual behavior
 
 ## Environment
+
 - Area: <!-- backend / frontend / ws / streaming / docker -->
 - Browser: <!-- if frontend -->
 - OS:
 
 ## Logs / errors
+
 ```
+
 ```

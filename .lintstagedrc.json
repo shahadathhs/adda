@@ -1,0 +1,5 @@
+{
+  "*.{ts,tsx}": ["oxlint --fix", "prettier --write"],
+  "*.{js,cjs,mjs,json,css,md,yaml,yml}": ["prettier --write"],
+  "backend/**/*.py": ["sh -c 'cd backend && uv run ruff check --fix . && uv run ruff format .'"]
+}

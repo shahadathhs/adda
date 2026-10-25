@@ -1,0 +1,284 @@
+@import "tailwindcss";
+
+/* adda design tokens — the same identity kit as the app (/docs/DESIGN.md): ink ladder,
+   marigold accent with ink-on-accent, live red reserved for live states. No violet. */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0c0d10;
+  --foreground: #edeef2;
+  --card: #14161b;
+  --secondary: #1c1f26;
+  --muted-foreground: #9aa1af;
+  --subtle-foreground: #676e7c;
+  --border: #262a33;
+  --input: #262a33;
+
+  --primary: #f5a623;
+  --primary-hover: #e29500;
+  --primary-foreground: #1a1205;
+  --primary-subtle: rgba(245, 166, 35, 0.14);
+
+  --live: #eb3223;
+  --ok: #2fbf71;
+
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  --ease-micro: linear(
+    0,
+    0.0147 1.42%,
+    0.0679 3.31%,
+    0.216 6.28%,
+    0.5118 10.49%,
+    0.8105 14.79%,
+    0.9758 18.87%,
+    1.0304 22.66%,
+    1.0405 26.15%,
+    1.0267 31.19%,
+    1.0042 38.85%,
+    0.9964 47.36%,
+    1
+  );
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-secondary: var(--secondary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-live: var(--live);
+  --color-ok: var(--ok);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: var(--primary-subtle);
+  }
+  a,
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .font-num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* The live pulse — the brand heartbeat, the one allowed glow. */
+.live-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--live);
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--live);
+  animation: pulse-ring 2s var(--ease-micro) infinite;
+}
+@keyframes pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Entrances: transform and opacity only, once. */
+.rise {
+  animation: rise 500ms var(--ease-micro) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot::after {
+    animation: none;
+    display: none;
+  }
+  .rise {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── Documentation prose ───────────────────────────────────────────── */
+.prose-adda {
+  color: var(--foreground);
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 46rem;
+}
+.prose-adda > * + * {
+  margin-top: 1.1em;
+}
+.prose-adda h1 {
+  font:
+    700 34px/1.15 var(--font-space-grotesk),
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+.prose-adda h2 {
+  font:
+    600 22px/1.3 var(--font-space-grotesk),
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+  margin-top: 2.2em;
+  padding-top: 0.2em;
+}
+.prose-adda h3 {
+  font:
+    600 17px/1.35 var(--font-space-grotesk),
+    system-ui,
+    sans-serif;
+  margin-top: 1.8em;
+}
+.prose-adda h2 a,
+.prose-adda h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.prose-adda p,
+.prose-adda li {
+  color: var(--muted-foreground);
+}
+.prose-adda strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.prose-adda a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-adda ul,
+.prose-adda ol {
+  padding-left: 1.4em;
+}
+.prose-adda ul {
+  list-style: disc;
+}
+.prose-adda ol {
+  list-style: decimal;
+}
+.prose-adda li + li {
+  margin-top: 0.35em;
+}
+.prose-adda li::marker {
+  color: var(--subtle-foreground);
+}
+.prose-adda code {
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  font-size: 0.88em;
+  background: var(--secondary);
+  border-radius: var(--radius-xs);
+  padding: 0.1em 0.35em;
+  color: var(--foreground);
+}
+.prose-adda pre {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.prose-adda pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: var(--foreground);
+}
+.prose-adda blockquote {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  background: var(--card);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+}
+.prose-adda blockquote p {
+  color: var(--foreground);
+}
+.prose-adda .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.prose-adda table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.prose-adda th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--foreground);
+  background: var(--card);
+}
+.prose-adda th,
+.prose-adda td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.prose-adda tr:last-child td {
+  border-bottom: 0;
+}
+.prose-adda td {
+  color: var(--muted-foreground);
+}
+.prose-adda hr {
+  border-color: var(--border);
+}

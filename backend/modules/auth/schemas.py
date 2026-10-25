@@ -29,10 +29,6 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(min_length=8, max_length=128)
 
 
-class GoogleAuthRequest(BaseModel):
-    id_token: str
-
-
 class Token(BaseModel):
     access_token: str
     refresh_token: str
@@ -55,36 +51,4 @@ class UpdateProfileRequest(BaseModel):
     )
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
     avatar_url: str | None = Field(default=None, max_length=512)
-    bio: str | None = Field(default=None, max_length=500)
-
-
-class SetPasswordRequest(BaseModel):
-    new_password: str = Field(min_length=8, max_length=128)
-
-
-# ── OTP login (passwordless) ──────────────────────────────────────────
-class OtpRequest(BaseModel):
-    email: EmailStr
-
-
-class OtpVerify(BaseModel):
-    email: EmailStr
-    code: str = Field(min_length=6, max_length=6)
-
-
-# ── 2FA ───────────────────────────────────────────────────────────────
-class TwoFactorVerify(BaseModel):
-    code: str = Field(min_length=6, max_length=6)
-
-
-class TwoFactorDisable(BaseModel):
-    password: str
-
-
-class Login2faVerify(BaseModel):
-    temp_token: str
-    code: str = Field(min_length=6, max_length=6)
-
-
-class GoogleLinkRequest(BaseModel):
-    id_token: str
+    bio: str | None = Field(default=None, max_length=280)

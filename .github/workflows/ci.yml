@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -12,8 +12,17 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend (ruff + pyright)
+    name: Backend (ruff + pyright + tests)
     runs-on: ubuntu-latest
+    # A real Redis for the two-instance fan-out test; everything else uses fakeredis.
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      ADDA_TEST_REDIS_URL: redis://localhost:6379/15
     defaults:
       run:
         working-directory: backend
@@ -38,12 +47,14 @@ jobs:
       - name: Pyright
         run: uv run pyright
 
-  frontend:
-    name: Frontend (lint + build)
+      # Embedded Postgres (pgserver) + fakeredis for most tests; the Redis service above
+      # is only for tests/test_two_instances.py.
+      - name: Tests
+        run: uv run pytest -q
+
+  web:
+    name: Web (lint + build)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - uses: actions/checkout@v7
 
@@ -53,15 +64,96 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "22"
 
-      # pnpm-lock.yaml is intentionally gitignored, so resolve fresh (no
-      # --frozen-lockfile, no lockfile-keyed cache).
+      # The lockfile is committed; a root install covers the whole workspace.
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Lint
+      - name: Lint (oxlint + prettier)
         run: pnpm lint
 
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Design gate (DESIGN.md banned patterns)
+        run: pnpm check:design
+
       - name: Build
-        run: pnpm build
+        run: pnpm -C web build
+
+  site:
+    name: Docs site (build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -C site build
+
+  e2e:
+    name: End-to-end (Playwright, full stack)
+    runs-on: ubuntu-latest
+    needs: [backend, web]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install ffmpeg (the test publisher) and the browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pnpm exec playwright install --with-deps chromium
+
+      # The same compose stack people run locally: postgres, redis, mediamtx, backend, web.
+      - name: Start the stack
+        env:
+          POSTGRES_PASSWORD: ci-only-postgres
+          JWT_SECRET: ci-only-jwt-secret-0123456789abcdef0123456789abcdef
+          SUPERADMIN_PASSWORD: ci-only-admin-12345
+        run: |
+          make env
+          make up
+          for url in http://localhost:7001/ready http://localhost:5173; do
+            for i in $(seq 1 60); do
+              curl -fsS -o /dev/null "$url" && break
+              [ "$i" = 60 ] && { echo "$url never became ready"; exit 1; }
+              sleep 2
+            done
+          done
+
+      - name: Run the tests
+        run: pnpm e2e
+
+      - name: Stack logs (on failure)
+        if: failure()
+        run: docker compose logs --tail=200
+
+      - name: Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

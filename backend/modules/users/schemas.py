@@ -4,6 +4,12 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
+class UserStatus(BaseModel):
+    emoji: str | None = None
+    text: str = ""
+    expires_at: str | None = None
+
+
 class UserOut(BaseModel):
     """Public user representation, shared across modules."""
 
@@ -16,9 +22,8 @@ class UserOut(BaseModel):
     avatar_url: str | None = None
     bio: str | None = None
     system_role: str = "user"
-    google_id: str | None = None
-    two_factor_enabled: bool = False
-    has_password: bool = True
+    identity_mode: str = "named"
+    status: UserStatus | None = None
 
     @field_validator("id", mode="before")
     @classmethod

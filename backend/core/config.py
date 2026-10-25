@@ -13,7 +13,11 @@ class Settings(BaseSettings):
     # App
     app_name: str = "adda"
     debug: bool = False
+    # Log every SQL statement. Very noisy, so it is separate from `debug`.
+    sql_echo: bool = False
     api_prefix: str = "/api"
+    # "text" for development, "json" for one log object per line in production.
+    log_format: str = "text"
 
     # Database
     database_url: str = "postgresql+asyncpg://adda:adda@localhost:5432/adda"
@@ -30,8 +34,6 @@ class Settings(BaseSettings):
     reset_token_expire_minutes: int = 30
     # Frontend URL the reset email links to (token appended as ?token=…).
     password_reset_url: str = "http://localhost:5173/reset-password"
-    # Google OAuth 2.0 (ID-token flow). Set to your Google client id to enable.
-    google_client_id: str = ""
 
     # Email (SMTP). Leave smtp_host empty to skip sending (e.g. in dev).
     smtp_host: str = ""
@@ -45,16 +47,23 @@ class Settings(BaseSettings):
     mtx_api_url: str = "http://localhost:9997"
     mtx_api_user: str = "admin"
     mtx_api_pass: str = "admin"
+    # Internal (server-side) HLS base — the thumbnail worker pulls frames
+    # from here, so it must reach mediamtx directly, not through the proxy.
+    mtx_hls_url: str = "http://localhost:8888"
     hls_base_url: str = "http://localhost:8888"
     webrtc_base_url: str = "http://localhost:8889"
     rtmp_base_url: str = "rtmp://localhost:1935"
     # Where mediamtx writes recordings (bind-mounted). Local: repo root; in
     # docker the container path (/recordings) is set via RECORDINGS_DIR.
     recordings_dir: str = "../recordings"
+    # Where live-stream thumbnails are written (one JPEG per community,
+    # overwritten in place while live; kept as the offline poster).
+    thumbs_dir: str = "../thumbs"
+    # Where uploaded emotes and channel banners are stored (a volume in docker).
+    uploads_dir: str = "../uploads"
 
-    # CORS origins (comma-separated). The tauri:// entries cover the desktop
-    # app (macOS/Linux uses tauri://localhost, Windows http://tauri.localhost).
-    cors_origins: str = "http://localhost:5173,tauri://localhost,http://tauri.localhost"
+    # CORS origins (comma-separated).
+    cors_origins: str = "http://localhost:5173"
 
     # Bootstrap accounts — seeded idempotently on startup (only created if they
     # don't already exist). Override all of these in prod with strong values.

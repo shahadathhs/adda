@@ -6,26 +6,17 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from core.exceptions import BadRequestException, NotFoundException
+from core.exceptions import NotFoundException
 from core.security.guards import require_admin
 from models.community import Community
-from models.membership import CommunityRole
 from modules.communities.schemas import (
     AdminCommunityOut,
     AdminCommunityUpdate,
-    MemberOut,
     StreamCredentialsOut,
 )
 from modules.communities.service.commands import delete_community
-from modules.communities.service.memberships import (
-    get_membership,
-    leave_community,
-)
-from modules.communities.service.memberships import (
-    list_members as list_members_service,
-)
+from modules.communities.service.follows import count_followers
 from modules.communities.service.queries import (
-    count_members,
     get_community,
     list_all_communities,
 )
@@ -49,7 +40,7 @@ async def _community_out(db: AsyncSession, c: Community) -> AdminCommunityOut:
         name=c.name,
         slug=c.slug,
         owner_id=c.owner_id,
-        member_count=await count_members(db, c.id),
+        follower_count=await count_followers(db, c.id),
         is_live=await is_community_live(str(c.id)),
         is_suspended=c.is_suspended,
         created_at=c.created_at,
@@ -85,43 +76,6 @@ async def update_community(
     await db.commit()
     await db.refresh(c)
     return await _community_out(db, c)
-
-
-@router.get("/{community_id}/members", response_model=list[MemberOut])
-async def list_members(
-    community_id: uuid.UUID,
-    db: AsyncSession = Depends(get_db),
-) -> list[MemberOut]:
-    out: list[MemberOut] = []
-    for m in await list_members_service(db, community_id):
-        await db.refresh(m, attribute_names=["user"])
-        if m.user is not None:
-            out.append(
-                MemberOut(
-                    user_id=m.user_id,
-                    username=m.user.username,
-                    display_name=m.user.display_name,
-                    role=m.role.value,
-                    joined_at=m.created_at,
-                )
-            )
-    return out
-
-
-@router.delete("/{community_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def kick_member(
-    community_id: uuid.UUID,
-    user_id: uuid.UUID,
-    db: AsyncSession = Depends(get_db),
-) -> None:
-    membership = await get_membership(db, community_id, user_id)
-    if membership is None:
-        raise NotFoundException("Member not found")
-    if membership.role == CommunityRole.owner:
-        raise BadRequestException(
-            "Can't remove the owner; transfer ownership or delete the community"
-        )
-    await leave_community(db, membership)
 
 
 @router.get("/{community_id}/stream-key", response_model=StreamCredentialsOut)

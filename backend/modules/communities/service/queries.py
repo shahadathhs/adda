@@ -1,10 +1,10 @@
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.channel_moderator import ChannelModerator
 from models.community import Community
-from models.membership import CommunityRole, Membership
 
 
 async def get_community(db: AsyncSession, community_id: uuid.UUID) -> Community | None:
@@ -35,19 +35,37 @@ async def list_all_communities(db: AsyncSession) -> list[Community]:
     return list(result.scalars().all())
 
 
-async def count_members(db: AsyncSession, community_id: uuid.UUID) -> int:
-    result = await db.execute(
-        select(func.count()).select_from(Membership).where(Membership.community_id == community_id)
-    )
-    return int(result.scalar() or 0)
-
-
-async def get_member_role(
-    db: AsyncSession, community_id: uuid.UUID, user_id: uuid.UUID
-) -> CommunityRole | None:
-    result = await db.execute(
-        select(Membership.role).where(
-            Membership.community_id == community_id, Membership.user_id == user_id
+async def search_communities(
+    db: AsyncSession, q: str | None = None, limit: int = 50, offset: int = 0
+) -> list[Community]:
+    """Public listing with optional name/slug/stream-title search."""
+    stmt = select(Community).where(Community.is_suspended.is_(False))
+    if q:
+        like = f"%{q}%"
+        stmt = stmt.where(
+            or_(
+                Community.name.ilike(like),
+                Community.slug.ilike(like),
+                Community.stream_title.ilike(like),
+            )
         )
+    result = await db.execute(
+        stmt.order_by(Community.created_at.desc()).limit(limit).offset(offset)
     )
-    return result.scalar_one_or_none()
+    return list(result.scalars().all())
+
+
+async def list_my_communities(db: AsyncSession, user_id: uuid.UUID) -> list[tuple[Community, str]]:
+    """Channels the user owns or moderates, each with their role."""
+    owned = await db.execute(
+        select(Community)
+        .where(Community.owner_id == user_id, Community.is_suspended.is_(False))
+        .order_by(Community.created_at.desc())
+    )
+    moderated = await db.execute(
+        select(Community)
+        .join(ChannelModerator, ChannelModerator.community_id == Community.id)
+        .where(ChannelModerator.user_id == user_id, Community.is_suspended.is_(False))
+        .order_by(Community.created_at.desc())
+    )
+    return [(c, "owner") for c in owned.scalars()] + [(c, "moderator") for c in moderated.scalars()]

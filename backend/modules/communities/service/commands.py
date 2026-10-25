@@ -1,17 +1,12 @@
 import uuid
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.channel import Channel
 from models.community import Community
-from models.membership import CommunityRole, Membership
+from models.video import Video
+from modules.chat.service.emotes import list_emotes
 from modules.communities.schemas import CommunityCreate, CommunityUpdate
-
-DEFAULT_CHANNELS = [
-    ("general", "General", "text", 0),
-    ("announcements", "Announcements", "announcement", 1),
-    ("live", "Live Chat", "text", 2),
-]
 
 
 async def create_community(
@@ -27,29 +22,6 @@ async def create_community(
         owner_id=owner_id,
     )
     db.add(community)
-    await db.flush()
-
-    # Owner is automatically an owner-role member.
-    db.add(
-        Membership(
-            user_id=owner_id,
-            community_id=community.id,
-            role=CommunityRole.owner,
-        )
-    )
-
-    # Default channels (Discord-style).
-    for slug, name, ctype, position in DEFAULT_CHANNELS:
-        db.add(
-            Channel(
-                community_id=community.id,
-                name=name,
-                slug=slug,
-                type=ctype,
-                position=position,
-            )
-        )
-
     await db.commit()
     await db.refresh(community)
     return community
@@ -59,6 +31,8 @@ async def update_community(
     db: AsyncSession, community: Community, data: CommunityUpdate
 ) -> Community:
     for field, value in data.model_dump(exclude_unset=True).items():
+        if field == "links":
+            value = value or []
         setattr(community, field, value)
     await db.commit()
     await db.refresh(community)
@@ -66,5 +40,21 @@ async def update_community(
 
 
 async def delete_community(db: AsyncSession, community: Community) -> None:
+    """Delete the channel and everything stored for it (recordings, emotes, banner)."""
+    from modules.chat.service.emotes import emotes_dir
+    from modules.recordings.service.files import purge_community_files
+    from modules.videos.service.storage import remove_video_files
+
+    emote_files = [e.file_key for e in await list_emotes(db, community.id)]
+    video_ids = (
+        (await db.execute(select(Video.id).where(Video.community_id == community.id)))
+        .scalars()
+        .all()
+    )
     await db.delete(community)
     await db.commit()
+    purge_community_files(str(community.id))
+    for video_id in video_ids:
+        remove_video_files(video_id)
+    for key in emote_files:
+        (emotes_dir() / key).unlink(missing_ok=True)

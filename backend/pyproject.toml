@@ -20,11 +20,16 @@ dependencies = [
     "python-multipart>=0.0.20",
     "httpx>=0.28.1",
     "aiosmtplib>=5.1.2",
+    "prometheus-client>=0.26.0",
 ]
 
 [dependency-groups]
 dev = [
+    "fakeredis>=2.40.0",
+    "pgserver>=0.1.4",
     "pyright>=1.1.391",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "ruff>=0.8.0",
 ]
 
@@ -48,3 +53,15 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # __init__.py re-exports are intentional.
 "__init__.py" = ["F401"]
+# Long assertions read better on one line.
+"tests/*" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+# One event loop for the whole run: the app's engine and Redis client are
+# module-level singletons bound to the loop that first uses them.
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+filterwarnings = ["ignore::DeprecationWarning"]

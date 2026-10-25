@@ -14,12 +14,21 @@ class CommunityCreate(BaseModel):
     is_private: bool = False
 
 
+class LinkIn(BaseModel):
+    """A link on the channel page. Only http(s) URLs are accepted."""
+
+    label: str = Field(min_length=1, max_length=40)
+    url: str = Field(min_length=1, max_length=300, pattern=r"^https?://\S+$")
+
+
 class CommunityUpdate(BaseModel):
-    name: str | None = Field(default=None, max_length=100)
+    name: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=1000)
     banner_url: str | None = None
     avatar_url: str | None = None
+    stream_title: str | None = Field(default=None, max_length=200)
     is_private: bool | None = None
+    links: list[LinkIn] | None = Field(default=None, max_length=5)
 
 
 class CommunityOut(BaseModel):
@@ -32,9 +41,13 @@ class CommunityOut(BaseModel):
     banner_url: str | None = None
     avatar_url: str | None = None
     is_private: bool
+    stream_title: str | None = None
     owner_id: str
-    member_count: int = 0
+    follower_count: int = 0
     is_live: bool = False
+    links: list[LinkIn] = []
+    # The requesting user's role on this channel: "owner" or "moderator" (filled by /mine).
+    my_role: str | None = None
 
 
 class StreamCredentialsOut(BaseModel):
@@ -44,29 +57,17 @@ class StreamCredentialsOut(BaseModel):
     stream_key: str
 
 
-# ── Members ───────────────────────────────────────────────────────────
-class MemberOut(BaseModel):
+# ── Moderators ────────────────────────────────────────────────────────
+class ModeratorOut(BaseModel):
     user_id: uuid.UUID
     username: str
     display_name: str
     avatar_url: str | None = None
-    bio: str | None = None
-    role: str
-    joined_at: datetime
+    since: datetime
 
 
-class RoleUpdateBody(BaseModel):
-    role: str  # admin, moderator, streamer, member, guest
-
-
-class JoinRequestOut(BaseModel):
-    id: uuid.UUID
+class AddModeratorBody(BaseModel):
     user_id: uuid.UUID
-    username: str
-    display_name: str
-    avatar_url: str | None = None
-    status: str
-    created_at: datetime
 
 
 # ── Admin community management ────────────────────────────────────────
@@ -77,7 +78,7 @@ class AdminCommunityOut(BaseModel):
     name: str
     slug: str
     owner_id: uuid.UUID
-    member_count: int = 0
+    follower_count: int = 0
     is_live: bool = False
     is_suspended: bool = False
     created_at: datetime
@@ -88,3 +89,13 @@ class AdminCommunityUpdate(BaseModel):
     description: str | None = Field(default=None, max_length=1000)
     is_private: bool | None = None
     is_suspended: bool | None = None
+
+
+class FollowerOut(BaseModel):
+    """A public follower of a channel (home-page/directory info only)."""
+
+    id: str
+    username: str
+    display_name: str
+    avatar_url: str | None = None
+    since: datetime | None = None

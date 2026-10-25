@@ -8,10 +8,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from core.exceptions import BadRequestException, NotFoundException
+from core.exceptions import BadRequestException, ForbiddenException, NotFoundException
+from core.security.deps import get_current_user
 from core.security.guards import require_admin
 from models.community import Community
-from modules.recordings.schemas import RecordingOut
+from models.user import SystemRole, User
+from modules.recordings.schemas import RecordingFeedItem, RecordingOut
 from modules.recordings.service.files import delete_recording, resolve_recording, scan_recordings
 
 # ── Public ────────────────────────────────────────────────────────────
@@ -31,12 +33,69 @@ async def list_recordings(
     return [RecordingOut(**r) for r in scan_recordings(str(community_id))]
 
 
+@router.get("/recent", response_model=list[RecordingFeedItem])
+async def recent_recordings(
+    limit: int = 12,
+    db: AsyncSession = Depends(get_db),
+) -> list[RecordingFeedItem]:
+    """Public home-page feed: newest recordings across PUBLIC channels.
+
+    Private-channel recordings never appear here. Playback goes through
+    the (already public) /recordings/file endpoint.
+    """
+    communities = (
+        (
+            await db.execute(
+                select(Community).where(Community.is_private == False)  # noqa: E712
+            )
+        )
+        .scalars()
+        .all()
+    )
+    by_id = {str(c.id): c for c in communities}
+
+    items: list[RecordingFeedItem] = []
+    for cid, community in by_id.items():
+        for r in scan_recordings(cid):
+            items.append(
+                RecordingFeedItem(
+                    community_id=cid,
+                    name=r["name"],
+                    path=r["path"],
+                    size_bytes=r["size_bytes"],
+                    created_at=r["created_at"],
+                    community_name=community.name,
+                    community_slug=community.slug,
+                )
+            )
+    items.sort(key=lambda i: i.created_at, reverse=True)
+    return items[: max(1, min(limit, 48))]
+
+
 @router.get("/file")
 async def serve_recording(path: str) -> FileResponse:
     full = resolve_recording(path)
     if full is None:
         raise NotFoundException("Recording not found")
     return FileResponse(full, media_type="video/mp4")
+
+
+@router.delete("/file", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_own_recording(
+    community_id: uuid.UUID,
+    path: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    """The channel owner (or staff) deletes one of the channel's recordings."""
+    community = await db.get(Community, community_id)
+    if community is None:
+        raise NotFoundException("Community not found")
+    if community.owner_id != current_user.id and current_user.system_role not in SystemRole.STAFF:
+        raise ForbiddenException("Only the channel owner can delete recordings")
+    if path not in {r["path"] for r in scan_recordings(str(community_id))}:
+        raise NotFoundException("Recording not found")
+    delete_recording(path)
 
 
 # ── Admin ─────────────────────────────────────────────────────────────

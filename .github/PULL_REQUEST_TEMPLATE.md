@@ -1,13 +1,17 @@
 ## Summary
+
 <!-- What does this PR change and why? -->
 
 ## Related issue
+
 <!-- Closes #123 -->
 
 ## Changes
+
 -
 
 ## Checklist
+
 - [ ] Backend type checking passes (`make typecheck`)
 - [ ] Backend lint passes (`cd backend && uv run ruff check .`)
 - [ ] Frontend lint + build pass (`make lint` / `make build-web`)

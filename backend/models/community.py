@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import secrets
 import uuid
-from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import JSON, ForeignKey, Integer, String, text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
-
-if TYPE_CHECKING:
-    from models.membership import Membership
 
 
 def new_stream_key() -> str:
@@ -29,6 +25,22 @@ class Community(Base):
     is_private: Mapped[bool] = mapped_column(default=False)
     # Suspended communities are hidden from public listings (admin lever).
     is_suspended: Mapped[bool] = mapped_column(default=False)
+    # What the owner is streaming right now (shown on the channel + browse grid).
+    stream_title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
+    # Links shown on the channel page: [{"label": ..., "url": ...}].
+    links: Mapped[list[dict[str, str]]] = mapped_column(
+        JSON, default=list, server_default=text("'[]'")
+    )
+
+    # Chat settings the owner and moderators control.
+    slow_mode_seconds: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
+    followers_only: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
+    # The one pinned chat message (cleared if that message goes away).
+    pinned_message_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("messages.id", ondelete="SET NULL", use_alter=True, name="fk_community_pinned"),
+        nullable=True,
+    )
 
     # Secret required to publish an RTMP stream to this community.
     stream_key: Mapped[str] = mapped_column(
@@ -40,13 +52,7 @@ class Community(Base):
         index=True,
     )
 
-    members: Mapped[list[Membership]] = relationship(
-        "Membership",
-        back_populates="community",
-        cascade="all, delete-orphan",
-    )
-
-    def to_public_dict(self, member_count: int = 0, is_live: bool = False) -> dict:
+    def to_public_dict(self, is_live: bool = False, follower_count: int = 0) -> dict:
         return {
             "id": str(self.id),
             "name": self.name,
@@ -55,7 +61,9 @@ class Community(Base):
             "banner_url": self.banner_url,
             "avatar_url": self.avatar_url,
             "is_private": self.is_private,
+            "stream_title": self.stream_title,
             "owner_id": str(self.owner_id),
-            "member_count": member_count,
+            "follower_count": follower_count,
             "is_live": is_live,
+            "links": self.links or [],
         }
