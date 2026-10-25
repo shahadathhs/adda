@@ -1,6 +1,6 @@
 export const SITE = {
   name: "adda",
-  url: "https://adda.vercel.app",
+  url: "https://getadda.vercel.app",
   repo: "https://github.com/shahadathhs/adda",
   install:
     "curl -fsSL https://raw.githubusercontent.com/shahadathhs/adda/dev/scripts/install.sh | sh",

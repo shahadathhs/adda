@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
-  <a href="https://adda.vercel.app">Website</a> ·
-  <a href="https://adda.vercel.app/docs/quickstart">Quickstart</a> ·
-  <a href="https://adda.vercel.app/docs">Documentation</a> ·
-  <a href="https://adda.vercel.app/blog">Blog</a> ·
+  <a href="https://getadda.vercel.app">Website</a> ·
+  <a href="https://getadda.vercel.app/docs/quickstart">Quickstart</a> ·
+  <a href="https://getadda.vercel.app/docs">Documentation</a> ·
+  <a href="https://getadda.vercel.app/blog">Blog</a> ·
   <a href="https://github.com/shahadathhs/adda/issues">Issues</a>
 </p>
 
@@ -113,7 +113,7 @@ secret, starts the stack with automatic HTTPS, and prints the admin password onc
 3. Press **Start Streaming**.
 
 Email (password-reset links, optional live alerts) is off until you add the `SMTP_*` values
-to `/opt/adda/.env`. The full guide is at [adda.vercel.app/docs/quickstart](https://adda.vercel.app/docs/quickstart).
+to `/opt/adda/.env`. The full guide is at [getadda.vercel.app/docs/quickstart](https://getadda.vercel.app/docs/quickstart).
 
 ### Try it locally
 
@@ -269,7 +269,7 @@ playback (HLS only). [docs/SCOPE.md](docs/SCOPE.md) has the reasoning.
 | [AGENTS.md](AGENTS.md)                           | Conventions for contributors and coding agents          |
 
 The same material, written for people running a server, is on the
-[website](https://adda.vercel.app/docs).
+[website](https://getadda.vercel.app/docs).
 
 ## Contributing
 

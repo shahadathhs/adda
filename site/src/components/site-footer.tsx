@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExternalLink } from "@/components/external-link";
 import { SITE } from "@/lib/site";
 
 export function SiteFooter() {
@@ -15,15 +16,21 @@ export function SiteFooter() {
           <Link href="/docs/operations" className="hover:text-foreground">
             Operations
           </Link>
-          <a href={`${SITE.repo}/blob/dev/docs/SCOPE.md`} className="hover:text-foreground">
+          <ExternalLink
+            href={`${SITE.repo}/blob/dev/docs/SCOPE.md`}
+            className="hover:text-foreground"
+          >
             Scope
-          </a>
-          <a href={`${SITE.repo}/blob/dev/SECURITY.md`} className="hover:text-foreground">
+          </ExternalLink>
+          <ExternalLink
+            href={`${SITE.repo}/blob/dev/SECURITY.md`}
+            className="hover:text-foreground"
+          >
             Security
-          </a>
-          <a href={SITE.repo} className="hover:text-foreground">
+          </ExternalLink>
+          <ExternalLink href={SITE.repo} className="hover:text-foreground">
             GitHub
-          </a>
+          </ExternalLink>
         </nav>
       </div>
     </footer>

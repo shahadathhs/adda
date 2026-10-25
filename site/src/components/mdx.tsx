@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExternalLink } from "@/components/external-link";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
@@ -8,6 +9,10 @@ const components = {
   a: ({ href = "", children, ...rest }: ComponentProps<"a">) =>
     href.startsWith("/") ? (
       <Link href={href}>{children}</Link>
+    ) : /^https?:\/\//.test(href) ? (
+      <ExternalLink href={href} {...rest}>
+        {children}
+      </ExternalLink>
     ) : (
       <a href={href} {...rest}>
         {children}

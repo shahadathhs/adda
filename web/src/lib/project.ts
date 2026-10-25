@@ -1,4 +1,4 @@
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://adda.vercel.app";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://getadda.vercel.app";
 
 /** Facts about the project, shown on the About page and in the footer. */
 export const PROJECT = {

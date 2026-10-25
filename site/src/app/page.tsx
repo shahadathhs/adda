@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { ArchitectureDiagram } from "@/components/architecture-diagram";
+import { ExternalLink } from "@/components/external-link";
 import { InstallCommand } from "@/components/install-command";
 import { Screen } from "@/components/screen";
 import { SITE } from "@/lib/site";
@@ -256,12 +257,12 @@ export default function Home() {
             light theme, an admin web interface, transcoding or clips, and WebRTC playback. Playback
             is HLS, and recordings and uploaded videos are not transcoded, so quality is what the
             encoder or the uploader sends. The full scope, with the reasoning, is in the{" "}
-            <a
+            <ExternalLink
               href={`${SITE.repo}/blob/dev/docs/SCOPE.md`}
               className="text-primary underline underline-offset-4"
             >
               repository
-            </a>
+            </ExternalLink>
             .
           </p>
         </div>
@@ -285,12 +286,12 @@ export default function Home() {
             >
               Quickstart
             </Link>
-            <a
+            <ExternalLink
               href={SITE.repo}
               className="inline-flex h-10 items-center rounded-sm border border-input px-5 text-sm font-medium transition-colors duration-[120ms] hover:bg-secondary"
             >
               View the source
-            </a>
+            </ExternalLink>
           </div>
         </div>
       </section>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExternalLink } from "@/components/external-link";
 import { Radio } from "lucide-react";
 import { SITE } from "@/lib/site";
 
@@ -20,9 +21,9 @@ export function SiteHeader() {
           <Link href="/blog" className={link}>
             Blog
           </Link>
-          <a href={SITE.repo} className={link}>
+          <ExternalLink href={SITE.repo} className={link}>
             GitHub
-          </a>
+          </ExternalLink>
         </nav>
         <Link
           href="/docs/quickstart"
