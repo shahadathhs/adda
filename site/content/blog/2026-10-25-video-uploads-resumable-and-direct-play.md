@@ -1,7 +1,10 @@
 ---
 title: "Video uploads: resumable parts and direct play"
 description: "How adda accepts a 4 GB video without a job queue: parts at explicit offsets, ffprobe to decide, and a copy instead of a re-encode."
-date: 2026-10-26
+date: 2026-10-25
+order: 1
+tag: "Video"
+image: "/blog/video-uploads-resumable-and-direct-play.svg"
 ---
 
 Live streams and their recordings were the first half of adda. The second half is the video a

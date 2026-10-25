@@ -1,28 +1,37 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { PostCard } from "@/components/post-card";
 import { allPosts } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Notes on how adda is built.",
+  description: "Notes on how adda is built: streaming, chat, operations and design.",
 };
 
 export default function BlogIndex() {
-  const posts = allPosts();
+  const [latest, ...rest] = allPosts();
   return (
-    <main className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <h1 className="font-display text-4xl font-bold tracking-tight">Blog</h1>
-      <p className="mt-2 text-muted-foreground">Notes on how adda is built.</p>
-      <ul className="mt-10 divide-y divide-border border-y border-border">
-        {posts.map((p) => (
-          <li key={p.slug.join("/")}>
-            <Link href={`/blog/${p.slug[0]}`} className="group block py-6">
-              <p className="font-num text-xs text-muted-foreground">{p.date}</p>
-              <h2 className="mt-1 font-display text-xl font-semibold group-hover:text-primary">
-                {p.title}
-              </h2>
-              <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{p.description}</p>
-            </Link>
+    <main className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        Blog
+      </p>
+      <h1 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+        How adda is built.
+      </h1>
+      <p className="mt-3 max-w-2xl text-lg leading-8 text-muted-foreground">
+        Notes from the people who run it: the streaming path, chat, operations and the design rules,
+        with what is measured and what is not.
+      </p>
+
+      {latest && (
+        <div className="mt-10">
+          <PostCard post={latest} priority featured />
+        </div>
+      )}
+
+      <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {rest.map((p) => (
+          <li key={p.slug.join("/")} className="flex">
+            <PostCard post={p} />
           </li>
         ))}
       </ul>

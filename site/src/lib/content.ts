@@ -14,6 +14,12 @@ export interface Doc {
 
 export interface Post extends Doc {
   date: string;
+  tag: string;
+  /** Breaks ties between posts of the same date; lower comes first. */
+  order: number;
+  /** Thumbnail path under /public, 1200x630. */
+  image: string;
+  minutes: number;
 }
 
 /** The same slug scheme `rehype-slug` uses, so the contents list can link to the headings. */
@@ -79,7 +85,20 @@ export function allPosts(): Post[] {
   return [...walk(join(ROOT, "blog"))]
     .map(({ file, slug }) => {
       const doc = load(file, slug);
-      return { ...doc, date: String(doc.data.date ?? "") };
+      return {
+        ...doc,
+        date:
+          doc.data.date instanceof Date
+            ? doc.data.date.toISOString().slice(0, 10)
+            : String(doc.data.date ?? ""),
+        tag: String(doc.data.tag ?? "Notes"),
+        order: Number(doc.data.order ?? 99),
+        image: String(doc.data.image ?? ""),
+        minutes: Math.max(1, Math.round(doc.body.split(/\s+/).length / 200)),
+      };
     })
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort(
+      (a, b) =>
+        b.date.localeCompare(a.date) || a.order - b.order || a.slug[0].localeCompare(b.slug[0]),
+    );
 }

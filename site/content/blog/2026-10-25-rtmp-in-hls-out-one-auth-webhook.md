@@ -2,6 +2,9 @@
 title: "RTMP in, HLS out, one auth webhook"
 description: "How adda turns an encoder's stream into a watchable, recorded, chat-enabled channel with very little code."
 date: 2026-10-25
+order: 2
+tag: "Streaming"
+image: "/blog/rtmp-in-hls-out-one-auth-webhook.svg"
 ---
 
 Streaming looks like a hard problem until you split it. adda's streaming path is three
