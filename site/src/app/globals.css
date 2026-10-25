@@ -137,7 +137,22 @@
   }
 }
 
+/* Scroll reveal (components/reveal.tsx): shown at once without JavaScript, armed only after
+   hydration for content below the fold. Transform and opacity only, once. */
+[data-reveal] {
+  transition:
+    opacity 250ms var(--ease-micro),
+    transform 250ms var(--ease-spring);
+}
+[data-reveal="armed"] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
   .live-dot::after {
     animation: none;
     display: none;

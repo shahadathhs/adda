@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { ArchitectureDiagram } from "@/components/architecture-diagram";
 import { ExternalLink } from "@/components/external-link";
+import { Reveal } from "@/components/reveal";
 import { InstallCommand } from "@/components/install-command";
 import { Screen } from "@/components/screen";
 import { SITE } from "@/lib/site";
@@ -140,7 +141,7 @@ export default function Home() {
       <section className="border-t border-border">
         <div className="mx-auto max-w-6xl space-y-24 px-4 py-20 sm:px-6">
           {FEATURES.map((f, i) => (
-            <div
+            <Reveal
               key={f.title}
               className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14"
             >
@@ -162,13 +163,13 @@ export default function Home() {
               <div className={i % 2 === 1 ? "lg:order-1" : ""}>
                 <Screen src={f.src} alt={f.alt} />
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       <section className="border-t border-border">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2">
+        <Reveal className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2">
           <div>
             <p className={eyebrow}>Who can do what</p>
             <h2 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight">
@@ -196,11 +197,11 @@ export default function Home() {
               </div>
             ))}
           </dl>
-        </div>
+        </Reveal>
       </section>
 
       <section className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <Reveal className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <p className={eyebrow}>How it works</p>
           <h2 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight">
             One small stack, nothing hidden.
@@ -231,11 +232,11 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <section className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <Reveal className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <p className={eyebrow}>Honest status</p>
           <h2 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight">
             What is built, and what is not.
@@ -265,11 +266,11 @@ export default function Home() {
             </ExternalLink>
             .
           </p>
-        </div>
+        </Reveal>
       </section>
 
       <section className="border-t border-border">
-        <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
+        <Reveal className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
           <h2 className="font-display text-3xl font-bold leading-tight tracking-tight">
             Your server. Your streams. Your chat.
           </h2>
@@ -293,7 +294,7 @@ export default function Home() {
               View the source
             </ExternalLink>
           </div>
-        </div>
+        </Reveal>
       </section>
     </main>
   );

@@ -318,18 +318,18 @@ arriving.
 
 ### Element rules
 
-| Element                 | Motion                                                                                                                                                    |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Buttons                 | press `scale .97`, 120ms micro spring return                                                                                                              |
-| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                                                                                                 |
-| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                                                                                        |
-| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)                                                                             |
-| ⌘K palette              | `scale .98→1` + fade, 150ms                                                                                                                               |
-| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom                                                                             |
-| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**                                                                             |
-| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name`                                                                       |
-| Site scroll reveals     | 12px rise + fade, once per element, `animation-timeline: view()` with IO fallback                                                                         |
-| App card reveals        | 16px rise + fade, 250ms, once, 50ms stagger across a row; `Reveal` shows anything already on screen at load, and everything under reduced motion, at once |
+| Element                 | Motion                                                                                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Buttons                 | press `scale .97`, 120ms micro spring return                                                                                                                                 |
+| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                                                                                                                    |
+| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                                                                                                           |
+| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)                                                                                                |
+| ⌘K palette              | `scale .98→1` + fade, 150ms                                                                                                                                                  |
+| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom                                                                                                |
+| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**                                                                                                |
+| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name`                                                                                          |
+| Site scroll reveals     | 12px rise + fade, 250ms spring, once per element, 35ms stagger in grids; IntersectionObserver (`Reveal`), never `animation-timeline` alone, which not every browser supports |
+| App card reveals        | 16px rise + fade, 250ms, once, 50ms stagger across a row; `Reveal` shows anything already on screen at load, and everything under reduced motion, at once                    |
 
 ### Engineering rules
 

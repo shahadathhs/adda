@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Reveal } from "@/components/reveal";
 import { PostCard } from "@/components/post-card";
 import { allPosts } from "@/lib/content";
 
@@ -29,9 +30,11 @@ export default function BlogIndex() {
       )}
 
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {rest.map((p) => (
+        {rest.map((p, i) => (
           <li key={p.slug.join("/")} className="flex">
-            <PostCard post={p} />
+            <Reveal className="flex w-full" delay={(i % 3) * 35}>
+              <PostCard post={p} />
+            </Reveal>
           </li>
         ))}
       </ul>
