@@ -318,18 +318,33 @@ arriving.
 
 ### Element rules
 
-| Element                 | Motion                                                                                                                                                                       |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Buttons                 | press `scale .97`, 120ms micro spring return                                                                                                                                 |
-| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                                                                                                                    |
-| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                                                                                                           |
-| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)                                                                                                |
-| ⌘K palette              | `scale .98→1` + fade, 150ms                                                                                                                                                  |
-| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom                                                                                                |
-| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**                                                                                                |
-| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name`                                                                                          |
-| Site scroll reveals     | 12px rise + fade, 250ms spring, once per element, 35ms stagger in grids; IntersectionObserver (`Reveal`), never `animation-timeline` alone, which not every browser supports |
-| App card reveals        | 16px rise + fade, 250ms, once, 50ms stagger across a row; `Reveal` shows anything already on screen at load, and everything under reduced motion, at once                    |
+| Element                 | Motion                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Buttons                 | press `scale .97`, 120ms micro spring return                                                                                                                       |
+| Popover/dialog/menu     | `scale .97→1` + fade + 4px rise, 250ms spring; exit 175ms                                                                                                          |
+| Stream card             | hover lift `translateY(-2px)` + thumbnail `brightness 1.05`, 120ms                                                                                                 |
+| Tab indicator (console) | slides between tabs, 250ms spring (measured transform, not per-tab re-render)                                                                                      |
+| ⌘K palette              | `scale .98→1` + fade, 150ms                                                                                                                                        |
+| Chat message            | new message rises 4px + fades, 150ms; auto-scroll only when already at bottom                                                                                      |
+| Viewer counts           | digits swap in place — tabular mono keeps width stable; **no odometer rolls**                                                                                      |
+| Site page change        | cross-document View Transition crossfade; headings morph via `view-transition-name`                                                                                |
+| Site scroll reveals     | 12px rise + fade, 250ms spring, once per element, 35ms stagger in grids (`Reveal`, Motion `whileInView`); under reduced motion fade only; without JS shown at once |
+| App card reveals        | 16px rise + fade, 250ms, once, 50ms stagger across a row; `Reveal` shows anything already on screen at load, and everything under reduced motion, at once          |
+
+### Site scroll motion
+
+Used only where it explains something, and nowhere in reading copy (docs and posts do not
+animate):
+
+- **Sections and cards** arrive once (`Reveal`): rise 12px, fade, stagger 35ms across a row.
+- **The architecture diagram draws in the order data travels**: RTMP in, HLS out, then the
+  requests, each arrowhead after its line. It starts when the diagram is a third in view.
+- **Feature screenshots drift 3% against their frame** (`ParallaxScreen`, scroll-linked) so the
+  frame reads as a window onto the app; the image is oversized by 6% so no edge shows.
+- **A reading bar** fills under the header on posts (`ReadingProgress`, spring-smoothed).
+- Everything animates `transform`, `opacity` or SVG `pathLength` only. Reduced motion: reveals
+  fade without moving, the screenshot sits still, the diagram is drawn at once. Without
+  JavaScript a `<noscript>` rule shows everything.
 
 ### Engineering rules
 
@@ -345,8 +360,11 @@ arriving.
     `@starting-style` for entries, `transition-behavior: allow-discrete`
     for exits, View Transitions API). Add a spring library only if
     choreography genuinely exceeds CSS — justify it in the PR.
-  - **Site (Next.js):** View Transitions for page changes;
-    scroll-driven CSS animations with an IntersectionObserver fallback.
+  - **Site (Next.js):** [Motion](https://motion.dev) (`motion`, loaded through
+    `LazyMotion` with `domAnimation`, a few KB). Scroll-linked work (the drawn diagram, the
+    screenshot drift, the reading bar) needs `useScroll`, which CSS alone does not cover
+    in every browser. Scroll motion must carry information, not decorate: see
+    "Site scroll motion" below.
 
 ---
 

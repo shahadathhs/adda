@@ -46,3 +46,10 @@ pnpm check:design                                 # from the repo root
 ```
 
 Pre-ship the DESIGN.md anti-slop checklist: the site is the brand's first impression.
+
+## Motion
+
+Scroll animation uses Motion (`motion/react`, `LazyMotion` in `MotionProvider`). Rules and the
+list of what animates are in `docs/DESIGN.md` ("Site scroll motion"). Use `Reveal` for sections
+and cards, never wrap reading copy, and keep anything that starts hidden covered by the
+`<noscript>` rule in `layout.tsx` (`data-reveal`, `data-draw`).

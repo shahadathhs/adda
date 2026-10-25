@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-
-type State = "visible" | "armed" | "in";
+import type { ReactNode } from "react";
+import * as m from "motion/react-m";
 
 /**
- * Fades and lifts its content in when it scrolls into view, once. Anything already on screen at
- * load, and everything under reduced motion, is shown at once, so nothing is ever hidden without JS.
+ * Rises 12px and fades in once as it scrolls into view. Siblings pass an increasing `delay` (35 ms
+ * apart) to arrive in turn. Under reduced motion it only fades; without JavaScript the layout
+ * stylesheet in `layout.tsx` shows it at once.
  */
 export function Reveal({
   children,
@@ -15,38 +15,19 @@ export function Reveal({
 }: {
   children: ReactNode;
   className?: string;
-  /** Milliseconds to wait after entering view; used to stagger siblings. */
+  /** Milliseconds to wait after entering view. */
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<State>("visible");
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (el.getBoundingClientRect().top < window.innerHeight) return;
-    setState("armed");
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setState("in");
-          io.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -8% 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
   return (
-    <div
-      ref={ref}
-      data-reveal={state}
+    <m.div
+      data-reveal
       className={className}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+      transition={{ type: "spring", stiffness: 260, damping: 30, delay: delay / 1000 }}
     >
       {children}
-    </div>
+    </m.div>
   );
 }

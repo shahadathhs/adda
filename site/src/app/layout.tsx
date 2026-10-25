@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { MotionProvider } from "@/components/motion-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SITE } from "@/lib/site";
@@ -31,9 +32,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`dark ${spaceGrotesk.variable}`}>
       <body className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <div className="flex-1">{children}</div>
-        <SiteFooter />
+        <noscript>
+          {/* Scroll animations start hidden; without JavaScript nothing may stay that way. */}
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-draw]{opacity:1!important;stroke-dasharray:none!important;stroke-dashoffset:0!important}`}</style>
+        </noscript>
+        <MotionProvider>
+          <SiteHeader />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </MotionProvider>
       </body>
     </html>
   );

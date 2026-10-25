@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { ArchitectureDiagram } from "@/components/architecture-diagram";
 import { ExternalLink } from "@/components/external-link";
+import { ParallaxScreen } from "@/components/parallax-screen";
 import { Reveal } from "@/components/reveal";
 import { InstallCommand } from "@/components/install-command";
 import { Screen } from "@/components/screen";
@@ -161,7 +162,7 @@ export default function Home() {
                 </ul>
               </div>
               <div className={i % 2 === 1 ? "lg:order-1" : ""}>
-                <Screen src={f.src} alt={f.alt} />
+                <ParallaxScreen src={f.src} alt={f.alt} />
               </div>
             </Reveal>
           ))}
