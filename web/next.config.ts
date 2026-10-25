@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   // Remote avatars/banners come straight from user-provided origins — skip
   // Next's image optimizer rather than whitelist every domain.
   images: { unoptimized: true },
-  eslint: { ignoreDuringBuilds: true },
 };
 
 export default nextConfig;

@@ -2,7 +2,7 @@
   "name": "adda",
   "version": "0.2.0",
   "private": true,
-  "description": "adda \u2014 self-hosted live-streaming platform: FastAPI backend, Next.js web app, Astro docs site",
+  "description": "adda — self-hosted live-streaming platform: FastAPI backend, Next.js web app, Astro docs site",
   "packageManager": "pnpm@10.0.0",
   "scripts": {
     "prepare": "husky",
@@ -15,12 +15,12 @@
     "e2e": "playwright test -c e2e/playwright.config.ts"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.2",
-    "@commitlint/config-conventional": "^21.2.2",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@playwright/test": "^1.64.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
-    "oxlint": "^1.79.0",
-    "prettier": "^3.9.6"
+    "oxlint": "^1.89.0",
+    "prettier": "^3.9.10"
   }
 }
