@@ -19,9 +19,9 @@ export function channelLive({ guest = false, reconnecting = false } = {}) {
     ? `<div class="banner warn" style="margin:10px 14px 0"><div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--input);border-top-color:var(--warn)"></div><span>Chat disconnected. Reconnecting in <span class="num">4s</span>… your draft is kept.</span></div>`
     : "";
   return `
-  ${topbar({ user: !guest, active: "browse", notif: !guest })}
-  <div style="display:flex;height:844px">
-    <main style="flex:1;min-width:0;padding:20px 24px;overflow:hidden">
+  ${topbar({ user: !guest, active: "", notif: !guest })}
+  <div class="col" style="display:flex;height:844px">
+    <main style="flex:1;min-width:0;padding:0 24px 0 0;padding-top:20px;overflow:hidden">
       <div class="card" style="border-radius:8px;position:relative">
         <div class="thumb" style="aspect-ratio:16/9;border-bottom:0">${scene("bench")}
           <div class="tl">${live()}</div>
@@ -43,7 +43,7 @@ export function channelLive({ guest = false, reconnecting = false } = {}) {
         </div>
         <div style="display:flex;gap:8px">${guest ? `<span class="btn primary">${icons.heart(14)} Sign in to follow</span>` : `<span class="btn secondary">${icons.bell(14)} Alerts on</span><span class="btn primary">${icons.heart(14)} Following</span>`}</div>
       </div>
-      <div class="tabs" style="margin-top:14px"><a class="on">About</a><a>Recordings <span class="num subtle" style="font-size:12px">23</span></a><a>Followers</a></div>
+      <div class="tabs" style="margin-top:14px"><a class="on">About</a><a>Recordings <span class="num subtle" style="font-size:12px">23</span></a><a>Videos <span class="num subtle" style="font-size:12px">4</span></a><a>Followers</a></div>
       <div style="display:flex;gap:32px;margin-top:14px;font-size:13px">
         <p class="muted" style="max-width:560px">Slow repairs of old radios, record players and the odd tape deck. New stream most Sundays. Be kind in chat; ask anything about capacitors.</p>
         <div class="muted" style="display:flex;flex-direction:column;gap:6px">

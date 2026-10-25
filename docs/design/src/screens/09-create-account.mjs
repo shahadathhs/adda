@@ -2,7 +2,7 @@ import { authShell, input } from "../shells.mjs";
 
 export default {
   w: 1440,
-  h: 900,
+  h: 1120,
   html: authShell(`<div style="width:360px">
     <h1 class="h1">Create your account</h1><p class="muted" style="margin-top:4px">An account is needed to chat, react, vote and follow.</p>
     <div style="display:flex;flex-direction:column;gap:16px;margin-top:24px">

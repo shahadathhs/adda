@@ -5,9 +5,9 @@ const amber = ["rgba(245,166,35,.14)", "#f5a623"];
 export default {
   w: 1440,
   h: 900,
-  html: `${topbar({ active: "browse", notif: true })}
-  <div style="display:flex;height:844px">
-    <main style="flex:1;min-width:0;padding:20px 24px;overflow:hidden">
+  html: `${topbar({ active: "", notif: true })}
+  <div class="col" style="display:flex;height:844px">
+    <main style="flex:1;min-width:0;padding:20px 24px 0 0;overflow:hidden">
       <div class="card" style="border-radius:8px"><div class="thumb" style="aspect-ratio:16/9;border-bottom:0">
         <div style="position:absolute;inset:0;opacity:.08">${scene("bench")}</div>
         <div style="position:absolute;inset:0;background:rgba(12,13,16,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center">
@@ -20,7 +20,7 @@ export default {
           <div style="display:flex;gap:8px;margin-top:8px"><span class="btn primary">${icons.heart(14)} Following</span><span class="btn secondary">${icons.bell(14)} Alerts on</span></div>
         </div></div></div>
       <div style="display:flex;align-items:flex-start;gap:14px;margin-top:16px">${avatar("nila_workshop", 48, amber)}<div style="flex:1"><h1 class="h2" style="line-height:26px">Sunday build: restoring the 1974 radio, part 3</h1><div class="muted" style="font-size:13px;margin-top:2px"><b style="color:var(--fg);font-weight:600">nila_workshop</b> · <span class="num">4,812</span> followers</div></div></div>
-      <div class="tabs" style="margin-top:14px"><a class="on">About</a><a>Recordings <span class="num subtle" style="font-size:12px">23</span></a><a>Followers</a></div>
+      <div class="tabs" style="margin-top:14px"><a class="on">About</a><a>Recordings <span class="num subtle" style="font-size:12px">23</span></a><a>Videos <span class="num subtle" style="font-size:12px">4</span></a><a>Followers</a></div>
     </main>
     <aside class="chat" style="width:340px;flex-shrink:0">
       <div class="head"><span>Chat</span><span class="tag">Stream ended</span></div>

@@ -1,0 +1,217 @@
+// Invented sample content shared by several concept screens.
+export const T = {
+  amber: ["rgba(245,166,35,.14)", "#f5a623"],
+  green: ["rgba(47,191,113,.16)", "#2fbf71"],
+  blue: ["rgba(90,169,230,.16)", "#5aa9e6"],
+  pink: ["rgba(214,122,177,.16)", "#d67ab1"],
+};
+
+export const liveNow = [
+  {
+    kind: "radio",
+    title: "Late night requests · open lines",
+    name: "latenight_radio",
+    viewers: "1,402",
+    tone: T.pink,
+  },
+  {
+    kind: "bench",
+    title: "Restoring the 1974 radio, part 3",
+    name: "nila_workshop",
+    viewers: "312",
+    tone: T.amber,
+  },
+  {
+    kind: "code",
+    title: "Writing a tiny HTTP server in Zig",
+    name: "dhaka_dev_chat",
+    viewers: "276",
+    tone: T.blue,
+  },
+  {
+    kind: "chess",
+    title: "Rook endgames, slowly (beginners)",
+    name: "kodomo_chess",
+    viewers: "88",
+    tone: T.green,
+  },
+];
+
+export const channels = [
+  {
+    name: "latenight_radio",
+    kind: "radio",
+    tone: T.pink,
+    status: "live",
+    viewers: "1,402",
+    line: "Late night requests · open lines",
+  },
+  {
+    name: "nila_workshop",
+    kind: "bench",
+    tone: T.amber,
+    status: "live",
+    viewers: "312",
+    line: "Restoring the 1974 radio, part 3",
+  },
+  {
+    name: "dhaka_dev_chat",
+    kind: "code",
+    tone: T.blue,
+    status: "live",
+    viewers: "276",
+    line: "Writing a tiny HTTP server in Zig",
+  },
+  {
+    name: "kodomo_chess",
+    kind: "chess",
+    tone: T.green,
+    status: "live",
+    viewers: "88",
+    line: "Rook endgames, slowly (beginners)",
+  },
+  {
+    name: "tuesday-tabletop",
+    kind: "dice",
+    tone: T.amber,
+    status: "off",
+    line: "@tuesday-tabletop",
+  },
+  { name: "shortwave_sam", kind: "wave", tone: T.blue, status: "off", line: "@shortwave_sam" },
+  { name: "ham_hour_bd", kind: "radio", tone: T.green, status: "off", line: "@ham_hour_bd" },
+  {
+    name: "radio_kolkata_archive",
+    kind: "wave",
+    tone: T.pink,
+    status: "off",
+    line: "@radio_kolkata_archive",
+  },
+  { name: "solder_sisters", kind: "bench", tone: T.pink, status: "off", line: "@solder_sisters" },
+  {
+    name: "zig_for_breakfast",
+    kind: "code",
+    tone: T.blue,
+    status: "off",
+    line: "@zig_for_breakfast",
+  },
+  { name: "endgame_club", kind: "chess", tone: T.green, status: "off", line: "@endgame_club" },
+  { name: "lofi_lathe", kind: "wave", tone: T.amber, status: "off", line: "@lofi_lathe" },
+];
+
+export const videos = [
+  {
+    kind: "bench",
+    title: "Dial lamp swap, start to finish",
+    channel: "nila_workshop",
+    dur: "18:42",
+    date: "Oct 24, 2026",
+  },
+  {
+    kind: "code",
+    title: "Zig in ten minutes",
+    channel: "dhaka_dev_chat",
+    dur: "10:05",
+    date: "Oct 21, 2026",
+  },
+  {
+    kind: "chess",
+    title: "Three rook endgames to know",
+    channel: "kodomo_chess",
+    dur: "24:18",
+    date: "Oct 19, 2026",
+  },
+  {
+    kind: "radio",
+    title: "How a superhet receiver works",
+    channel: "latenight_radio",
+    dur: "31:07",
+    date: "Oct 15, 2026",
+  },
+  {
+    kind: "wave",
+    title: "Shortwave band report, October",
+    channel: "shortwave_sam",
+    dur: "12:30",
+    date: "Oct 12, 2026",
+  },
+  {
+    kind: "dice",
+    title: "Painting the sunken keep",
+    channel: "tuesday-tabletop",
+    dur: "42:55",
+    date: "Oct 9, 2026",
+  },
+  {
+    kind: "bench",
+    title: "Tape deck belts, a field guide",
+    channel: "nila_workshop",
+    dur: "15:21",
+    date: "Oct 2, 2026",
+  },
+  {
+    kind: "code",
+    title: "Parsing HTTP by hand",
+    channel: "dhaka_dev_chat",
+    dur: "27:48",
+    date: "Sep 28, 2026",
+  },
+];
+
+export const recordings = [
+  {
+    kind: "bench",
+    title: "Sunday build: the stack",
+    channel: "nila_workshop",
+    dur: "2:14:09",
+    date: "Oct 18, 2026",
+  },
+  {
+    kind: "chess",
+    title: "Endgames, slowly",
+    channel: "kodomo_chess",
+    dur: "1:02:44",
+    date: "Oct 17, 2026",
+  },
+  {
+    kind: "code",
+    title: "Zig HTTP server, part 1",
+    channel: "dhaka_dev_chat",
+    dur: "2:48:30",
+    date: "Oct 14, 2026",
+  },
+  {
+    kind: "dice",
+    title: "The sunken keep, session 4",
+    channel: "tuesday-tabletop",
+    dur: "3:31:12",
+    date: "Oct 13, 2026",
+  },
+  {
+    kind: "radio",
+    title: "Late night requests, 112",
+    channel: "latenight_radio",
+    dur: "4:02:51",
+    date: "Oct 11, 2026",
+  },
+  {
+    kind: "wave",
+    title: "Shortwave Sunday",
+    channel: "shortwave_sam",
+    dur: "1:48:20",
+    date: "Oct 11, 2026",
+  },
+  {
+    kind: "bench",
+    title: "Restoring the 1974 radio, part 2",
+    channel: "nila_workshop",
+    dur: "3:02:51",
+    date: "Oct 11, 2026",
+  },
+  {
+    kind: "chess",
+    title: "Opening traps for beginners",
+    channel: "kodomo_chess",
+    dur: "58:03",
+    date: "Oct 6, 2026",
+  },
+];

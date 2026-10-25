@@ -74,6 +74,26 @@ export const icons = {
       '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/>',
       s,
     ),
+  film: (s) =>
+    ic(
+      '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+      s,
+    ),
+  clapper: (s) =>
+    ic(
+      '<path d="m4 11 16-6.5V8L4 11Z"/><path d="M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><path d="m8.5 8.8-2-3.6"/><path d="m13 7-2-3.6"/>',
+      s,
+    ),
+  upload: (s) =>
+    ic(
+      '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+      s,
+    ),
+  chevd: (s) => ic('<path d="m6 9 6 6 6-6"/>', s),
+  chevl: (s) => ic('<path d="m15 18-6-6 6-6"/>', s),
+  chevr: (s) => ic('<path d="m9 18 6-6-6-6"/>', s),
+  arrow: (s) => ic('<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>', s),
+  x: (s) => ic('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', s),
   msg: (s) => ic('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/>', s),
 };
 
@@ -132,16 +152,64 @@ export const avatar = (name, size = 36, tone) =>
 
 export const live = () => `<span class="live"><i></i>LIVE</span>`;
 
-export function topbar({ user = true, active = "", notif = false } = {}) {
-  return `<header class="topbar">
+export const LINKS = ["Following", "Live", "Channels", "Videos", "Recordings"];
+
+/** The top bar: logo, links, global search (every page), account side. `q` types into the search; `dd` is the popover html. */
+export function topbar({
+  user = true,
+  active = "",
+  notif = false,
+  q = null,
+  dd = "",
+  auth = false,
+  menu = "",
+} = {}) {
+  const links = LINKS.filter((l) => user || l !== "Following");
+  return `<header class="topbar"><div class="col">
     <div class="brand">${icons.radio(20)}<span>adda</span></div>
-    <nav class="nav" style="display:flex">${user ? `<a class="${active === "following" ? "on" : ""}">Following</a>` : ""}<a class="${active === "browse" ? "on" : ""}">Browse</a></nav>
-    <div class="search">${icons.search(16)}<span>Search channels…</span></div>
-    <div class="right">
-      ${user ? `<div class="iconbtn">${icons.bell(18)}${notif ? '<i class="dot"></i>' : ""}</div>${avatar("Rafi Ahmed", 30)}` : '<span class="btn ghost">Sign in</span><span class="btn primary">Create account</span>'}
+    <nav class="nav">${links.map((l) => `<a class="${active === l.toLowerCase() ? "on" : ""}">${l}</a>`).join("")}</nav>
+    <div class="search ${q !== null ? "focus" : ""}">${icons.search(16)}${q ? `<span style="color:var(--fg)">${q}</span>` : `<span>Search adda…</span>`}${dd}</div>
+    <div class="right" style="position:relative">
+      ${auth ? "" : user ? `<div class="iconbtn">${icons.bell(18)}${notif ? '<i class="dot"></i>' : ""}</div>${avatar("Rafi Ahmed", 30)}` : '<span class="btn ghost">Sign in</span><span class="btn primary">Create account</span>'}${menu}
     </div>
-  </header>`;
+  </div></header>`;
 }
+
+export function footer() {
+  const li = (a) => a.map((t) => `<li>${t}</li>`).join("");
+  return `<footer class="footer"><div class="col">
+    <div class="cols">
+      <div><div class="brand">${icons.radio(20)}<span>adda</span></div>
+        <p class="muted" style="margin-top:12px;max-width:280px;font-size:13px">A live-streaming site you run yourself, with realtime chat and every broadcast kept.</p>
+        <p class="subtle" style="margin-top:10px;font-size:13px">আড্ডা: an unhurried chat among friends.</p></div>
+      <div><h4>Watch</h4><ul>${li(["Live now", "Channels", "Videos", "Recordings", "Search"])}</ul></div>
+      <div><h4>Project</h4><ul>${li(["About", "Source on GitHub", "Report an issue"])}</ul></div>
+      <div><h4>Run your own</h4><ul>${li(["Running a server", "MIT license"])}</ul></div>
+    </div>
+    <div class="bottom"><span>Built by shahadathhs. Open source under the MIT license.</span><span>Runs on its host's own server.</span></div>
+  </div></footer>`;
+}
+
+/** Channel card for directories and search: poster, state badge, avatar, name, @slug or stream title. */
+export function channelCard({ name, kind, tone, status = "off", line, viewers }) {
+  return `<div class="card"><div class="thumb">${scene(kind)}<div class="tl">${status === "live" ? live() : '<span class="offline">Offline</span>'}</div>${status === "live" && viewers ? `<div class="bl"><span style="display:inline-flex">${icons.eye(12)}</span><span class="num">${viewers}</span></div>` : ""}</div>
+  <div class="cardmeta">${avatar(name, 36, tone)}<div style="min-width:0;flex:1"><div class="t">${name}</div><div class="s" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${line}</div></div></div></div>`;
+}
+
+/** Video or recording card: 16:9 poster, mono duration badge bottom right, title, channel · date. */
+export function videoCard({ kind, title, channel, dur, date }) {
+  return `<div class="card"><div class="thumb">${scene(kind)}<div class="br num">${dur}</div></div>
+  <div style="padding:10px 12px 12px"><div class="t" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div><div class="s" style="font-size:13px;color:var(--fg-muted);margin-top:2px">${channel} · ${date}</div></div></div>`;
+}
+
+export const pager = (range, pages) =>
+  `<div class="pager"><span class="num">${range}</span><div class="pg"><span class="dis">${icons.chevl(16)}</span>${pages.map((p) => (p === "…" ? `<span class="dis">…</span>` : `<span class="${p === pages[0] ? "cur" : ""}">${p}</span>`)).join("")}<span>${icons.chevr(16)}</span></div></div>`;
+
+export const sel = (v) => `<div class="sel"><span>${v}</span>${icons.chevd(14)}</div>`;
+
+export const filterBar = ({ q = "", show = "All", sort = "Most viewers", clear = false } = {}) =>
+  `<div class="filterbar"><div class="in ${q ? "" : "ph"}">${icons.search(16)}<span style="flex:1">${q || "Filter by name, handle, about or stream title"}</span></div>
+  <span class="muted" style="font-size:13px">Show</span>${sel(show)}<span class="muted" style="font-size:13px">Sort by</span>${sel(sort)}${clear ? '<span class="btn ghost">Clear filters</span>' : ""}</div>`;
 
 export function streamCard({ kind, title, channel, viewers, isLive = true, tone, since }) {
   return `<div class="card">
@@ -179,3 +247,9 @@ export function msg({
 }
 
 export const page = (inner, { w = 1440, h = 900 } = {}) => ({ inner, w, h });
+
+/** Phone top bar: logo, search, bell and avatar on one row; the links on a second, sideways-scrolling row. */
+export function mobileBar({ active = "" } = {}) {
+  return `<header class="topbar" style="height:auto"><div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px"><div class="brand">${icons.radio(20)}<span>adda</span></div><div style="flex:1"></div><div class="iconbtn">${icons.search(18)}</div><div class="iconbtn">${icons.bell(18)}<i class="dot"></i></div>${avatar("Rafi Ahmed", 30)}</div>
+  <nav class="nav" style="height:40px;align-items:center;padding:0 10px;border-top:1px solid var(--line);overflow:hidden;white-space:nowrap">${LINKS.map((l) => `<a class="${active === l.toLowerCase() ? "on" : ""}">${l}</a>`).join("")}</nav></header>`;
+}

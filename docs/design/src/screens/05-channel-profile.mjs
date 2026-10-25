@@ -14,17 +14,17 @@ export default {
   w: 1440,
   h: 900,
   html: `
-  ${topbar({ active: "browse", notif: true })}
+  ${topbar({ active: "", notif: true })}
   <div style="height:844px;overflow:hidden">
-    <div style="height:176px;position:relative;border-bottom:1px solid var(--line);background:#171b22"><div class="cover" style="opacity:.4">${scene("bench")}</div></div>
-    <div style="max-width:1200px;margin:0 auto;padding:0 24px">
+    <div class="col"><div style="height:176px;margin-top:20px;position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#171b22"><div class="cover" style="opacity:.4">${scene("bench")}</div></div>
+    <div>
       <div style="display:flex;align-items:flex-end;gap:18px;margin-top:-36px;position:relative">
         <div style="border:4px solid var(--bg);border-radius:50%">${avatar("nila_workshop", 96, amber).replace("font-size:35px", "font-size:34px")}</div>
         <div style="flex:1;padding-bottom:6px"><div style="display:flex;align-items:center;gap:10px"><h1 class="h1">nila_workshop</h1><span class="badge owner">owner</span></div>
           <div class="muted" style="font-size:13px"><span class="num">4,812</span> followers · joined <span class="num">Mar 2025</span> · <span class="num">23</span> recordings</div></div>
         <div style="display:flex;gap:8px;padding-bottom:8px"><span class="btn secondary">${icons.bell(14)} Alerts on</span><span class="btn primary">${icons.heart(14)} Following</span></div>
       </div>
-      <div class="tabs" style="margin-top:18px"><a class="on">About</a><a>Recordings</a><a>Followers</a></div>
+      <div class="tabs" style="margin-top:18px"><a class="on">About</a><a>Recordings</a><a>Videos</a><a>Followers</a></div>
       <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:40px;margin-top:22px">
         <div>
           <div class="eyebrow">About</div>
@@ -43,6 +43,6 @@ export default {
           <div class="btn ghost" style="margin-top:8px;padding:0">View all followers</div>
         </div>
       </div>
-    </div>
+    </div></div>
   </div>`,
 };

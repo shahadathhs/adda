@@ -11,14 +11,14 @@ const n = (unread, who, tone, body, time, tag) =>
 export default {
   w: 1440,
   h: 900,
-  html: `${topbar({ active: "browse", notif: true })}
-  <div style="padding:24px;opacity:.45"><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+  html: `${topbar({ active: "", notif: true })}
+  <div class="col" style="padding-top:24px;opacity:.45"><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
     ${streamCard({ kind: "radio", title: "Late night requests · open lines", channel: "latenight_radio", viewers: "1,402", tone: T.pink })}
     ${streamCard({ kind: "bench", title: "Restoring the 1974 radio, part 3", channel: "nila_workshop", viewers: "312", tone: T.amber })}
     ${streamCard({ kind: "code", title: "Writing a tiny HTTP server in Zig", channel: "dhaka_dev_chat", viewers: "276", tone: T.blue })}
     ${streamCard({ kind: "chess", title: "Rook endgames, slowly", channel: "kodomo_chess", viewers: "88", tone: T.amber })}
   </div></div>
-  <div class="menu" style="right:20px;top:60px;width:400px">
+  <div class="menu" style="right:104px;top:60px;width:400px">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)"><b style="font-weight:600">Notifications <span class="num muted" style="font-weight:500">3 new</span></b><span style="color:var(--accent);font-size:13px">Mark all read</span></div>
     ${n(true, "nila_workshop", T.amber, "<b>nila_workshop</b> is live: Restoring the 1974 radio, part 3", "2m ago", "went live")}
     ${n(true, "sadia", T.blue, "<b>sadia</b> mentioned you: “@rafi you asked about the 6V6 earlier…”", "8m ago", "mention · nila_workshop")}

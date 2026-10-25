@@ -15,9 +15,9 @@ export default {
   w: 1440,
   h: 900,
   html: `
-  ${topbar({ active: "browse", notif: false })}
-  <div style="display:flex;height:844px">
-    <main style="flex:1;min-width:0;padding:20px 24px;overflow:hidden">
+  ${topbar({ active: "", notif: false })}
+  <div class="col" style="display:flex;height:844px">
+    <main style="flex:1;min-width:0;padding:20px 24px 0 0;overflow:hidden">
       <div class="card" style="border-radius:8px">
         <div class="thumb" style="aspect-ratio:16/9;border-bottom:0">${scene("bench")}
           <div style="position:absolute;left:0;right:0;bottom:0;background:rgba(12,13,16,.86);padding:10px 14px 12px">

@@ -1,4 +1,4 @@
-import { avatar, icons, scene, live } from "../components.mjs";
+import { avatar, icons, scene, live, mobileBar } from "../components.mjs";
 
 const T = {
   amber: ["rgba(245,166,35,.14)", "#f5a623"],
@@ -14,10 +14,9 @@ const card = (kind, title, ch, v, tone) =>
 export default {
   w: 390,
   h: 844,
-  html: `<header class="topbar" style="padding:0 16px;gap:12px"><div class="brand">${icons.radio(20)}<span>adda</span></div><div style="flex:1"></div><div class="iconbtn">${icons.search(18)}</div><div class="iconbtn">${icons.bell(18)}<i class="dot"></i></div>${avatar("Rafi Ahmed", 30)}</header>
-  <div style="padding:16px;height:788px;overflow:hidden">
-    <div class="seg" style="width:100%;display:flex"><span class="on" style="flex:1;text-align:center">Browse</span><span style="flex:1;text-align:center">Following</span></div>
-    <div class="eyebrow" style="margin:18px 0 10px">Following</div>
+  html: `${mobileBar({ active: "" })}
+  <div style="padding:16px;height:752px;overflow:hidden">
+    <div class="eyebrow" style="margin:0 0 10px">Following</div>
     <div style="display:flex;gap:6px">${ring("nila_workshop", T.amber, true)}${ring("latenight_radio", T.pink, true)}${ring("kodomo_chess", T.green, true)}${ring("tuesday-tabletop", T.amber, false)}${ring("dhaka_dev", T.blue, false)}</div>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 12px"><h2 class="h2">Live now <span class="num muted" style="font-size:14px;font-weight:500">6</span></h2></div>
     <div style="display:flex;flex-direction:column;gap:14px">

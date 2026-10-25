@@ -1,6 +1,11 @@
 import { icons, avatar } from "../components.mjs";
 import { settingsShell } from "../shells.mjs";
 
+const menu = `<div class="menu" style="right:0;top:40px;width:240px;z-index:40">
+  <div style="padding:12px 14px;border-bottom:1px solid var(--line)"><div style="font-weight:600">Rafi Ahmed</div><div class="muted" style="font-size:13px">@rafi</div><div style="font-size:13px;margin-top:4px">☕ Back at 6, streaming the radio build</div></div>
+  <div style="padding:8px 14px">Your channel</div><div style="padding:8px 14px">Studio</div><div style="padding:8px 14px;background:var(--panel-2)">Settings</div>
+  <div style="padding:8px 14px;border-top:1px solid var(--line)">Sign out</div></div>`;
+
 const T = ["rgba(245,166,35,.14)", "#f5a623"];
 const row = (t, d, on) =>
   `<div class="row" style="padding:12px 0;border-bottom:1px solid var(--line)"><div style="flex:1"><div style="font-weight:500">${t}</div><div class="muted" style="font-size:13px">${d}</div></div><div class="toggle ${on ? "on" : ""}"></div></div>`;
@@ -29,5 +34,6 @@ export default {
         ${ch("nila_workshop", true, true)}${ch("latenight_radio", true, false)}${ch("kodomo_chess", true, true)}${ch("tuesday-tabletop", false, false)}
       </tbody></table>
     </div>`,
+    { menu },
   ),
 };

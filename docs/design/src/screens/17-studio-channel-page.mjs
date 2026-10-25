@@ -28,6 +28,6 @@ export default {
       </div>
     </div>
   </div>`,
-    { h: 944 },
+    { h: 1000 },
   ),
 };
