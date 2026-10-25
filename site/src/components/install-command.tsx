@@ -7,11 +7,11 @@ import { Check, Copy } from "lucide-react";
 export function InstallCommand({ command }: { command: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="flex items-center gap-2 rounded-md border border-border bg-card py-1.5 pl-4 pr-1.5">
+    <div className="flex w-fit max-w-full items-center gap-2 rounded-md border border-border bg-card py-1.5 pl-4 pr-1.5">
       <span className="select-none text-muted-foreground" aria-hidden="true">
         $
       </span>
-      <code className="min-w-0 flex-1 break-all font-num text-[13px] leading-5 text-foreground">
+      <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-num text-[13px] leading-5 text-foreground">
         {command}
       </code>
       <button

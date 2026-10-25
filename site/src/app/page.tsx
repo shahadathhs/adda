@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { ArchitectureDiagram } from "@/components/architecture-diagram";
 import { InstallCommand } from "@/components/install-command";
 import { Screen } from "@/components/screen";
 import { SITE } from "@/lib/site";
@@ -116,7 +117,7 @@ export default function Home() {
             no per-minute fees.
           </p>
         </div>
-        <div className="rise mt-8 max-w-3xl" style={{ animationDelay: "80ms" }}>
+        <div className="rise mt-8 w-fit max-w-full" style={{ animationDelay: "80ms" }}>
           <InstallCommand command={SITE.install} />
           <p className="mt-3 text-sm text-muted-foreground">
             On a Linux server with a domain pointing at it.{" "}
@@ -203,15 +204,7 @@ export default function Home() {
           <h2 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight">
             One small stack, nothing hidden.
           </h2>
-          <pre
-            aria-label="Diagram: OBS publishes RTMP to mediamtx, which asks the backend to authorise it; viewers watch HLS; the web app talks to the backend over REST and WebSocket; Postgres and Redis sit behind the backend."
-            className="mt-8 overflow-x-auto rounded-lg border border-border bg-card p-5 font-num text-[13px] leading-6 text-muted-foreground"
-          >{`OBS ──RTMP──▶ mediamtx ──auth webhook──▶ backend (FastAPI) ◀──▶ Postgres
-                 │                            │   ▲
-                 └──HLS──▶ viewers' browsers  │   └── Redis (fan-out, presence,
-                                              │        rate limits, poll tallies)
-                     web (Next.js) ◀──REST + WebSocket──┘
-                     Caddy: automatic HTTPS in front of everything`}</pre>
+          <ArchitectureDiagram />
           <div className="mt-8 grid gap-6 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
             {[
               [
@@ -275,14 +268,14 @@ export default function Home() {
       </section>
 
       <section className="border-t border-border">
-        <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
+        <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
           <h2 className="font-display text-3xl font-bold leading-tight tracking-tight">
             Your server. Your streams. Your chat.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
             A 2 GB server, a domain and ports 80, 443 and 1935 is all it needs.
           </p>
-          <div className="mt-7 text-left">
+          <div className="mt-7 flex justify-center text-left">
             <InstallCommand command={SITE.install} />
           </div>
           <div className="mt-6 flex justify-center gap-3">
