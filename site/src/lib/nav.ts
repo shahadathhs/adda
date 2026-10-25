@@ -11,6 +11,9 @@ export const DOCS_NAV: { label: string; items: { label: string; slug: string }[]
     label: "Guides",
     items: [
       { label: "Going live with OBS", slug: "guides/streaming" },
+      { label: "Uploading videos", slug: "guides/uploading-videos" },
+      { label: "Search and browsing", slug: "guides/finding-things" },
+      { label: "Your account", slug: "guides/your-account" },
       { label: "Chat and moderation", slug: "guides/chat-and-moderation" },
       { label: "Your channel page", slug: "guides/channel-page" },
       { label: "Administration", slug: "guides/admin" },

@@ -84,9 +84,9 @@ to the backend log.
 
 ## Web app (build time)
 
-| Variable                   | Default                 | Notes                                                     |
-| -------------------------- | ----------------------- | --------------------------------------------------------- |
-| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:7001` | The API address the browser calls                         |
-| `NEXT_PUBLIC_HLS_BASE_URL` | `http://localhost:8888` | The playback address the browser uses                     |
-| `NEXT_PUBLIC_SITE_URL`     | empty                   | Optional marketing site, linked from the footer and About |
-| `API_SSR_URL`              | `http://localhost:7001` | The API address the web server calls (server rendering)   |
+| Variable                   | Default                   | Notes                                                     |
+| -------------------------- | ------------------------- | --------------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:7001`   | The API address the browser calls                         |
+| `NEXT_PUBLIC_HLS_BASE_URL` | `http://localhost:8888`   | The playback address the browser uses                     |
+| `NEXT_PUBLIC_SITE_URL`     | `https://adda.vercel.app` | Optional marketing site, linked from the footer and About |
+| `API_SSR_URL`              | `http://localhost:7001`   | The API address the web server calls (server rendering)   |

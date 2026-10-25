@@ -25,6 +25,11 @@ a new tab.
 Short posts (500 characters) shown on your channel page. Pinned posts come first. Delete one
 from the same card.
 
+## Videos
+
+Your uploaded videos have their own tab in the studio and on your channel page. See
+[Uploading videos](/docs/guides/uploading-videos).
+
 ## Emotes
 
 **Studio → Emotes** lists your emotes. To add one, choose an image (PNG, GIF or WebP, up to 256

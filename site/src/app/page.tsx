@@ -43,6 +43,42 @@ const FEATURES = [
     src: "/screens/channel-profile.png",
     alt: "A channel profile with an about text, a link, an announcement and a list of followers.",
   },
+  {
+    eyebrow: "Videos",
+    title: "Upload a video. It plays as you made it.",
+    body: "Channel owners upload MP4, MOV or WebM files up to 4 GB from the studio. The file goes up in parts and resumes after a dropped connection, then the server checks it, moves the index to the front so playback starts at once, and takes a poster frame.",
+    points: [
+      "Public, unlisted or private, and editable at any time.",
+      "No transcoding: H.264, VP8, VP9 or AV1 plays directly, and anything else fails with a clear message.",
+      "Videos appear on the channel page, in a directory and in search.",
+    ],
+    src: "/screens/studio-videos.png",
+    alt: "The studio's Videos tab: a list of uploaded videos with their status and the upload card.",
+  },
+  {
+    eyebrow: "Find things",
+    title: "One search box, and a directory for everything.",
+    body: "Search suggests channels, videos and recordings as you type, live ones first. Live, Channels, Videos and Recordings each have their own page with filters, sorting and numbered pages that you can bookmark.",
+    points: [
+      "Arrow keys, Enter and Escape work in the search box.",
+      "Filters and the page number live in the address, so any view can be shared.",
+      "Private channels never appear anywhere.",
+    ],
+    src: "/screens/videos.png",
+    alt: "The video directory: a filter bar, a grid of video cards with durations, and page numbers.",
+  },
+  {
+    eyebrow: "Your account",
+    title: "A picture, a status, and chat on your terms.",
+    body: "Upload a profile picture, set a short status with an optional end time, and choose whether you chat under your name or as Anonymous. Notifications are per channel, and email is opt-in.",
+    points: [
+      "Anonymous hides your name from viewers, not from the moderators.",
+      "Change your password in the same place.",
+      "Signing out takes you back to the home page.",
+    ],
+    src: "/screens/settings.png",
+    alt: "The settings page: profile with a picture, a status card, chat identity and password.",
+  },
 ];
 
 const STATUS: [string, string][] = [
@@ -52,6 +88,11 @@ const STATUS: [string, string][] = [
   ["Anonymous chat that stays recorded against the account", "Built"],
   ["Follows, bell notifications, optional live emails", "Built"],
   ["Channel pages, announcements, recording comments", "Built"],
+  [
+    "Search, directories with filters and pages, video uploads (resumable, no transcoding)",
+    "Built",
+  ],
+  ["Profile pictures and statuses", "Built"],
   [
     "One-command install with automatic HTTPS",
     "Built; timed install on a clean server still to measure",
@@ -220,8 +261,8 @@ export default function Home() {
           <p className="mt-5 max-w-3xl text-sm leading-6 text-muted-foreground">
             Not in version 1: desktop or mobile apps, direct messages, several rooms per channel, a
             light theme, an admin web interface, transcoding or clips, and WebRTC playback. Playback
-            is HLS and recordings are not transcoded, so quality is what your encoder sends. The
-            full scope, with the reasoning, is in the{" "}
+            is HLS, and recordings and uploaded videos are not transcoded, so quality is what the
+            encoder or the uploader sends. The full scope, with the reasoning, is in the{" "}
             <a
               href={`${SITE.repo}/blob/dev/docs/SCOPE.md`}
               className="text-primary underline underline-offset-4"

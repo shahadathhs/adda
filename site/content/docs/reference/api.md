@@ -46,6 +46,34 @@ the server can send email). Guests send no token; they can read public data and 
 | `GET`  | `/api/streaming/communities/{id}/health` | owner, moderators | Viewers, uptime, codecs       |
 | `POST` | `/api/streaming/communities/{id}/stop`   | owner, moderators | Disconnect the encoder        |
 
+## Browse and search
+
+Public, paginated lists (`page`, `page_size` up to 48; the answer is
+`{ items, total, page, page_size }`). Private and suspended channels never appear.
+
+| Method | Path                                                      | Purpose                                                  |
+| ------ | --------------------------------------------------------- | -------------------------------------------------------- |
+| `GET`  | `/api/browse/channels?q=&status=all\|live\|offline&sort=` | Channels (`viewers`, `followers`, `newest`, `name`)      |
+| `GET`  | `/api/browse/videos?q=&channel=&sort=`                    | Videos (`newest`, `oldest`, `longest`, `largest`)        |
+| `GET`  | `/api/browse/recordings?q=&channel=&sort=`                | Recordings (`newest`, `oldest`, `largest`)               |
+| `GET`  | `/api/search?q=&limit=`                                   | A few channels, videos and recordings for the search box |
+
+## Videos
+
+| Method                 | Path                               | Who       | Purpose                                              |
+| ---------------------- | ---------------------------------- | --------- | ---------------------------------------------------- |
+| `POST`                 | `/api/communities/{id}/videos`     | owner     | Start an upload (title, filename, size)              |
+| `PUT`                  | `/api/videos/{id}/chunk?offset=`   | owner     | Send a part (at most 16 MB); a wrong offset is `409` |
+| `POST`                 | `/api/videos/{id}/complete`        | owner     | All parts sent: check and prepare the file           |
+| `GET`                  | `/api/communities/{id}/videos`     | anyone    | Public videos; the owner also sees the rest          |
+| `GET`/`PATCH`/`DELETE` | `/api/videos/{id}`                 | see below | Details, edit (owner), delete (owner)                |
+| `GET`                  | `/api/videos/{id}/file`, `/poster` | see below | The video (range requests work) and its poster       |
+
+Public and unlisted videos are open to anyone. Private videos, and videos that are not ready,
+are for the owner only; because a video element cannot send a header, `file` and `poster` also
+accept the owner's access token as `?token=`. Uploaded files are validated with ffprobe and are
+not transcoded.
+
 ## Recordings
 
 `GET /api/recordings?community_id=`, `GET /api/recordings/recent`, `GET /api/recordings/file?path=`
@@ -54,7 +82,8 @@ the server can send email). Guests send no token; they can read public data and 
 
 ## Account
 
-`GET /api/auth/me`, `PATCH /api/auth/me`, `PUT /api/me/identity-mode`, `GET /api/notifications`,
+`GET /api/auth/me`, `PATCH /api/auth/me`, `POST`/`DELETE /api/auth/me/avatar`,
+`PUT`/`DELETE /api/auth/me/status`, `PUT /api/me/identity-mode`, `GET /api/notifications`,
 `POST /api/notifications/read`, `GET`/`PUT /api/me/notification-prefs`.
 
 ## Health and metrics

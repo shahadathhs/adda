@@ -21,11 +21,23 @@ key is wrong: copy the address from **Studio → Setup** again.
 
 No. Playback is passthrough HLS, so viewers receive the quality your encoder sends. That keeps
 CPU use tiny. Choose a sane output in OBS (720p at 4 to 5 Mbps suits most audiences) and put a
-CDN in front of the HLS path for large audiences.
+CDN in front of the HLS path for large audiences. Recordings and uploaded videos are not
+transcoded either.
 
 ## How far behind the live stream is playback?
 
 A few seconds. It is HLS, not WebRTC. The Studio's Live tab shows the same delay viewers see.
+
+## Can viewers upload videos?
+
+No. Only the channel owner (and the server admin) can upload, from **Studio → Videos**. Uploads
+play as they were sent, so they need H.264, VP8, VP9 or AV1 video; see
+[Uploading videos](/docs/guides/uploading-videos).
+
+## An upload stopped halfway
+
+Open **Studio → Videos**. The video shows as paused; choose **Continue** and pick the same file,
+and it resumes from where the server stopped. Uploads nobody touches for 24 hours are removed.
 
 ## Do I need an email server?
 
